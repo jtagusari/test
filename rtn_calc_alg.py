@@ -1,5 +1,5 @@
 
-from qgis.PyQt.QtCore import QCoreApplication
+from qgis.PyQt.QtCore import (QCoreApplication, QT_TRANSLATE_NOOP)
 from qgis.core import (
   QgsProcessing,
   QgsVectorFileWriter,
@@ -10,7 +10,8 @@ from qgis.core import (
   QgsProcessingParameterBoolean,
   QgsProcessingParameterFeatureSource,
   QgsProcessingParameterNumber,
-  QgsProcessingParameterFeatureSink
+  QgsProcessingParameterFeatureSink,
+  QgsProcessingParameterFolderDestination
   )
 import asyncio
 import re
@@ -18,13 +19,14 @@ import tempfile
 import os
 import sys
 
+
 class rtn_calc_alg(QgsProcessingAlgorithm):
   PARAMETERS = {  
     "ROAD": {
       "crs_referrence": True, # this parameter is used as CRS referrence
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": "Road layer",
+        "description": QT_TRANSLATE_NOOP("rtn_calc_alg","Road layer"),
         "types": [QgsProcessing.TypeVectorLine]
       },
       "n_mdl":"roadGeomPath",
@@ -33,7 +35,7 @@ class rtn_calc_alg(QgsProcessingAlgorithm):
     "BUILDING": {
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": "Building layer",
+        "description": QT_TRANSLATE_NOOP("rtn_calc_alg","Building layer"),
         "types": [QgsProcessing.TypeVectorPolygon]
       },
       "n_mdl": "buildingGeomPath",
@@ -42,7 +44,7 @@ class rtn_calc_alg(QgsProcessingAlgorithm):
     "RECEIVER": {
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": "Receiver layer",
+        "description": QT_TRANSLATE_NOOP("rtn_calc_alg","Receiver layer"),
         "types": [QgsProcessing.TypeVectorPoint]
       },
       "n_mdl": "receiverGeomPath",
@@ -51,7 +53,7 @@ class rtn_calc_alg(QgsProcessingAlgorithm):
     "DEM": {
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": "DEM layer",
+        "description": QT_TRANSLATE_NOOP("rtn_calc_alg","DEM layer"),
         "types": [QgsProcessing.TypeVectorPoint],
         "optional": True
       },
@@ -61,7 +63,7 @@ class rtn_calc_alg(QgsProcessingAlgorithm):
     "GROUND_ABS": {
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": "Ground absorption layer",
+        "description": QT_TRANSLATE_NOOP("rtn_calc_alg","Ground absorption layer"),
         "types": [QgsProcessing.TypeVectorPolygon],
         "optional": True
       },
@@ -73,7 +75,7 @@ class rtn_calc_alg(QgsProcessingAlgorithm):
       "advanced": True,
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
-        "description": "Max distance between source and receiver (m)",
+        "description": QT_TRANSLATE_NOOP("rtn_calc_alg","Max distance between source and receiver (m)"),
         "type": QgsProcessingParameterNumber.Double,
         "minValue": 100.0, "defaultValue": 500.0, "maxValue": 1000.0
       },
@@ -83,7 +85,7 @@ class rtn_calc_alg(QgsProcessingAlgorithm):
       "advanced": True,
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
-        "description": "Max distance between source and reflection wall (m)",
+        "description": QT_TRANSLATE_NOOP("rtn_calc_alg","Max distance between source and reflection wall (m)"),
         "type": QgsProcessingParameterNumber.Double,
         "minValue": 0.0, "defaultValue": 100.0, "maxValue": 300.0
       },
@@ -93,9 +95,9 @@ class rtn_calc_alg(QgsProcessingAlgorithm):
       "advanced": True,
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
-        "description": "Max number of reflections (times)",
+        "description": QT_TRANSLATE_NOOP("rtn_calc_alg","Max number of reflections (times)"),
         "type": QgsProcessingParameterNumber.Integer,
-        "minValue": 0, "defaultValue": 3, "maxValue": 5
+        "minValue": 0, "defaultValue": 1, "maxValue": 5
       },
       "n_mdl": "confReflOrder"
     },
@@ -103,7 +105,7 @@ class rtn_calc_alg(QgsProcessingAlgorithm):
       "advanced": True,
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
-        "description": "Relative humidity (%)",
+        "description": QT_TRANSLATE_NOOP("rtn_calc_alg","Relative humidity (%)"),
         "type": QgsProcessingParameterNumber.Double,
         "minValue": 0.0, "defaultValue": 70.0, "maxValue": 100.0
       },
@@ -113,7 +115,7 @@ class rtn_calc_alg(QgsProcessingAlgorithm):
       "advanced": True,
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
-        "description": "Temperature (°C)",
+        "description": QT_TRANSLATE_NOOP("rtn_calc_alg","Temperature (°C)"),
         "type": QgsProcessingParameterNumber.Double,
         "minValue": -40.0, "defaultValue": 15.0, "maxValue": 50.0
       },
@@ -123,17 +125,17 @@ class rtn_calc_alg(QgsProcessingAlgorithm):
       "advanced": True,
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
-        "description": "Reflectance at wall (0: fully absorbent - 1: fully reflective)",
+        "description": QT_TRANSLATE_NOOP("rtn_calc_alg","Reflectance at wall (0: fully absorbent - 1: fully reflective)"),
         "type": QgsProcessingParameterNumber.Double,
         "minValue": 0.0, "defaultValue": 1.0, "maxValue": 1.0
       },
-      "n_mdl": "confWallAlpha"
+      "n_mdl": "paramWallAlpha"
     }, 
     "DIFF_VERTICAL": {
       "advanced": True,
       "ui_func": QgsProcessingParameterBoolean,
       "ui_args": {
-        "description": "Diffraction at vertical edge",
+        "description": QT_TRANSLATE_NOOP("rtn_calc_alg","Diffraction at vertical edge"),
         "defaultValue": False
       },
       "n_mdl": "confDiffVertical"
@@ -142,7 +144,7 @@ class rtn_calc_alg(QgsProcessingAlgorithm):
       "advanced": True,
       "ui_func": QgsProcessingParameterBoolean,
       "ui_args": {
-        "description": "Diffraction at horizontal edge",
+        "description": QT_TRANSLATE_NOOP("rtn_calc_alg","Diffraction at horizontal edge"),
         "defaultValue": True
       },
       "n_mdl": "confDiffHorizontal"
@@ -151,7 +153,7 @@ class rtn_calc_alg(QgsProcessingAlgorithm):
       "advanced": True,
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
-        "description": "Number of threads to calculate (0: all)",
+        "description": QT_TRANSLATE_NOOP("rtn_calc_alg","Number of threads to calculate (0: all)"),
         "type": QgsProcessingParameterNumber.Integer,
         "minValue": 0, "defaultValue": 0, "maxValue": 20
       },
@@ -161,7 +163,7 @@ class rtn_calc_alg(QgsProcessingAlgorithm):
   
   OUTPUT = {
     "OUTPUT": {
-      "ui_func": QgsProcessingParameterFeatureSink,
+      "ui_func": QgsProcessingParameterFolderDestination,
       "ui_args": {
         "description": "Output layer" 
       }
@@ -225,48 +227,7 @@ class rtn_calc_alg(QgsProcessingAlgorithm):
         elif value.get("ui_func") == QgsProcessingParameterBoolean:
           value_input = self.parameterAsInt(parameters, key, context)
         wps_args[value.get("n_mdl")] = value_input
-        
-    
-    # # save road layer      
-    # road = self.parameterAsVectorLayer(parameters, self.ROAD, context)
-    
-    # qctc = QgsCoordinateTransformContext()
-    # vw_options = QgsVectorFileWriter.SaveVectorOptions()
-    # vw_options.driverName = "GeoJSON"
-    
-    # wps_args[self.ROAD.lower()] = os.path.join(tempdir, self.ROAD)
-    # QgsVectorFileWriter.writeAsVectorFormatV2(
-    #   road, wps_args[self.ROAD.lower()], qctc, vw_options
-    # )
-    # wps_args[self.ROAD.lower()] = wps_args[self.ROAD.lower()] + ".geojson"
-    
-    # # save other layers
-    # for lname in [self.BUILDING, self.RECEIVER, self.DEM, self.GROUND_ABS]:  
-    #   vl = self.parameterAsVectorLayer(parameters, lname, context)
-    #   if vl != None:
-    #     if vl.sourceCrs() != road.sourceCrs():
-    #       sys.exit(self.tr("CRS is not the same!"))
-    #     else:
-    #       wps_args[lname.lower()] = os.path.join(tempdir, lname)
-    #       QgsVectorFileWriter.writeAsVectorFormatV2(
-    #         vl, wps_args[lname.lower()], qctc, vw_options
-    #       )
-    #       wps_args[lname.lower()] = wps_args[lname.lower()]+".geojson"
-    
-    # wps_args["paraWallAlpha"] = self.parameterAsDouble(parameters, self.REFLECTANCE, context)
-    # wps_args["confReflOrder"] = self.parameterAsInt(parameters, self.MAX_N_REFL, context)
-    # wps_args["confMaxSrcDist"] = self.parameterAsDouble(parameters, self.MAX_DIST_SRC, context)
-    # wps_args["confMaxReflDist"] = self.parameterAsDouble(parameters, self.MAX_DIST_REFL, context)
-    # wps_args["confThreadNumber"] = self.parameterAsInt(parameters, self.N_THREAD, context)
-    # wps_args["confDiffVertical"] = self.parameterAsInt(parameters, self.DIF_AT_VEDGE, context)
-    # wps_args["confDiffHorizontal"] = self.parameterAsInt(parameters, self.DIF_AT_HEDGE, context)
-    # wps_args["confHumidity"] = self.parameterAsDouble(parameters, self.HUMIDITY, context)
-    # wps_args["confTemperature"] = self.parameterAsDouble(parameters, self.TEMPERATURE, context)
-    
-    # (sink, dest_id) = self.parameterAsSink(
-    #   parameters, "OUTPUT",
-    #   context, road.fields(), road.wkbType(), road.sourceCrs()
-    #   )
+     
 
     args = "".join([" -" + k + " " + str(v) for k, v in wps_args.items()])
     
@@ -277,11 +238,24 @@ class rtn_calc_alg(QgsProcessingAlgorithm):
     feedback.pushCommandInfo(cmd)    
     
     loop = asyncio.ProactorEventLoop()      
-    # loop.run_until_complete(
-    #   self.calc_stream_with_progress(nm_path, cmd, feedback)
-    # )
-      
-    # return {self.OUTPUT: dest_id}
+    loop.run_until_complete(
+      self.calc_stream_with_progress(nm_path, cmd, feedback)
+    )
+    
+    geom_receiver = self.parameterAsVectorLayer(parameters, "RECEIVER", context)
+    geom_receiver.fields()
+    geom_receiver.dataProvider.delteAttributes([0])
+    geom_receiver.updateFields()
+    geom_receiver.fields() = geom_receiver.fields().field("PK").rename(0, "IDRECEIVER")
+    for noise_idx in ["LDAY","LEVENING", "LNIGHT", "LDEN"]:
+      geom = QgsVectorLayer(path = os.path.join(tempdir, noise_idx+"_GEOM.geojson"), baseName = noise_idx)
+      x=QgsVectorLayer(os.path.join(tempdir, "LDAY_GEOM.geojson"))
+      (sink, dest_id) = self.parameterAsSink(
+        parameters, "OUTPUT",
+        context, geom.fields(), geom.wkbType(), geom.sourceCrs()
+        )
+    
+    return {self.OUTPUT: dest_id}
 
   async def calc_stream_with_progress(self, nm_path, cmd, feedback):
     # set proc
@@ -301,7 +275,7 @@ class rtn_calc_alg(QgsProcessingAlgorithm):
       if stderr:
         feedback.pushInfo(stderr.replace("\n",""))
 
-      prg_match = re.search(r"Compute.*[0-9]+\.[0-9]+.*%", stderr)
+      prg_match = re.search(r".*[0-9]+\.[0-9]+.*%", stderr)
       if prg_match:                
         feedback.setProgress(
           int(float(re.search(r"[0-9]+\.[0-9]+", prg_match.group()).group()))

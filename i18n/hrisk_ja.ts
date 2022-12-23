@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="ja_JP" sourcelanguage="en">
+<!DOCTYPE TS><TS version="2.0" language="ja_JP" sourcelanguage="en_US">
 <context>
     <name>hrisk_provider</name>
     <message>
@@ -11,94 +11,99 @@
 <context>
     <name>rtn_calc_alg</name>
     <message>
-        <location filename="../rtn_calc_alg.py" line="35"/>
+        <location filename="../rtn_calc_alg.py" line="27"/>
         <source>Road layer</source>
-        <translation type="obsolete">道路レイヤー</translation>
+        <translation>道路レイヤー</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="80"/>
+        <location filename="../hrisk_provider.py" line="22"/>
         <source>Output layer</source>
         <translation type="obsolete">計算結果</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="329"/>
+        <location filename="../rtn_calc_alg.py" line="315"/>
         <source>rtn_calc_alg</source>
-        <translation type="unfinished">騒音レベルの計算</translation>
+        <translation>騒音レベルの計算</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="332"/>
+        <location filename="../rtn_calc_alg.py" line="318"/>
         <source>rtn</source>
-        <translation type="unfinished">自動車騒音</translation>
+        <translation>自動車騒音</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="43"/>
+        <location filename="../rtn_calc_alg.py" line="36"/>
         <source>Building layer</source>
-        <translation type="obsolete">建物レイヤー</translation>
+        <translation>建物レイヤー</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="51"/>
+        <location filename="../rtn_calc_alg.py" line="45"/>
         <source>Receiver layer</source>
-        <translation type="obsolete">計算点レイヤー</translation>
+        <translation>計算点レイヤー</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="60"/>
+        <location filename="../rtn_calc_alg.py" line="54"/>
         <source>DEM layer</source>
-        <translation type="obsolete">標高点（DEM）レイヤー</translation>
+        <translation>標高点（DEM）レイヤー</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="68"/>
+        <location filename="../rtn_calc_alg.py" line="64"/>
         <source>Ground absorption layer</source>
-        <translation type="obsolete">地表面吸音レイヤー</translation>
+        <translation>地表面吸音レイヤー</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="87"/>
+        <location filename="../rtn_calc_alg.py" line="76"/>
         <source>Max distance between source and receiver (m)</source>
-        <translation type="obsolete">音源から計算点の最大距離 (m)</translation>
+        <translation>音源から計算点の最大距離 (m)</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="99"/>
+        <location filename="../rtn_calc_alg.py" line="86"/>
         <source>Max distance between source and reflection wall (m)</source>
-        <translation type="obsolete">音源から反射面の最大距離 (m)</translation>
+        <translation>音源から反射面の最大距離 (m)</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="112"/>
+        <location filename="../rtn_calc_alg.py" line="96"/>
         <source>Max number of reflections (times)</source>
-        <translation type="obsolete">最大反射回数 (回)</translation>
+        <translation>最大反射回数 (回)</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="124"/>
+        <location filename="../rtn_calc_alg.py" line="126"/>
         <source>Reflectance at wall (0: fully absorbent - 1: fully reflective)</source>
-        <translation type="obsolete">壁面の反射率 (0: 完全吸音 -　1: 完全反射)</translation>
+        <translation>壁面の反射率 (0: 完全吸音 -　1: 完全反射)</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="135"/>
+        <location filename="../rtn_calc_alg.py" line="145"/>
         <source>Diffraction at horizontal edge</source>
-        <translation type="obsolete">水平エッジによる回折</translation>
+        <translation>水平エッジにおける回折</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="144"/>
+        <location filename="../rtn_calc_alg.py" line="136"/>
         <source>Diffraction at vertical edge</source>
-        <translation type="obsolete">垂直エッジによる回折</translation>
+        <translation>垂直エッジにおける回折</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="152"/>
+        <location filename="../rtn_calc_alg.py" line="106"/>
         <source>Relative humidity (%)</source>
-        <translation type="obsolete">相対湿度 ()</translation>
+        <translation>相対湿度 ()</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="164"/>
+        <location filename="../rtn_calc_alg.py" line="116"/>
         <source>Temperature (&#xb0;C)</source>
         <translation type="obsolete">気温 (°C)</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="176"/>
+        <location filename="../rtn_calc_alg.py" line="154"/>
         <source>Number of threads to calculate (0: all)</source>
-        <translation type="obsolete">計算スレッド数 (0: 全て)</translation>
+        <translation>計算スレッド数 (0: 全て)</translation>
     </message>
     <message>
-        <location filename="../rtn_calc_alg.py" line="262"/>
+        <location filename="../rtn_calc_alg.py" line="215"/>
         <source>CRS is not the same!</source>
         <translation>座標系が一致しません！</translation>
+    </message>
+    <message encoding="UTF-8">
+        <location filename="../rtn_calc_alg.py" line="116"/>
+        <source>Temperature (°C)</source>
+        <translation>気温 (°C)</translation>
     </message>
 </context>
 </TS>
