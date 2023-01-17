@@ -1,2 +1,8 @@
-SOURCES = hrisk_provider.py rtn_calc_alg.py
+SOURCES = \
+hrisk_provider.py \
+noisefromtraffic.py \
+fetchjageom.py receiverfacade.py \
+receiverregulargrid.py \
+receiverdelaunaygrid.py \
+isosurface.py
 TRANSLATIONS = i18n/hrisk_ja.ts

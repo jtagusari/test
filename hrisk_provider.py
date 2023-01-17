@@ -1,5 +1,10 @@
 from qgis.core import QgsProcessingProvider
-from .rtn_calc_alg import rtn_calc_alg
+from .noisefromtraffic import noisefromtraffic
+from .fetchjageom import fetchjageom
+from .receiverfacade import receiverfacade
+from .receiverregulargrid import receiverregulargrid
+from .receiverdelaunaygrid import receiverdelaunaygrid
+from .isosurface import isosurface
 
 
 class hrisk_provider(QgsProcessingProvider):
@@ -11,10 +16,15 @@ class hrisk_provider(QgsProcessingProvider):
         pass
 
     def loadAlgorithms(self):
-        self.addAlgorithm(rtn_calc_alg())
+        self.addAlgorithm(fetchjageom())
+        self.addAlgorithm(noisefromtraffic())
+        self.addAlgorithm(receiverfacade())
+        self.addAlgorithm(receiverregulargrid())
+        self.addAlgorithm(receiverdelaunaygrid())
+        self.addAlgorithm(isosurface())
 
     def id(self):
-        return 'H-RISK'
+        return 'hrisk'
 
     def name(self):
         return self.tr('H-RISK')

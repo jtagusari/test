@@ -9,6 +9,12 @@ title = 'Calculation of road traffic noise'
 description = 'Sound levels at receivers are calculated using information on road (including geometry and traffic conditions), buildings, etc.'
 
 inputs = [
+  projectId:[
+    name : "ID of the project",
+    title : "ID of the project",
+    description : "ID of the project",
+    type : String.class
+  ],
   roadGeomPath:[
     name : "Path of the road file",
     title : "Path of the road file",
@@ -304,7 +310,7 @@ def exec(Connection connection, input) {
 
   // export results
   for (tbl in ["LDAY_GEOM", "LEVENING_GEOM", "LNIGHT_GEOM", "LDEN_GEOM"]){
-    Path p_result = Paths.get(input["exportDir"]).resolve(Paths.get(tbl+".geojson"))
+    Path p_result = Paths.get(input["exportDir"]).resolve(Paths.get(input["projectId"] + tbl + ".geojson"))
     runScript(
       connection, 
       "noisemodelling/wps/Import_and_Export/Export_Table.groovy",
