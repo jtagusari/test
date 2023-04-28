@@ -1,8 +1,6 @@
 from qgis.PyQt.QtCore import QCoreApplication, QTranslator, QSettings
 from qgis.core import QgsApplication
-
 import os
-
 from .hrisk_provider import hrisk_provider
 
 

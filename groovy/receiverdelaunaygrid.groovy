@@ -28,6 +28,16 @@ inputs = [
     min        : 0, max: 1,
     type : String.class
   ],
+  inputSRID: [
+    name: 'Projection identifier',
+    title: 'Projection identifier',
+    description: 'Original projection identifier (also called SRID) of your table. It should be an EPSG code, a integer with 4 or 5 digits (ex: 3857 is Web Mercator projection). ' +
+            '</br>  All coordinates will be projected from the specified EPSG to WGS84 coordinates. ' +
+            '</br> This entry is optional because many formats already include the projection and you can also import files without geometry attributes.</br> ' +
+            '</br> <b> Default value : 4326 </b> ',
+    type: Integer.class,
+    min: 0, max: 1
+  ],
   maxPropDist : [
     name: 'Maximum Propagation Distance',
     title: 'Maximum Propagation Distance',
@@ -96,13 +106,13 @@ def runScript(connection, scriptFile, arguments) {
   }
 }
 
-def importAndGetTable(connection, filepath){
+def importAndGetTable(connection, pathFile, inputSRID){
   runScript(
     connection, 
     "noisemodelling/wps/Import_and_Export/Import_File.groovy", 
-    ["pathFile":filepath]
+    ["pathFile":pathFile, "inputSRID": inputSRID]
     )
-  File f = new File(filepath)
+  File f = new File(pathFile)
 	String bname = f.getName()
   return bname.substring(0,bname.lastIndexOf('.')).toUpperCase()
 }
@@ -110,19 +120,19 @@ def importAndGetTable(connection, filepath){
 def exec(Connection connection, input) {
 
   // set building table
-  String tableBuilding =  importAndGetTable(connection, input["buildingGeomPath"])
+  String tableBuilding =  importAndGetTable(connection, input["buildingGeomPath"], input["inputSRID"])
 
   // set source table
   String sourcesTableName = null
   if (input["sourceGeomPath"]) {
-    sourcesTableName = importAndGetTable(connection, input["sourceGeomPath"])
+    sourcesTableName = importAndGetTable(connection, input["sourceGeomPath"], input["inputSRID"])
   } 
   
 
   // set fance table
   String fenceTableName = null
   if (input["fenceGeomPath"]) {
-    fenceTableName = importAndGetTable(connection, input["fenceGeomPath"])
+    fenceTableName = importAndGetTable(connection, input["fenceGeomPath"], input["inputSRID"])
   } 
 
   // run calculation
@@ -134,7 +144,7 @@ def exec(Connection connection, input) {
       "roadWidth": input["roadWidth"],
       "maxArea": input["maxArea"],
       "height": input["height"],
-      "isoSurfaceInBuildings": input["isoSurfaceInBuildings"] == 1 ? 1 : null
+      "isoSurfaceInBuildings": input["isoSurfaceInBuildings"] == 1 ? true : null
     ].findAll{ it.value!=null }
 
   runScript(
@@ -142,8 +152,6 @@ def exec(Connection connection, input) {
     "noisemodelling/wps/Receivers/Delaunay_Grid.groovy",
     args
   )
-
-  // export results
 
   // export results
   for (tbl in ["RECEIVERS", "TRIANGLES"]){

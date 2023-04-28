@@ -5,27 +5,14 @@ import java.sql.Connection
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-title = 'Receiver at building facade'
-description = 'Geometry of receivers at building facade is obtained'
+title = 'Road emission from traffic'
+description = 'Road emission (LW) is obtained from the information on the traffic'
 
 inputs = [
-  buildingGeomPath:[
-    name : "Path of the building file",
-    title : "Path of the building file",
-    description : "Path of the building file",
-    type : String.class
-  ],
-  sourceGeomPath:[
-    name : "Path of the source file",
-    title : "Path of the source file",
-    description : "Path of the source file",
-    min        : 0, max: 1,
-    type : String.class
-  ],
-  fenceGeomPath:[
-    name : "Path of the fence file",
-    title : "Path of the fence file",
-    description : "Path of the fence file",
+  roadGeomPath:[
+    name : "Path of the road file",
+    title : "Path of the road file",
+    description : "Path of the road file",
     min        : 0, max: 1,
     type : String.class
   ],
@@ -38,21 +25,6 @@ inputs = [
             '</br> <b> Default value : 4326 </b> ',
     type: Integer.class,
     min: 0, max: 1
-  ],
-  delta: [
-    name       : 'Receivers minimal distance',
-    title      : 'Distance between receivers',
-    description: 'Distance between receivers in the Cartesian plane in meters',
-    min        : 0, max: 100,
-    type       : Double.class
-  ],
-  height: [
-    name       : 'height',
-    title      : 'height',
-    description: 'Height of receivers in meters (FLOAT)' +
-            '</br> </br> <b> Default value : 4 </b> ',
-    min        : 0, max: 10,
-    type       : Double.class
   ],
   exportDir : [
     name: "Path of export directory",
@@ -97,38 +69,22 @@ def importAndGetTable(connection, pathFile, inputSRID){
 def exec(Connection connection, input) {
 
   // set building table
-  String tableBuilding =  importAndGetTable(connection, input["buildingGeomPath"], input["inputSRID"])
+  String tableRoads =  importAndGetTable(connection, input["roadGeomPath"], input["inputSRID"])
 
-  // set source table
-  String sourcesTableName = null
-  if (input["sourceGeomPath"]) {
-    sourcesTableName = importAndGetTable(connection, input["sourceGeomPath"], input["inputSRID"])
-  } 
-  
-
-  // set fance table
-  String fenceTableName = null
-  if (input["fenceGeomPath"]) {
-    fenceTableName = importAndGetTable(connection, input["fenceGeomPath"], input["inputSRID"])
-  } 
 
   // run calculation
   Map args = [
-      "tableBuilding": tableBuilding, 
-      "sourcesTableName": sourcesTableName, 
-      "fenceTableName": fenceTableName, 
-      "delta": input["delta"],
-      "height": input["height"]
+      "tableRoads": tableRoads
     ].findAll{ it.value!=null }
 
   runScript(
     connection, 
-    "noisemodelling/wps/Receivers/Building_Grid.groovy",
+    "noisemodelling/wps/NoiseModelling/Road_Emission_from_Traffic.groovy",
     args
   )
 
   // export results
-  for (tbl in ["RECEIVERS"]){
+  for (tbl in ["LW_ROADS"]){
     Path p_result = Paths.get(input["exportDir"]).resolve(Paths.get(tbl + ".geojson"))
     runScript(
       connection, 
@@ -136,6 +92,5 @@ def exec(Connection connection, input) {
       ["exportPath": p_result, "tableToExport":tbl]
     )
   }
-
 }
 

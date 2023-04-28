@@ -1,22 +1,15 @@
-from qgis.PyQt.QtCore import (QCoreApplication, QT_TRANSLATE_NOOP, QVariant)
+from qgis.PyQt.QtCore import (QCoreApplication, QT_TRANSLATE_NOOP)
 from qgis.core import (
-  QgsProject,
-  QgsVectorLayer,
   QgsProcessing,
-  QgsProcessingAlgorithm,
-  QgsProcessingParameterDefinition, 
   QgsProcessingParameterFeatureSource,
   QgsProcessingParameterNumber,
-  QgsProcessingParameterFolderDestination,
-  QgsVectorFileWriter,
-  QgsCoordinateTransformContext
+  QgsProcessingParameterFeatureSink
   )
 
-import os
-import sys
-import asyncio
 
-class receiverfacade(QgsProcessingAlgorithm):
+from .receiverabstract import receiverabstract
+
+class receiverfacade(receiverabstract):
   PARAMETERS = { 
     "BUILDING": {
       "crs_referrence": True, # this parameter is used as CRS referrence
@@ -67,126 +60,35 @@ class receiverfacade(QgsProcessingAlgorithm):
       },
       "n_mdl": "height"
     },
-  }
-  
-  OUTPUT = {
-    "OUTPUT_DIRECTORY": {
-      "ui_func": QgsProcessingParameterFolderDestination,
+    "OUTPUT": {
+      "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("receiverfacade","Output directory" )
-      }
+        "description": QT_TRANSLATE_NOOP("receiverfacade","Receivers at facade" )
+      }     
     }
   }
   
-  RECEIVER_LAYER = None
-  OUTPUT_DIR     = None
-    
-  NoiseModelling_HOME = os.environ["NoiseModelling"]
-  NoiseModelling_SCRIPT = os.path.join(os.path.dirname(__file__), "groovy", "receiverfacade.groovy")
-  
-    
   def initAlgorithm(self, config):
-    for key, value in {**self.PARAMETERS, **self.OUTPUT}.items():
-      args = value.get("ui_args")
-      args["name"] = key
-      args["description"] = self.tr(args["description"])
-              
-      ui = value.get("ui_func")(**args)
-      
-      if value.get("advanced") != None and value.get("advanced") == True:
-        ui.setFlags(QgsProcessingParameterDefinition.FlagAdvanced)
-        
-      self.addParameter(ui)  
-  
+    self.initParameters()
 
   def processAlgorithm(self, parameters, context, feedback):
     
-    # folder where the files are saved
-    self.OUTPUT_DIR = os.path.normpath(self.parameterAsOutputLayer(parameters, "OUTPUT_DIRECTORY", context))
-    if not os.path.exists(self.OUTPUT_DIR):
-      os.mkdir(self.OUTPUT_DIR)
-              
-    receiver_geom_path = os.path.join(self.OUTPUT_DIR, "RECEIVER_FACADE.geojson")
-    # set arguments for wps
-    wps_args = {
-      "w": self.OUTPUT_DIR, 
-      "s": self.NoiseModelling_SCRIPT,
-      "exportPath": receiver_geom_path
-    }
+    self.initNoiseModelling("receiverfacade.groovy")
+    self.initWpsArgs(parameters, context, feedback)
     
-    # get CRS
-    crs_key = [key for key, value in self.PARAMETERS.items() if value.get("crs_referrence") != None and value.get("crs_referrence") == True]
-    crs_referrence = self.parameterAsVectorLayer(parameters, crs_key[0], context).sourceCrs()
-    
-    # define save function
-    def save_geom(vector_layer, path):
-      save_options = QgsVectorFileWriter.SaveVectorOptions()
-      save_options.driverName = "GeoJSON"
-      QgsVectorFileWriter.writeAsVectorFormatV3(
-        vector_layer, path, QgsCoordinateTransformContext(), save_options
-      )
-    
-    # get the value from each input, which are passed to groovy script
-    for key, value in self.PARAMETERS.items():
-      if value.get("n_mdl") != None:
-        if value.get("save_layer_get_path") != None and value.get("save_layer_get_path") == True:
-          geom = self.parameterAsVectorLayer(parameters, key, context)
-          if geom != None:
-            if geom.sourceCrs() != crs_referrence:
-              sys.exit(self.tr("CRS is not the same!"))
-            geom_path = os.path.join(self.OUTPUT_DIR, key + "_FACADE.geojson")
-            save_geom(geom, geom_path)
-            wps_args[value.get("n_mdl")] = geom_path
-        else:
-          if value.get("ui_func") == QgsProcessingParameterNumber:
-            if value.get("ui_args").get("type") == QgsProcessingParameterNumber.Integer:
-              value_input = self.parameterAsInt(parameters, key, context)
-            else:
-              value_input = self.parameterAsDouble(parameters, key, context)
-          wps_args[value.get("n_mdl")] = value_input
-    
-    # set the command to execute
-    cmd = os.path.join("bin","wps_scripts") + "".join([" -" + k + " " + str(v) for k, v in wps_args.items()])
-    feedback.pushCommandInfo(cmd)   
+    feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
     
     # execute groovy script using wps_scripts
-    loop = asyncio.ProactorEventLoop()      
-    loop.run_until_complete(
-      self.calc_stream(cmd, feedback)
-    )
+    self.execNoiseModelling(feedback)
     
-    self.RECEIVER_LAYER = QgsVectorLayer(receiver_geom_path, "receiver_facade")
+    # import the result    
+    dest_id_rcv = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT",self.NOISEMODELLING["RECEIVER_PATH"])
     
-    return {}
-  
-  async def calc_stream(self, cmd, feedback):
-    proc = await asyncio.create_subprocess_shell(
-      cmd,
-      stdout=asyncio.subprocess.PIPE,
-      stderr=asyncio.subprocess.PIPE,
-      cwd = self.NoiseModelling_HOME
-    )
-
-    while True:
-      if proc.stdout.at_eof() and proc.stderr.at_eof():
-        break  
-
-      stderr_raw = await proc.stderr.readline() # for debugging
-      stderr = stderr_raw.decode()
-      
-      if stderr:
-        feedback.pushInfo(stderr.replace("\n",""))
-        
+    return {"OUTPUT": dest_id_rcv}
 
   # Post processing; append layers
   def postProcessAlgorithm(self, context, feedback):
-    
-    if self.RECEIVER_LAYER != None:
-      QgsProject.instance().addMapLayer(self.RECEIVER_LAYER)
     return {}
-
-  def name(self):
-    return 'receiverfacade'
 
   def displayName(self):
     return self.tr("At building facade")
@@ -196,9 +98,6 @@ class receiverfacade(QgsProcessingAlgorithm):
 
   def groupId(self):
     return 'receiver'
-
-  def tr(self, string):
-    return QCoreApplication.translate(self.__class__.__name__, string)
 
   def createInstance(self):
     return receiverfacade()

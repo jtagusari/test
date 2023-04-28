@@ -1,45 +1,54 @@
-from qgis.PyQt.QtCore import (QCoreApplication, QT_TRANSLATE_NOOP, QVariant)
+from qgis.PyQt.QtCore import (
+  QT_TRANSLATE_NOOP
+  )
 from qgis.core import (
   QgsProject,
-  QgsVectorLayer,
   QgsProcessing,
-  QgsProcessingAlgorithm,
-  QgsProcessingParameterDefinition, 
   QgsProcessingParameterFeatureSource,
   QgsProcessingParameterNumber,
   QgsProcessingParameterString,
-  QgsProcessingParameterFolderDestination,
-  QgsVectorFileWriter,
-  QgsCoordinateTransformContext,
+  QgsProcessingParameterFeatureSink,
   QgsCategorizedSymbolRenderer,
   QgsRendererCategory,
   QgsFillSymbol,
-  edit,
-  QgsField
+  QgsProcessingParameterField,
+  QgsFeatureRequest,
+  QgsProcessingLayerPostProcessorInterface
   )
 
 from qgis import processing
+from .algabstract import algabstract
 
 import os
-import sys
 import re
 import asyncio
 
-class isosurface(QgsProcessingAlgorithm):
+class isosurface(algabstract):
   PARAMETERS = { 
     "LEVEL_RESULT": {
+      "crs_referrence": True, # this parameter is used as CRS referrence
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
         "description": QT_TRANSLATE_NOOP("isosurface","Sound-level results layer"),
         "types": [QgsProcessing.TypeVectorPoint]
       }
     },
-    "TRIANGLE": {
+    "LEVEL_RID": {
+      "ui_func": QgsProcessingParameterField,
+      "ui_args":{
+        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Field of Receiver ID in Level layer"),
+        "parentLayerParameterName": "LEVEL_RESULT",
+        "defaultValue": "IDRECEIVER"
+      }
+    },
+    "TRIANGLES": { # Note: the name "TRIANGLES" should not be changed
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
         "description": QT_TRANSLATE_NOOP("isosurface","Triangle layer"),
         "types": [QgsProcessing.TypeVectorPolygon]
-      }
+      },
+      "n_mdl": "triangleGeomPath",
+      "save_layer_get_path": True
     },
     "ISO_CLASS": {
       "ui_func": QgsProcessingParameterString,
@@ -58,213 +67,117 @@ class isosurface(QgsProcessingAlgorithm):
         "minValue": 0.0, "defaultValue": 1.0, "maxValue": 2.0
       },
       "n_mdl": "smoothCoefficient"
-    }
-  }
-  
-  OUTPUT = {
-    "OUTPUT_DIRECTORY": {
-      "ui_func": QgsProcessingParameterFolderDestination,
+    },
+    "OUTPUT": {
+      "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("isosurface","Output directory" )
+        "description": QT_TRANSLATE_NOOP("isosurface","Isosurface")
       }
     }
   }
-  
-  ISOSURFACE_LAYER = None
-  OUTPUT_DIR       = None
-    
-  NoiseModelling_HOME = os.environ["NoiseModelling"]
-  NoiseModelling_SCRIPT = os.path.join(os.path.dirname(__file__), "groovy", "isosurface.groovy")
-  
-    
-  def initAlgorithm(self, config):
-    for key, value in {**self.PARAMETERS, **self.OUTPUT}.items():
-      args = value.get("ui_args")
-      args["name"] = key
-      args["description"] = self.tr(args["description"])
-              
-      ui = value.get("ui_func")(**args)
-      
-      if value.get("advanced") != None and value.get("advanced") == True:
-        ui.setFlags(QgsProcessingParameterDefinition.FlagAdvanced)
         
-      self.addParameter(ui)  
-  
+  def initAlgorithm(self, config):
+    self.initParameters() 
 
-  def processAlgorithm(self, parameters, context, feedback):
+  def addPathNoiseModelling(self):
+    self.NOISEMODELLING["LEVEL_PATH"] = os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LEVEL_RESULT.geojson")
+    self.NOISEMODELLING["ISOSURFACE_PATH"] = os.path.join(self.NOISEMODELLING["TEMP_DIR"], "CONTOURING_NOISE_MAP.geojson")
     
+  def processAlgorithm(self, parameters, context, feedback):
     import ptvsd
     ptvsd.debug_this_thread()
     
-    # folder where the files are saved
-    self.OUTPUT_DIR = os.path.normpath(self.parameterAsOutputLayer(parameters, "OUTPUT_DIRECTORY", context))
-    if not os.path.exists(self.OUTPUT_DIR):
-      os.mkdir(self.OUTPUT_DIR)
-              
-    isosurface_geom_path = os.path.join(self.OUTPUT_DIR, "ISOSURFACE.geojson")
-    level_geom_path = os.path.join(self.OUTPUT_DIR, "LEVEL_ISOSURFACE.geojson")
-    triangle_geom_path = os.path.join(self.OUTPUT_DIR, "TRIANGLES.geojson")
+    self.initNoiseModelling("isosurface.groovy")
     
-    # spatial join level and receiver
-    level_with_pk = processing.run(
+    processing.run(
       "native:renametablefield",
       {
-        "INPUT": self.parameterAsVectorLayer(parameters, "LEVEL_RESULT", context),
-        "FIELD": "IDRECEIVER",
+        "INPUT": self.parameterAsSource(parameters, "LEVEL_RESULT", context).materialize(QgsFeatureRequest(), feedback),
+        "FIELD": self.parameterAsFields(parameters, "LEVEL_RID", context)[0],
         "NEW_NAME": "PK",
-        "OUTPUT": "memory:level_with_pk"
+        "OUTPUT": self.NOISEMODELLING["LEVEL_PATH"]
       }
-    )["OUTPUT"]
-    # self.parameterAsVectorLayer(parameters, "LEVEL_RESULT", context)
-    # with edit(level_with_pk):
-    #   level_with_pk.addAttribute(QgsField("PK", QVariant.Int))
-    #   level_with_pk.updateFields()
-    #   for fid, ft in enumerate(level_with_pk.getFeatures()):
-    #     ft["PK"] = fid
-    #     level_with_pk.updateFeature(ft)
-            
-    save_options = QgsVectorFileWriter.SaveVectorOptions()
-    save_options.driverName = "GeoJSON"
-    QgsVectorFileWriter.writeAsVectorFormatV3(
-      level_with_pk, level_geom_path, 
-      QgsCoordinateTransformContext(), save_options
     )
     
-    QgsVectorFileWriter.writeAsVectorFormatV3(
-      self.parameterAsVectorLayer(parameters, "TRIANGLE", context), triangle_geom_path, 
-      QgsCoordinateTransformContext(), save_options
-    )
+    self.initWpsArgs(parameters, context, feedback, {"resultGeomPath": self.NOISEMODELLING["LEVEL_PATH"]})
     
-    iso_class = self.parameterAsString(parameters, "ISO_CLASS", context)
-    smooth_coef = self.parameterAsDouble(parameters, "SMOOTH_COEF", context)
-    
-    # set arguments for wps
-    wps_args = {
-      "w": self.OUTPUT_DIR, 
-      "s": self.NoiseModelling_SCRIPT,
-      "exportPath": isosurface_geom_path,
-      "resultGeomPath": level_geom_path,
-      "triangleGeomPath": triangle_geom_path,
-      "isoClass": iso_class,
-      "smoothCoefficient": smooth_coef
-    }    
-    
-    # set the command to execute
-    cmd = os.path.join("bin","wps_scripts") + "".join([" -" + k + " " + str(v) for k, v in wps_args.items()])
-    feedback.pushCommandInfo(cmd)   
+    feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
     
     # execute groovy script using wps_scripts
-    loop = asyncio.ProactorEventLoop()      
-    loop.run_until_complete(
-      self.calc_stream(cmd, feedback)
-    )
+    self.execNoiseModelling(feedback)
     
-    self.ISOSURFACE_LAYER = QgsVectorLayer(isosurface_geom_path, "isosurface")
-        
-    return {}
-  
-  async def calc_stream(self, cmd, feedback):
-    proc = await asyncio.create_subprocess_shell(
-      cmd,
-      stdout=asyncio.subprocess.PIPE,
-      stderr=asyncio.subprocess.PIPE,
-      cwd = self.NoiseModelling_HOME
-    )
-
-    while True:
-      if proc.stdout.at_eof() and proc.stderr.at_eof():
-        break  
-
-      stderr_raw = await proc.stderr.readline() # for debugging
-      stderr = stderr_raw.decode()
-      
-      if stderr:
-        feedback.pushInfo(stderr.replace("\n",""))
-        
+    # import the result    
+    dest_id = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT", self.NOISEMODELLING["ISOSURFACE_PATH"])
+    
+    return {"OUTPUT": dest_id}          
 
   # Post processing; append layers
   def postProcessAlgorithm(self, context, feedback):    
-    if self.ISOSURFACE_LAYER != None:
-      
-      isocategory = {}
-      for ft in self.ISOSURFACE_LAYER.getFeatures():
-        if isocategory.get(ft["ISOLABEL"]) == None:
-          isovalue_list = [float(s) for s in re.findall(r"\d+\.*\d*", ft["ISOLABEL"])]
-          isovalue_mean = sum(isovalue_list) / len(isovalue_list)
-          (isolabel, isocolor) = self.getNoisemapLabelColor(isovalue_mean)
-          isocategory[ft["ISOLABEL"]] = {
-            "mean": isovalue_mean,
-            "color": isocolor,
-            "label": isolabel
-          }
-          
-      isosurface_renderer = QgsCategorizedSymbolRenderer("ISOLABEL")
-      for key, value in isocategory.items():
-        isosurface_renderer.addCategory(
-          QgsRendererCategory(
-            key, 
-            QgsFillSymbol.createSimple({"color":value.get("color")}), 
-            key
-          )
-        )
-          
-      self.ISOSURFACE_LAYER.setRenderer(isosurface_renderer)
-      self.ISOSURFACE_LAYER.triggerRepaint()
-
-      QgsProject.instance().addMapLayer(self.ISOSURFACE_LAYER)
-      
+    
+    isosurface_path = list(context.layersToLoadOnCompletion().keys())[0]
+    global isosurface_postprocessor
+    isosurface_postprocessor = isosurfacePostProcessor()    
+    context.layerToLoadOnCompletionDetails(isosurface_path).setPostProcessor(isosurface_postprocessor)
     return {}
 
-  def getNoisemapLabelColor(self, level):
-    if level < 35:
-      label = "< 35 dB"
-      color_rgb = "255,255,255,255"
-    elif level < 40:
-      label = "35 - 40 dB"
-      color_rgb = "160,186,191,255"
-    elif level < 45:
-      label = "40 - 45 dB"
-      color_rgb = "184,214,209,255"
-    elif level < 50:
-      label = "45 - 50 dB"
-      color_rgb = "206,228,204,255"
-    elif level < 55:
-      label = "50 - 55 dB"
-      color_rgb = "226,242,191,255"
-    elif level < 60:
-      label = "55 - 60 dB"
-      color_rgb = "243,198,131,255"
-    elif level < 65:
-      label = "60 - 65 dB"
-      color_rgb = "232,126,77,255"
-    elif level < 70:
-      label = "65 - 70 dB"
-      color_rgb = "205,70,62,255"
-    elif level < 75:
-      label = "70 - 75 dB"
-      color_rgb = "161,26,77,255"
-    elif level < 80:
-      label = "75 - 80 dB"
-      color_rgb = "117,8,92,255"
-    else:
-      label = "> 80 dB"
-      color_rgb = "67,10,74,255"
-    return label, color_rgb
   
-  def name(self):
-    return 'isosurface'
-
   def displayName(self):
     return self.tr("Isosurface")
 
   def group(self):
-    return self.tr('Noise prediction')
+    return self.tr('Noise prediction / evaluation')
 
   def groupId(self):
-    return 'noiseprediction'
-
-  def tr(self, string):
-    return QCoreApplication.translate(self.__class__.__name__, string)
+    return 'noisepredictionevaluation'
 
   def createInstance(self):
     return isosurface()
+
+
+class isosurfacePostProcessor (QgsProcessingLayerPostProcessorInterface):
+  
+  def postProcessLayer(self, layer, context, feedback):
+    
+    # find the vector layer
+    root = QgsProject.instance().layerTreeRoot()
+    vl = root.findLayer(layer.id())
+    
+    col_map = {
+      "< 35 dB":    {"lower": -999, "upper":  35, "color": "255,255,255, 100"},
+      "35 - 40 dB": {"lower":   35, "upper":  40, "color": "160,186,191, 100"},
+      "40 - 45 dB": {"lower":   40, "upper":  45, "color": "184,214,209, 100"},
+      "45 - 50 dB": {"lower":   45, "upper":  50, "color": "206,228,204, 100"},
+      "50 - 55 dB": {"lower":   50, "upper":  55, "color": "226,242,191, 100"},
+      "55 - 60 dB": {"lower":   55, "upper":  60, "color": "243,198,131, 100"},
+      "60 - 65 dB": {"lower":   60, "upper":  65, "color": "232,126, 77, 100"},
+      "65 - 70 dB": {"lower":   65, "upper":  70, "color": "205, 70, 62, 100"},
+      "70 - 75 dB": {"lower":   70, "upper":  75, "color": "161, 26, 77, 100"},
+      "75 - 80 dB": {"lower":   75, "upper":  80, "color": "117,  8, 92, 100"},
+      "> 80 dB":    {"lower":   80, "upper": 999, "color": " 67, 10, 74, 100"}
+    }
+    
+    col_dict = {}
+    for ft in layer.getFeatures():
+      if not ft["ISOLABEL"] in col_dict.keys():
+        isovalue_list = [float(s) for s in re.findall(r"\d+\.*\d*", ft["ISOLABEL"])]
+        if re.match(r"<", ft["ISOLABEL"]) != None:
+          isovalue_list.append(-999)
+        isovalue_mean = sum(isovalue_list) / len(isovalue_list)
+        for col_map_item in col_map.values():
+          if isovalue_mean >= col_map_item["lower"] and isovalue_mean < col_map_item["upper"]:
+            col_dict[ft["ISOLABEL"]] = col_map_item
+    
+    # set renderer
+    renderer = QgsCategorizedSymbolRenderer("ISOLABEL")
+                
+    # set symbols
+    for key, value in col_dict.items():
+      renderer.addCategory(
+        QgsRendererCategory(
+          key, QgsFillSymbol.createSimple({"color":value.get("color")}), key + " dB"
+        )
+      )
+    # apply renderer
+    vl.layer().setRenderer(renderer)
+    vl.layer().triggerRepaint()   
+    

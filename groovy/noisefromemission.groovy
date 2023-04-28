@@ -5,14 +5,14 @@ import java.sql.Connection
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-title = 'Calculation of road traffic noise'
-description = 'Sound levels at receivers are calculated using information on road (including geometry and traffic conditions), buildings, etc.'
+title = 'Calculation of (road traffic) noise from emission)'
+description = 'Sound levels at receivers are calculated using information on emission (including geometry and LW), buildings, etc.'
 
 inputs = [
   roadGeomPath:[
-    name : "Path of the road file",
-    title : "Path of the road file",
-    description : "Path of the road file",
+    name : "Path of the source file",
+    title : "Path of the source file",
+    description : "Path of the source file",
     type : String.class
   ],
   buildingGeomPath:[
@@ -40,7 +40,7 @@ inputs = [
     description : "Path of the ground absorption file",
     min        : 0, max: 1,
     type : String.class
-  ],
+  ],  
   inputSRID: [
     name: 'Projection identifier',
     title: 'Projection identifier',
@@ -266,7 +266,7 @@ def exec(Connection connection, input) {
   // run calculation
   Map args = [
       "tableBuilding": tableBuilding, 
-      "tableRoads": tableRoads, 
+      "tableSources": tableRoads, 
       "tableReceivers": tableReceivers,
       "tableDEM": tableDEM, 
       "tableGroundAbs": tableGroundAbs,
@@ -288,7 +288,7 @@ def exec(Connection connection, input) {
 
   runScript(
     connection, 
-    "noisemodelling/wps/NoiseModelling/Noise_level_from_traffic.groovy",
+    "noisemodelling/wps/NoiseModelling/Noise_level_from_source.groovy",
     args
   )
 

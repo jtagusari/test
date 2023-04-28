@@ -29,6 +29,16 @@ inputs = [
     description : "Path of the fence file",
     type : String.class
   ],
+  inputSRID: [
+    name: 'Projection identifier',
+    title: 'Projection identifier',
+    description: 'Original projection identifier (also called SRID) of your table. It should be an EPSG code, a integer with 4 or 5 digits (ex: 3857 is Web Mercator projection). ' +
+            '</br>  All coordinates will be projected from the specified EPSG to WGS84 coordinates. ' +
+            '</br> This entry is optional because many formats already include the projection and you can also import files without geometry attributes.</br> ' +
+            '</br> <b> Default value : 4326 </b> ',
+    type: Integer.class,
+    min: 0, max: 1
+  ],
   delta: [
     name       : 'Receivers minimal distance',
     title      : 'Distance between receivers',
@@ -44,10 +54,10 @@ inputs = [
     min        : 0, max: 10,
     type       : Double.class
   ],
-  exportPath : [
-    name: "Path of export",
-    title: "Path of export",
-    description: "Path of export",
+  exportDir : [
+    name: "Path of export directory",
+    title: "Path of export directory",
+    description: "Path of export directory",
     min        : 0, max: 1,
     type : String.class
   ]
@@ -73,13 +83,13 @@ def runScript(connection, scriptFile, arguments) {
   }
 }
 
-def importAndGetTable(connection, filepath){
+def importAndGetTable(connection, pathFile, inputSRID){
   runScript(
     connection, 
     "noisemodelling/wps/Import_and_Export/Import_File.groovy", 
-    ["pathFile":filepath]
+    ["pathFile":pathFile, "inputSRID": inputSRID]
     )
-  File f = new File(filepath)
+  File f = new File(pathFile)
 	String bname = f.getName()
   return bname.substring(0,bname.lastIndexOf('.')).toUpperCase()
 }
@@ -87,19 +97,19 @@ def importAndGetTable(connection, filepath){
 def exec(Connection connection, input) {
 
   // set building table
-  String tableBuilding =  importAndGetTable(connection, input["buildingGeomPath"])
+  String tableBuilding =  importAndGetTable(connection, input["buildingGeomPath"], input["inputSRID"])
 
   // set source table
   String sourcesTableName = null
   if (input["sourceGeomPath"]) {
-    sourcesTableName = importAndGetTable(connection, input["sourceGeomPath"])
+    sourcesTableName = importAndGetTable(connection, input["sourceGeomPath"], input["inputSRID"])
   } 
   
 
   // set fance table
   String fenceTableName = null
   if (input["fenceGeomPath"]) {
-    fenceTableName = importAndGetTable(connection, input["fenceGeomPath"])
+    fenceTableName = importAndGetTable(connection, input["fenceGeomPath"], input["inputSRID"])
   } 
 
   // run calculation
@@ -118,11 +128,13 @@ def exec(Connection connection, input) {
   )
 
   // export results
-  Path p_result = Paths.get(input["exportPath"])
-  runScript(
-    connection, 
-    "noisemodelling/wps/Import_and_Export/Export_Table.groovy",
-    ["exportPath": p_result, "tableToExport": "RECEIVERS"]
-  )
+  for (tbl in ["RECEIVERS"]){
+    Path p_result = Paths.get(input["exportDir"]).resolve(Paths.get(tbl + ".geojson"))
+    runScript(
+      connection, 
+      "noisemodelling/wps/Import_and_Export/Export_Table.groovy",
+      ["exportPath": p_result, "tableToExport":tbl]
+    )
+  }
 }
 

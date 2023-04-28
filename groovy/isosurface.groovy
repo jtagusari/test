@@ -37,10 +37,20 @@ inputs = [
     min: 0, max: 1,
     type: Double.class
   ],
-  exportPath : [
-    name: "Path of export",
-    title: "Path of export",
-    description: "Path of export",
+  inputSRID: [
+    name: 'Projection identifier',
+    title: 'Projection identifier',
+    description: 'Original projection identifier (also called SRID) of your table. It should be an EPSG code, a integer with 4 or 5 digits (ex: 3857 is Web Mercator projection). ' +
+            '</br>  All coordinates will be projected from the specified EPSG to WGS84 coordinates. ' +
+            '</br> This entry is optional because many formats already include the projection and you can also import files without geometry attributes.</br> ' +
+            '</br> <b> Default value : 4326 </b> ',
+    type: Integer.class,
+    min: 0, max: 1
+  ],
+  exportDir : [
+    name: "Path of export directory",
+    title: "Path of export directory",
+    description: "Path of export directory",
     min        : 0, max: 1,
     type : String.class
   ]
@@ -66,13 +76,13 @@ def runScript(connection, scriptFile, arguments) {
   }
 }
 
-def importAndGetTable(connection, filepath){
+def importAndGetTable(connection, pathFile, inputSRID){
   runScript(
     connection, 
     "noisemodelling/wps/Import_and_Export/Import_File.groovy", 
-    ["pathFile":filepath]
+    ["pathFile":pathFile, "inputSRID": inputSRID]
     )
-  File f = new File(filepath)
+  File f = new File(pathFile)
 	String bname = f.getName()
   return bname.substring(0,bname.lastIndexOf('.')).toUpperCase()
 }
@@ -80,8 +90,8 @@ def importAndGetTable(connection, filepath){
 def exec(Connection connection, input) {
 
   // set result table
-  String resultTable =  importAndGetTable(connection, input["resultGeomPath"])
-  String triangleTable =  importAndGetTable(connection, input["triangleGeomPath"])
+  String resultTable =  importAndGetTable(connection, input["resultGeomPath"], input["inputSRID"])
+  String triangleTable =  importAndGetTable(connection, input["triangleGeomPath"], input["inputSRID"])
 
   // run calculation
   Map args = [
@@ -95,13 +105,15 @@ def exec(Connection connection, input) {
     "noisemodelling/wps/Acoustic_Tools/Create_Isosurface.groovy",
     args
   )
-
+  
   // export results
-  Path p_result = Paths.get(input["exportPath"])
-  runScript(
-    connection, 
-    "noisemodelling/wps/Import_and_Export/Export_Table.groovy",
-    ["exportPath": p_result, "tableToExport": "CONTOURING_NOISE_MAP"]
-  )
+  for (tbl in ["CONTOURING_NOISE_MAP"]){
+    Path p_result = Paths.get(input["exportDir"]).resolve(Paths.get(tbl + ".geojson"))
+    runScript(
+      connection, 
+      "noisemodelling/wps/Import_and_Export/Export_Table.groovy",
+      ["exportPath": p_result, "tableToExport":tbl]
+    )
+  }
 }
 

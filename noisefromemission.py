@@ -15,13 +15,13 @@ from qgis.core import (
 import datetime
 from .noiseabstract import noiseabstract
 
-class noisefromtraffic(noiseabstract):
+class noisefromemission(noiseabstract):
   PARAMETERS = {
     "ROAD": {
       "crs_referrence": True, # this parameter is used as CRS referrence
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Road layer"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Road layer"),
         "types": [QgsProcessing.TypeVectorLine]
       },
       "n_mdl":"roadGeomPath",
@@ -30,7 +30,7 @@ class noisefromtraffic(noiseabstract):
     "BUILDING": {
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Building layer"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Building layer"),
         "types": [QgsProcessing.TypeVectorPolygon]
       },
       "n_mdl": "buildingGeomPath",
@@ -39,7 +39,7 @@ class noisefromtraffic(noiseabstract):
     "RECEIVER": {
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Receiver layer"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Receiver layer"),
         "types": [QgsProcessing.TypeVectorPoint]
       },
       "n_mdl": "receiverGeomPath",
@@ -48,7 +48,7 @@ class noisefromtraffic(noiseabstract):
     "DEM": {
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","DEM layer"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","DEM layer"),
         "types": [QgsProcessing.TypeVectorPoint],
         "optional": True
       },
@@ -58,7 +58,7 @@ class noisefromtraffic(noiseabstract):
     "GROUND_ABS": {
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Ground absorption layer"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Ground absorption layer"),
         "types": [QgsProcessing.TypeVectorPolygon],
         "optional": True
       },
@@ -70,7 +70,7 @@ class noisefromtraffic(noiseabstract):
       "advanced": True,
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Max distance between source and receiver (m)"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Max distance between source and receiver (m)"),
         "type": QgsProcessingParameterNumber.Double,
         "minValue": 100.0, "defaultValue": 200.0, "maxValue": 1000.0
       },
@@ -80,7 +80,7 @@ class noisefromtraffic(noiseabstract):
       "advanced": True,
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Max distance between source and reflection wall (m)"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Max distance between source and reflection wall (m)"),
         "type": QgsProcessingParameterNumber.Double,
         "minValue": 0.0, "defaultValue": 50.0, "maxValue": 300.0
       },
@@ -90,7 +90,7 @@ class noisefromtraffic(noiseabstract):
       "advanced": True,
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Max number of reflections (times)"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Max number of reflections (times)"),
         "type": QgsProcessingParameterNumber.Integer,
         "minValue": 0, "defaultValue": 1, "maxValue": 5
       },
@@ -100,7 +100,7 @@ class noisefromtraffic(noiseabstract):
       "advanced": True,
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Relative humidity (%)"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Relative humidity (%)"),
         "type": QgsProcessingParameterNumber.Double,
         "minValue": 0.0, "defaultValue": 70.0, "maxValue": 100.0
       },
@@ -110,7 +110,7 @@ class noisefromtraffic(noiseabstract):
       "advanced": True,
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Temperature (°C)"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Temperature (°C)"),
         "type": QgsProcessingParameterNumber.Double,
         "minValue": -40.0, "defaultValue": 15.0, "maxValue": 50.0
       },
@@ -120,7 +120,7 @@ class noisefromtraffic(noiseabstract):
       "advanced": True,
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Reflectance at wall (0: fully absorbent - 1: fully reflective)"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Reflectance at wall (0: fully absorbent - 1: fully reflective)"),
         "type": QgsProcessingParameterNumber.Double,
         "minValue": 0.0, "defaultValue": 1.0, "maxValue": 1.0
       },
@@ -130,7 +130,7 @@ class noisefromtraffic(noiseabstract):
       "advanced": True,
       "ui_func": QgsProcessingParameterBoolean,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Diffraction at vertical edge"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Diffraction at vertical edge"),
         "defaultValue": False
       },
       "n_mdl": "confDiffVertical"
@@ -139,7 +139,7 @@ class noisefromtraffic(noiseabstract):
       "advanced": True,
       "ui_func": QgsProcessingParameterBoolean,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Diffraction at horizontal edge"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Diffraction at horizontal edge"),
         "defaultValue": True
       },
       "n_mdl": "confDiffHorizontal"
@@ -148,7 +148,7 @@ class noisefromtraffic(noiseabstract):
       "advanced": True,
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Number of threads to calculate (0: all)"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Number of threads to calculate (0: all)"),
         "type": QgsProcessingParameterNumber.Integer,
         "minValue": 0, "defaultValue": 0, "maxValue": 20
       },
@@ -158,7 +158,7 @@ class noisefromtraffic(noiseabstract):
       "advanced": True,
       "ui_func": QgsProcessingParameterBoolean,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Estimate sound levels and health risks (only for facade receivers)"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Estimate sound levels and health risks (only for facade receivers)"),
         "defaultValue": True
       }
     },
@@ -166,14 +166,14 @@ class noisefromtraffic(noiseabstract):
       "advanced": True,
       "ui_func": QgsProcessingParameterBoolean,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Make isosurface (only for delaunay receivers and triangle layer is necessary)"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Make isosurface (only for delaunay receivers and triangle layer is necessary)"),
         "defaultValue": True
       }
     },
     "TRIANGLE": {
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Triangle layer"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Triangle layer"),
         "types": [QgsProcessing.TypeVectorPolygon],
         "optional": True
       }
@@ -182,7 +182,7 @@ class noisefromtraffic(noiseabstract):
       "advanced": True,
       "ui_func": QgsProcessingParameterString,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Separation of sound levels for isosurfaces (e.g. 35.0,40.0)"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Separation of sound levels for isosurfaces (e.g. 35.0,40.0)"),
         "defaultValue": "35.0,40.0,45.0,50.0,55.0,60.0,65.0,70.0,75.0,80.0,200.0",
         "multiLine": False
       }
@@ -199,42 +199,42 @@ class noisefromtraffic(noiseabstract):
     "WPS_ARGS": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Arguments for the calculation" )
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Arguments for the calculation" )
       },
       "visibleByDefault": False
     },    
     "LDEN": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Lden" )
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Lden" )
       },
       "visibleByDefault": True
     },    
     "LNIGHT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Lnight" )
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Lnight" )
       },
       "visibleByDefault": True
     },    
     "LDAY": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Lday" )
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Lday" )
       },
       "visibleByDefault": False
     },    
     "LEVENING": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Levening" )
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Levening" )
       },
       "visibleByDefault": False
     },    
     "BUILDING_WITH_LEVEL": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Building with facade level" )
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Building with facade level" )
       },
       "visibleByDefault": True
     }
@@ -249,7 +249,7 @@ class noisefromtraffic(noiseabstract):
     import ptvsd
     ptvsd.debug_this_thread()    
     
-    self.initNoiseModelling("noisefromtraffic.groovy")
+    self.initNoiseModelling("noisefromemission.groovy")
     self.initWpsArgs(parameters, context, feedback)
 
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
@@ -302,7 +302,7 @@ class noisefromtraffic(noiseabstract):
     return self.PROC_RESULTS
   
   def displayName(self):
-    return self.tr("Level from traffic")
+    return self.tr("Level from emission")
 
   def group(self):
     return self.tr("Noise prediction / evaluation")
@@ -311,5 +311,5 @@ class noisefromtraffic(noiseabstract):
     return "noisepredictionevaluation"
 
   def createInstance(self):
-    return noisefromtraffic()
+    return noisefromemission()
 
