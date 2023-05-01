@@ -81,12 +81,9 @@ class isosurface(algabstract):
 
   def addPathNoiseModelling(self):
     self.NOISEMODELLING["LEVEL_PATH"] = os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LEVEL_RESULT.geojson")
-    self.NOISEMODELLING["ISOSURFACE_PATH"] = os.path.join(self.NOISEMODELLING["TEMP_DIR"], "CONTOURING_NOISE_MAP.geojson")
+    self.NOISEMODELLING["ISOSURFACE_PATH"] = os.path.join(self.NOISEMODELLING["TEMP_DIR"], "CONTOURLNG_NOISE_MAP.geojson")
     
   def processAlgorithm(self, parameters, context, feedback):
-    import ptvsd
-    ptvsd.debug_this_thread()
-    
     self.initNoiseModelling("isosurface.groovy")
     
     processing.run(
@@ -104,7 +101,7 @@ class isosurface(algabstract):
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
     
     # execute groovy script using wps_scripts
-    self.execNoiseModelling(feedback)
+    self.execNoiseModelling(parameters, context, feedback))
     
     # import the result    
     dest_id = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT", self.NOISEMODELLING["ISOSURFACE_PATH"])

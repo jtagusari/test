@@ -12,7 +12,8 @@ from qgis.core import (
   QgsFeatureRequest,
   QgsProcessingParameterString,
   QgsProcessingParameterBoolean,
-  QgsCoordinateReferenceSystem
+  QgsCoordinateReferenceSystem,
+  QgsRasterFileWriter
   )
 
 import os
@@ -104,8 +105,19 @@ class algabstract(QgsProcessingAlgorithm):
       vector_layer, path, QgsCoordinateTransformContext(), save_options
     )
   
+  
+  # to save a raster layer
+  def saveRasterLayer(self, raster_layer, path):
+    file_writer = QgsRasterFileWriter(path)
+    file_writer.writeRaster(
+      raster_layer.pipe(), 
+      raster_layer.width(), raster_layer.height(),
+      raster_layer.dataProvider().extent(),
+      raster_layer.crs()
+      )
+  
   # execution of the NoiseModelling scrript
-  def execNoiseModelling(self, feedback):
+  def execNoiseModelling(self, parameters, context, feedback):
     loop = asyncio.ProactorEventLoop()      
     loop.run_until_complete(
       self.streamNoiseModelling(self.NOISEMODELLING["CMD"], feedback)
@@ -143,10 +155,6 @@ class algabstract(QgsProcessingAlgorithm):
         sink.addFeatures(layer.getFeatures())
           
     return dest_id
-
-  # Post processing; append layers
-  def postProcessAlgorithm(self, context, feedback):
-    return {}
 
   def name(self):
     return self.__class__.__name__

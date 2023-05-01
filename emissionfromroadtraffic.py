@@ -12,13 +12,13 @@ from qgis import processing
 import os
 from .algabstract import algabstract
 
-class sourceemissionfromroadtraffic(algabstract):
+class emissionfromroadtraffic(algabstract):
   PARAMETERS = {  
     "INPUT": {
       "crs_referrence": True, # this parameter is used as CRS referrence
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("sourceemissionfromroadtraffic","Road layer"),
+        "description": QT_TRANSLATE_NOOP("emissionfromroadtraffic","Road layer"),
         "types": [QgsProcessing.TypeVectorLine]
       },
       "n_mdl":"roadGeomPath",
@@ -27,7 +27,7 @@ class sourceemissionfromroadtraffic(algabstract):
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("sourceemissionfromroadtraffic","Road with LW" )
+        "description": QT_TRANSLATE_NOOP("emissionfromroadtraffic","Road with LW" )
       }
     }
   }
@@ -44,13 +44,13 @@ class sourceemissionfromroadtraffic(algabstract):
     import ptvsd
     ptvsd.debug_this_thread()
     
-    self.initNoiseModelling("sourceemissionfromroadtraffic.groovy")
+    self.initNoiseModelling("emissionfromroadtraffic.groovy")
     self.initWpsArgs(parameters,context,feedback)    
     
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
     
     # execute groovy script using wps_scripts
-    self.execNoiseModelling(feedback)
+    self.execNoiseModelling(parameters, context, feedback))
     
     # join to the source geom
     
@@ -105,4 +105,4 @@ class sourceemissionfromroadtraffic(algabstract):
     return "source"
 
   def createInstance(self):
-    return sourceemissionfromroadtraffic()
+    return emissionfromroadtraffic()

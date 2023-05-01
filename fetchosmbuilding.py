@@ -1,4 +1,4 @@
-from qgis.PyQt.QtCore import (QT_TRANSLATE_NOOP)
+from qgis.PyQt.QtCore import (QT_TRANSLATE_NOOP,QVariant)
 from qgis.core import (
   QgsCoordinateReferenceSystem,
   QgsProcessingParameterExtent,
@@ -12,25 +12,25 @@ from qgis import processing
 
 from .fetchabstract import fetchabstract
 
-class fetchosmroad(fetchabstract):
+class fetchosmbuilding(fetchabstract):
   
   PARAMETERS = {  
     "EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("fetchosmroad","Extent of the calculation area")
+        "description": QT_TRANSLATE_NOOP("fetchosmbuilding","Extent of the calculation area")
       }
     },
     "TARGET_CRS": {
       "ui_func": QgsProcessingParameterCrs,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchosmroad","Target CRS")
+        "description": QT_TRANSLATE_NOOP("fetchosmbuilding","Target CRS")
       }
     },
     "BUFFER": {
       "ui_func": QgsProcessingParameterDistance,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchosmroad","Buffer of the calculation area based on Target CRS"),
+        "description": QT_TRANSLATE_NOOP("fetchosmbuilding","Buffer of the calculation area based on Target CRS"),
         "defaultValue": 0.0,
         "parentParameterName": "TARGET_CRS"
       }
@@ -46,15 +46,15 @@ class fetchosmroad(fetchabstract):
     "OSM_KEY": {
       "ui_func": QgsProcessingParameterString,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchosmroad","Key of OpenStreetMap for roads. By default, 'highway'"),
-        "defaultValue": "highway",
+        "description": QT_TRANSLATE_NOOP("fetchosmbuilding","Key of OpenStreetMap for buildings. By default, 'building'"),
+        "defaultValue": "building",
         "optional": True
       }
     },
     "OSM_VALUE": {
       "ui_func": QgsProcessingParameterString,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchosmroad","Value of OpenStreetMap for roads. By default, '' (all values)"),
+        "description": QT_TRANSLATE_NOOP("fetchosmbuilding","Value of OpenStreetMap for buildings. By default, '' (all buildings)"),
         "defaultValue": "",
         "optional": True
       }
@@ -62,7 +62,7 @@ class fetchosmroad(fetchabstract):
     "OSM_TIMEOUT": {
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchosmroad","Value of OpenStreetMap for roads. By default, '' (all values)"),
+        "description": QT_TRANSLATE_NOOP("fetchosmbuilding","Value of OpenStreetMap for roads. By default, '' (all values)"),
         "type": QgsProcessingParameterNumber.Double,
         "defaultValue": 25,
         "optional": True
@@ -71,56 +71,53 @@ class fetchosmroad(fetchabstract):
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchosmroad","Output")
+        "description": QT_TRANSLATE_NOOP("fetchosmbuilding","Output")
       }
     }
   }
-  
+    
   def initAlgorithm(self, config):    
     self.initUsingCanvas()
     self.initParameters()
   
   def processAlgorithm(self, parameters, context, feedback):
-    self.setCalcArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:4326"))
-    self.setOsmMeta(parameters, context, feedback, geom_type="Linestring")
+    self.setCalcArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
+    self.setOsmMeta(parameters, context, feedback, geom_type="Polygon")
     
-    road_raw = self.fetchFeaturesFromOsm(context, feedback)
+    bldg_raw = self.fetchFeaturesFromOsm(context, feedback)
     
     # post processing if there are features
-    if road_raw is not None and road_raw.featureCount() > 0:
+    if bldg_raw is not None and bldg_raw.featureCount() > 0:
       
-      road_transformed = self.transformToTargetCrs(parameters,context,feedback,road_raw)
-      road_dissolve = self.dissolveFeatures(road_transformed)
-
-      # Set road traffic fields
-      road_final = processing.run(
-        "hrisk:initroad",{
-          "INPUT": road_dissolve,
+      bldg_transformed = self.transformToTargetCrs(parameters,context,feedback,bldg_raw)
+      bldg_dissolve = self.dissolveFeatures(bldg_transformed)
+      
+      bldg_final = processing.run(
+        "hrisk:initbuilding",{
+          "INPUT": bldg_dissolve,
           "OVERWRITE_MODE": 0,
           "OUTPUT": "TEMPORARY_OUTPUT"
         }
       )["OUTPUT"]
       
-      # set sink and add features with values
       (sink, dest_id) = self.parameterAsSink(
         parameters, "OUTPUT", context,
-        road_final.fields(), road_final.wkbType(), road_final.sourceCrs()
+        bldg_final.fields(), bldg_final.wkbType(), bldg_final.sourceCrs()
       )
       
-      sink.addFeatures(road_final.getFeatures())
-      
+      sink.addFeatures(bldg_final.getFeatures())
+            
     else:  
       # set sink and add features with values
       (sink, dest_id) = self.parameterAsSink(
         parameters, "OUTPUT", context,
-        road_raw.fields(), road_raw.wkbType(), road_raw.sourceCrs()
+        bldg_raw.fields(), bldg_raw.wkbType(), bldg_raw.sourceCrs()
       )
       
     return {"OUTPUT": dest_id}
-  
 
   def displayName(self):
-    return self.tr("Road centerlines")
+    return self.tr("Buildings")
 
   def group(self):
     return self.tr('Fetch geometries (OSM)')
@@ -129,4 +126,4 @@ class fetchosmroad(fetchabstract):
     return 'fetchosmgeometry'
 
   def createInstance(self):
-    return fetchosmroad()
+    return fetchosmbuilding()

@@ -104,11 +104,11 @@ class estimatelevelofbuilding(algabstract):
   def processAlgorithm(self, parameters, context, feedback):
     
     # initialize road layer (and data provider) to which vector features added
-    building = self.parameterAsSource(parameters, "BUILDING", context)
-    building_bid = self.parameterAsString(parameters, "BUILDING_BID", context)
+    bldg = self.parameterAsSource(parameters, "BUILDING", context)
+    bldg_bid = self.parameterAsString(parameters, "BUILDING_BID", context)
     
-    if not building_bid in building.fields().names():
-      sys.exit(self.tr("The following attribute does not exist in the building layer:") + building_bid)
+    if not bldg_bid in bldg.fields().names():
+      sys.exit(self.tr("The following attribute does not exist in the bldg layer:") + bldg_bid)
     
     receiver = self.parameterAsSource(parameters, "RECEIVER", context).materialize(QgsFeatureRequest(), feedback)
     receiver_bid = self.parameterAsFields(parameters, "RECEIVER_BID", context)[0]
@@ -145,11 +145,13 @@ class estimatelevelofbuilding(algabstract):
         "DISCARD_NONMATCHING": False,
         "PREFIX": level_prefix,
         "OUTPUT": "TEMPORARY_OUTPUT"
-      }
+      },
+      context = context,
+      feedback = feedback
     )["OUTPUT"]
       
     
-    # aggregate the level values for each building
+    # aggregate the level values for each bldg
     aggregates = [
       {
         "aggregate": "first_value", "input": receiver_bid, "name": receiver_bid,
@@ -177,15 +179,17 @@ class estimatelevelofbuilding(algabstract):
         "GROUP_BY": receiver_bid,
         "AGGREGATES": aggregates,
         "OUTPUT": "TEMPORARY_OUTPUT"
-      }
+      },
+      context = context,
+      feedback = feedback
     )["OUTPUT"]
     
     # finally the aggregated values are joined
     building_joined = processing.run(
       "native:joinattributestable",
       {
-        "INPUT": building.materialize(QgsFeatureRequest(), feedback),
-        "FIELD": building_bid,
+        "INPUT": bldg.materialize(QgsFeatureRequest(), feedback),
+        "FIELD": bldg_bid,
         "INPUT_2": receiver_aggregate,
         "FIELD_2": receiver_bid,
         "FIELDS_TO_COPY": summarized_field,
@@ -193,7 +197,9 @@ class estimatelevelofbuilding(algabstract):
         "DISCARD_NONMATCHING": False,
         "PREFIX": None,
         "OUTPUT": "TEMPORARY_OUTPUT"
-      }
+      },
+      context = context,
+      feedback = feedback
     )["OUTPUT"]
         
     # define the feature sink
@@ -206,9 +212,6 @@ class estimatelevelofbuilding(algabstract):
           
     return {"OUTPUT": dest_id}
   
-  # Post processing; append layers
-  def postProcessAlgorithm(self, context, feedback):
-    return {}
 
   def displayName(self):
     return self.tr("Assign levels to buildings")

@@ -9,7 +9,8 @@ from qgis.core import (
   QgsFeatureRequest,
   QgsProcessingParameterField,
   QgsFeature,
-  QgsField
+  QgsField,
+  QgsProcessingParameterNumber
   )
 
 import sys
@@ -45,6 +46,30 @@ class estimateriskofbuilding(algabstract):
         "parentLayerParameterName": "BUILDING"
       }
     },
+    "BASERISK_IHD_INC": {
+      "ui_func": QgsProcessingParameterNumber,
+      "ui_args":{
+        "description": QT_TRANSLATE_NOOP("estimateriskofbuilding","Base-line risk of IHD incident, per 100000"),
+        "type": QgsProcessingParameterNumber.Double,
+        "defaultValue": 0.0
+      }
+    },
+    "BASERISK_IHD_PRV": {
+      "ui_func": QgsProcessingParameterNumber,
+      "ui_args":{
+        "description": QT_TRANSLATE_NOOP("estimateriskofbuilding","Base-line risk of IHD prevalence, per 100000"),
+        "type": QgsProcessingParameterNumber.Double,
+        "defaultValue": 1282000.0 / 126227000.0 * 100000 # from Patients survey 2020 and National Census 2020
+      }
+    },
+    "BASERISK_IHD_DEATH": {
+      "ui_func": QgsProcessingParameterNumber,
+      "ui_args":{
+        "description": QT_TRANSLATE_NOOP("estimateriskofbuilding","Base-line risk of IHD death, per 100000"),
+        "type": QgsProcessingParameterNumber.Double,
+        "defaultValue": 129.2012 # from WHO-GHE 2019
+      }
+    },
     "OVERWRITE": {
       "ui_func": QgsProcessingParameterBoolean,
       "ui_args":{
@@ -73,23 +98,28 @@ class estimateriskofbuilding(algabstract):
       "type": QVariant.Double,
       "formula": "ft_new['probHSD'] * ft['POP'] if ft['POP'] != None else 0"
       },
-    "riskPatientIHDJa": {
+    "riskPatientIHD": {
       "type": QVariant.Double,
-      "formula": "ft_new['relRiskIHD'] * 1282000.0 / 126227000.0" # from Patients survey 2020 and National Census 2020
+      "formula": "ft_new['relRiskIHD'] * {BASERISK_IHD_INC}" 
       },
-    "nPatientIHDJa": {
+    "nPatientIHD": {
       "type": QVariant.Double,
-      "formula": "ft_new['relRiskIHD'] * 1282000.0 / 126227000.0 * ft['POP'] if ft['POP'] != None else 0" # from Patients survey 2020 and National Census 2020
+      "formula": "ft_new['relRiskIHD'] * {BASERISK_IHD_INC} * ft['POP'] if ft['POP'] != None else 0" 
       },
-    "riskDeathIHDJa": {
+    "riskDeathIHD": {
       "type": QVariant.Double,
-      "formula": "ft_new['relRiskIHD'] * 129.2012 / 100000.0" # from WHO-GHE 2019
+      "formula": "ft_new['relRiskIHD'] * {BASERISK_IHD_DEATH}" 
       },
-    "nDeathIHDJa": {
+    "nDeathIHD": {
       "type": QVariant.Double,
-      "formula": "ft_new['relRiskIHD'] * 129.2012 / 100000.0 * ft['POP'] if ft['POP'] != None else 0" # from WHO-GHE 2019
+      "formula": "ft_new['relRiskIHD'] * {BASERISK_IHD_DEATH} * ft['POP'] if ft['POP'] != None else 0"
       },
   }
+  
+  def initFormula(self, parameters, context, feedback):
+    for key, value in self.FIELDS_ROAD.items():
+      self.FIELDS_ROAD[key]["formula"] = value["formula"].replace("{BASERISK_IHD_INC}", str(self.parameterAsDouble(parameters, "BASERISK_IHD_INC", context) / 100000.0))
+      self.FIELDS_ROAD[key]["formula"] = value["formula"].replace("{BASERISK_IHD_DEATH}", str(self.parameterAsDouble(parameters, "BASERISK_IHD_DEATH", context) / 100000.0))
   
   def initAlgorithm(self, config):
     self.initParameters()
@@ -100,6 +130,7 @@ class estimateriskofbuilding(algabstract):
     field_Lden = self.parameterAsFields(parameters, "LDEN", context)[0]
     field_Lnight = self.parameterAsFields(parameters, "LNIGHT", context)[0]
     field_pop = self.parameterAsFields(parameters, "POP", context)[0]
+    self.initFormula(parameters, context, feedback)
     
     for existing_field_name in bldg_fields.names():
       if existing_field_name.lower() in map(lambda x: x.lower(), self.FIELDS_ROAD.keys()):
@@ -137,9 +168,6 @@ class estimateriskofbuilding(algabstract):
           
     return {"OUTPUT": dest_id}
   
-  # Post processing; append layers
-  def postProcessAlgorithm(self, context, feedback):
-    return {}
 
   def displayName(self):
     return self.tr("Estimate health risk of buildings")

@@ -5,6 +5,8 @@ from qgis.core import (
   QgsProcessingParameterDistance,
   QgsProcessingParameterFeatureSink,
   QgsProcessingParameterCrs, 
+  QgsProcessingParameterString,
+  QgsProcessingParameterNumber,
   QgsField,
   QgsFeature
   )
@@ -14,6 +16,7 @@ from .fetchabstract import fetchabstract
 
 class fetchjabuilding(fetchabstract):
   
+  # UIs
   PARAMETERS = {  
     "EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
@@ -35,6 +38,31 @@ class fetchjabuilding(fetchabstract):
         "parentParameterName": "TARGET_CRS"
       }
     },
+    "MAPTILE_URL": {
+      "ui_func": QgsProcessingParameterString,
+      "advanced": True,
+      "ui_args": {
+        "description": QT_TRANSLATE_NOOP("fetchjabuilding","URL of the vector map tile"),
+        "defaultValue": "https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf|layername=building|geometrytype=Polygon"
+      }
+    },
+    "MAPTILE_CRS": {
+      "ui_func": QgsProcessingParameterCrs,
+      "advanced": True,
+      "ui_args": {
+        "description": QT_TRANSLATE_NOOP("fetchjabuilding","CRS of the vector map tile"),
+        "defaultValue": QgsCoordinateReferenceSystem("EPSG:3857")
+      }
+    },
+    "MAPTILE_ZOOM": {
+      "ui_func": QgsProcessingParameterNumber,
+      "advanced": True,
+      "ui_args": {
+        "description": QT_TRANSLATE_NOOP("fetchjabuilding","Zoom level of the vector map tile"),
+        "type": QgsProcessingParameterNumber.Integer,
+        "defaultValue": 16
+      }
+    },
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
@@ -43,48 +71,46 @@ class fetchjabuilding(fetchabstract):
     }
   }  
   
-  DEFAULT_BUILDING_HEIGHT = 6.0
-    
+  # initialization of the algorithm
   def initAlgorithm(self, config):    
     self.initUsingCanvas()
     self.initParameters()
     
-    
-  def modifyFeaturesFromTile(self, fts, z, tx, ty):
-    
+  
+  # modification of the feature obtained from the map tile
+  def modifyFeaturesFromTile(self, fts, z, tx, ty):    
+    # constants
     EQUATOR_M = 40075016.68557849
     N_PIXELS_IN_GSI_VTILE = 4096
-  
     n_pixels_all = N_PIXELS_IN_GSI_VTILE * 2 ** z
     meter_per_tile  = EQUATOR_M / 2 ** z
     meter_per_pixel = EQUATOR_M / n_pixels_all
     
     # affine transformation to obtain x and y for a given CRS
     affine_parameters = {        
-        "INPUT": fts,
-        "DELTA_X":    tx    * meter_per_tile - EQUATOR_M / 2,
-        "DELTA_Y": - (ty+1) * meter_per_tile + EQUATOR_M / 2,
-        "SCALE_X": meter_per_pixel,
-        "SCALE_Y": meter_per_pixel,
-        "OUTPUT": "TEMPORARY_OUTPUT"
+      "INPUT": fts,
+      "DELTA_X":    tx    * meter_per_tile - EQUATOR_M / 2,
+      "DELTA_Y": - (ty+1) * meter_per_tile + EQUATOR_M / 2,
+      "SCALE_X": meter_per_pixel,
+      "SCALE_Y": meter_per_pixel,
+      "OUTPUT": "TEMPORARY_OUTPUT"
     }        
     fts_modified = processing.run("native:affinetransform", affine_parameters)["OUTPUT"]
     return(fts_modified)
         
-  def processAlgorithm(self, parameters, context, feedback):
+  # execution of the algorithm
+  def processAlgorithm(self, parameters, context, feedback):    
         
     self.setCalcArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
-    self.setMapTileMeta(
-      "https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf|layername=building|geometrytype=Polygon",
-      QgsCoordinateReferenceSystem("EPSG:3857"),
-      "Polygon", 16
-    )
+    self.setMapTileMeta(parameters, context, feedback, "Polygon")
     
-    bldg_raw = self.fetchFeaturesFromTile()
+    # fetch the data from vector map tile
+    bldg_raw = self.fetchFeaturesFromTile(parameters, context, feedback)
     
     # post processing if there are any features
     if bldg_raw.featureCount() > 0:
       
+      # transform
       bldg_transformed = self.transformToTargetCrs(parameters,context,feedback,bldg_raw)
       
       # snap geometry
@@ -99,30 +125,25 @@ class fetchjabuilding(fetchabstract):
         }
       )["OUTPUT"]
       
+      # dissolve
       bldg_dissolve = self.dissolveFeatures(bldg_snap)
-      
-      
-      # substitute self constant with the fetched vector layer
-      bldg_final = bldg_dissolve
-      
-      # add fields and values
-      bldg_fields = bldg_final.fields()
-      bldg_fields.append(QgsField("PK", QVariant.Int))
-      bldg_fields.append(QgsField("height", QVariant.Double))
+            
+      bldg_final = processing.run(
+        "hrisk:initbuilding",{
+          "INPUT": bldg_dissolve,
+          "OVERWRITE_MODE": 0,
+          "OUTPUT": "TEMPORARY_OUTPUT"
+        }
+      )["OUTPUT"]
       
       (sink, dest_id) = self.parameterAsSink(
         parameters, "OUTPUT", context,
-        bldg_fields, bldg_final.wkbType(), bldg_final.sourceCrs()
+        bldg_final.fields(), bldg_final.wkbType(), bldg_final.sourceCrs()
       )
       
-      for fid, ft in enumerate(bldg_final.getFeatures(), start = 1):
-        new_ft = QgsFeature(bldg_fields)
-        new_ft.setGeometry(ft.geometry())
-        for fld in ft.fields().names():
-          new_ft[fld] = ft[fld]
-        new_ft["PK"] = fid
-        new_ft["height"] = self.DEFAULT_BUILDING_HEIGHT
-        sink.addFeature(new_ft)
+      sink.addFeatures(bldg_final.getFeatures())
+      
+      return {"OUTPUT": dest_id}
       
     else:  
       # set sink and add features with values

@@ -17,7 +17,7 @@ class jameshpop(object):
   ESTAT_ID_MESH_FILE = os.path.join(os.path.dirname(__file__),"estatId_mesh_list.txt")
   ESTAT_ID_MESH_DICT = None
   
-  ESTAT_API_URI = "https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData"   
+  ESTAT_API_URL = "https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData"   
   ESTAT_API_PARAMS = {
     "appId": "b877fd89560ce21475681dba1a6681dd6426cbc3",
     "statsDataId": "",
@@ -95,7 +95,7 @@ class jameshpop(object):
     for mesh5_list_short in [mesh5_list[i:i+size] for i in range(0, len(mesh5_list), size)]:
       params_estat["cdArea"] = ",".join(mesh5_list_short)
 
-      req = urllib.request.Request(f"{self.ESTAT_API_URI}?{urllib.parse.urlencode(params_estat)}")
+      req = urllib.request.Request(f"{self.ESTAT_API_URL}?{urllib.parse.urlencode(params_estat)}")
       # with urllib.request.urlopen(req) as res:
       body = json.load(urllib.request.urlopen(req))
       if body.get("GET_STATS_DATA", {}).get("STATISTICAL_DATA", {}).get("DATA_INF") != None:

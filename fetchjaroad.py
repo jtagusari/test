@@ -4,7 +4,9 @@ from qgis.core import (
   QgsProcessingParameterExtent,
   QgsProcessingParameterCrs,
   QgsProcessingParameterDistance,
-  QgsProcessingParameterFeatureSink
+  QgsProcessingParameterFeatureSink,
+  QgsProcessingParameterString,
+  QgsProcessingParameterNumber
   )
 from qgis import processing
 
@@ -14,6 +16,7 @@ import re
 
 class fetchjaroad(fetchabstract):
   
+  # UIs
   PARAMETERS = {  
     "EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
@@ -35,6 +38,31 @@ class fetchjaroad(fetchabstract):
         "parentParameterName": "TARGET_CRS"
       }
     },
+    "MAPTILE_URL": {
+      "ui_func": QgsProcessingParameterString,
+      "advanced": True,
+      "ui_args": {
+        "description": QT_TRANSLATE_NOOP("fetchjaroad","URL of the vector map tile"),
+        "defaultValue": "https://cyberjapandata.gsi.go.jp/xyz/experimental_rdcl/{z}/{x}/{y}.geojson"
+      }
+    },
+    "MAPTILE_CRS": {
+      "ui_func": QgsProcessingParameterCrs,
+      "advanced": True,
+      "ui_args": {
+        "description": QT_TRANSLATE_NOOP("fetchjaroad","CRS of the vector map tile"),
+        "defaultValue": QgsCoordinateReferenceSystem("EPSG:6668")
+      }
+    },
+    "MAPTILE_ZOOM": {
+      "ui_func": QgsProcessingParameterNumber,
+      "advanced": True,
+      "ui_args": {
+        "description": QT_TRANSLATE_NOOP("fetchjaroad","Zoom level of the vector map tile"),
+        "type": QgsProcessingParameterNumber.Integer,
+        "defaultValue": 16
+      }
+    },
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
@@ -42,56 +70,43 @@ class fetchjaroad(fetchabstract):
       }
     }
   }
-  DEFAULT_SPD = {
-    "LV_D": 60,
-    "LV_E": 60,
-    "LV_N": 60,
-    "HV_D": 60,
-    "HV_E": 60,
-    "HV_N": 60
-  }
-  DEFEALT_PVMT = "DEF" # reference, without correction
-    
-    
   
+  # initialization of the algorithm
   def initAlgorithm(self, config):    
     self.initUsingCanvas()
     self.initParameters()
   
+  # execution of the algorithm
   def processAlgorithm(self, parameters, context, feedback):
-    self.setCalcArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
-    self.setMapTileMeta(
-      "https://cyberjapandata.gsi.go.jp/xyz/experimental_rdcl/{z}/{x}/{y}.geojson",
-      QgsCoordinateReferenceSystem("EPSG:6668"),
-      "Linestring", 16
-    )
+    self.setCalcArea(parameters, context, feedback, QgsCoordinateReferenceSystem("EPSG:6668"))
+    self.setMapTileMeta(parameters, context, feedback, "Linestring")
     
-    road_raw = self.fetchFeaturesFromTile()
+    # fetch the data from vector map tile
+    road_raw = self.fetchFeaturesFromTile(parameters, context, feedback)
     
     # post processing if there are features
-    if road_raw is not None and road_raw.featureCount() > 0:
+    if road_raw.featureCount() > 0:
       
+      # transform and dissolve
       road_transformed = self.transformToTargetCrs(parameters,context,feedback,road_raw)
       road_dissolve = self.dissolveFeatures(road_transformed)
 
-      # Set road traffic fields
-      road_with_fields = processing.run(
-        "hrisk:sourceroadtrafficfield",
-        {
+      road_final = processing.run(
+        "hrisk:initroad",{
           "INPUT": road_dissolve,
+          "OVERWRITE_MODE": 0,
           "OUTPUT": "TEMPORARY_OUTPUT"
         }
       )["OUTPUT"]
       
-      road_layer_final = road_with_fields
-      
       # set sink and add features with values
       (sink, dest_id) = self.parameterAsSink(
         parameters, "OUTPUT", context,
-        road_layer_final.fields(), road_layer_final.wkbType(), road_layer_final.sourceCrs()
+        road_final.fields(), road_final.wkbType(), road_final.sourceCrs()
       )
       
-      for ft in road_layer_final.getFeatures():
+      # set attributes values
+      for ft in road_final.getFeatures():
         (lv_d, hv_d, lv_e, hv_e, lv_n, hv_n) = self.cmptDefaultTrafficVolumeJa(ft)
         ft["lv_d"] = lv_d
         ft["hv_d"] = hv_d
@@ -99,13 +114,6 @@ class fetchjaroad(fetchabstract):
         ft["hv_e"] = hv_e
         ft["lv_n"] = lv_n
         ft["hv_n"] = hv_n
-        ft["lv_spd_d"] = self.DEFAULT_SPD["LV_D"]
-        ft["lv_spd_e"] = self.DEFAULT_SPD["LV_E"]
-        ft["lv_spd_n"] = self.DEFAULT_SPD["LV_N"]
-        ft["hv_spd_d"] = self.DEFAULT_SPD["HV_D"]
-        ft["hv_spd_e"] = self.DEFAULT_SPD["HV_E"]
-        ft["hv_spd_n"] = self.DEFAULT_SPD["HV_N"]
-        ft["pvmt"] = self.DEFEALT_PVMT
         sink.addFeature(ft)
       
     else:  
@@ -118,6 +126,7 @@ class fetchjaroad(fetchabstract):
     return {"OUTPUT": dest_id}
   
   
+  # default traffic volume in Ja
   def cmptDefaultTrafficVolumeJa(self, roadFeature):
     
     # return zero if the road width is not set

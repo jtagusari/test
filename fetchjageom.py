@@ -42,7 +42,6 @@ class fetchjageom(fetchabstract, receiverabstract):
         "parentParameterName": "TARGET_CRS"
       }
     },
-    
     "RECEIVER_TYPE": {
       "ui_func": QgsProcessingParameterEnum,
       "ui_args": {
@@ -192,7 +191,7 @@ class fetchjageom(fetchabstract, receiverabstract):
   }
   
   PROC_RESULTS = {}
-  PROJECT_ID = ""
+  GRP_ID = ""
     
   
   def initAlgorithm(self, config):    
@@ -205,13 +204,9 @@ class fetchjageom(fetchabstract, receiverabstract):
       "hrisk:fetchjapop",
       {
         "EXTENT": self.parameterAsString(parameters, "EXTENT", context), # Note that parameterAsExtent is NG because CRS is not included
-        # "EXTENT": '141.172662332,141.179633628,42.969768032,42.974430189 [EPSG:4326]',
         "TARGET_CRS": self.parameterAsCrs(parameters, "TARGET_CRS", context),
         "BUFFER": self.parameterAsDouble(parameters, "BUFFER",context),
         "OUTPUT": self.parameterAsOutputLayer(parameters, "POP", context)
-        # "TARGET_CRS": QgsCoordinateReferenceSystem('EPSG:32654'),
-        # "BUFFER": 0,
-        # "OUTPUT": "TEMPORARY_OUTPUT"
       },
       context = context,
       feedback = feedback
@@ -309,13 +304,10 @@ class fetchjageom(fetchabstract, receiverabstract):
     self.PROC_RESULTS["TRIANGLE_DELAUNAY"] = delaunay_processing["TRIANGLE"]
 
   def processAlgorithm(self, parameters, context, feedback):
-    import ptvsd
-    ptvsd.debug_this_thread()
-    
     feedback.pushInfo(self.tr("Configurations"))
     feedback.setProgress(0)    
     
-    self.PROJECT_ID = "ja_geom_" + str(uuid.uuid4())[:6]
+    self.GRP_ID = "ja_geom_" + str(uuid.uuid4())[:6]
     
     feedback.pushInfo(self.tr("Set calculation area"))
     self.setCalcArea(parameters,context,feedback)
@@ -357,13 +349,13 @@ class fetchjageom(fetchabstract, receiverabstract):
     global jageom_postprocessors
     jageom_postprocessors = []
     
-    QgsProject.instance().layerTreeRoot().insertGroup(0, self.PROJECT_ID)
+    QgsProject.instance().layerTreeRoot().insertGroup(0, self.GRP_ID)
     
     layer_dict = context.layersToLoadOnCompletion()
     for i, path in enumerate(layer_dict.keys()):
       if len([k for k, v in self.PROC_RESULTS.items() if v == path]) == 1:
         vis = self.PARAMETERS.get([k for k, v in self.PROC_RESULTS.items() if v == path][0]).get("visibleByDefault")
-        jageom_postprocessors.append(jageomPostProcessor(self.PROJECT_ID, vis, context.layerToLoadOnCompletionDetails(path).postProcessor()))
+        jageom_postprocessors.append(jageomPostProcessor(self.GRP_ID, vis, context.layerToLoadOnCompletionDetails(path).postProcessor()))
         context.layerToLoadOnCompletionDetails(path).setPostProcessor(jageom_postprocessors[i])
     return {}
 

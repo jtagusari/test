@@ -79,7 +79,7 @@ class receiverregulargrid(receiverabstract):
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
     
     # execute groovy script using wps_scripts
-    self.execNoiseModelling(feedback)
+    self.execNoiseModelling(parameters, context, feedback))
     
     # import the result    
     dest_id_rcv = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT", self.NOISEMODELLING["RECEIVER_PATH"])

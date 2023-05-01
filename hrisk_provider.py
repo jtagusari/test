@@ -2,12 +2,15 @@ from qgis.core import QgsProcessingProvider
 
 from .noisefromtraffic import noisefromtraffic
 from .noisefromemission import noisefromemission
-from .sourceemissionfromroadtraffic import sourceemissionfromroadtraffic
-from .sourceaddroadfields import sourceaddroadfields
+from .emissionfromroadtraffic import emissionfromroadtraffic
+from .initroad import initroad
+from .initbuilding import initbuilding
 from .fetchjageom import fetchjageom
 from .fetchjaroad import fetchjaroad
-# from .fetchosmroad import fetchosmroad
+from .fetchosmroad import fetchosmroad
+from .fetchosmbuilding import fetchosmbuilding
 from .fetchjabuilding import fetchjabuilding
+from .fetchsrtmdem import fetchsrtmdem
 from .fetchjadem import fetchjadem
 from .fetchjapop import fetchjapop
 from .receiverfacade import receiverfacade
@@ -33,11 +36,14 @@ class hrisk_provider(QgsProcessingProvider):
         self.addAlgorithm(fetchjabuilding())
         self.addAlgorithm(fetchjadem())
         self.addAlgorithm(fetchjapop())
-        # self.addAlgorithm(fetchosmroad())
+        self.addAlgorithm(fetchosmroad())
+        self.addAlgorithm(fetchosmbuilding())
+        self.addAlgorithm(fetchsrtmdem())
         self.addAlgorithm(noisefromtraffic())
         self.addAlgorithm(noisefromemission())
-        self.addAlgorithm(sourceemissionfromroadtraffic())
-        self.addAlgorithm(sourceaddroadfields())
+        self.addAlgorithm(initroad())
+        self.addAlgorithm(initbuilding())
+        self.addAlgorithm(emissionfromroadtraffic())
         self.addAlgorithm(receiverfacade())
         self.addAlgorithm(receiverregulargrid())
         self.addAlgorithm(receiverdelaunaygrid())

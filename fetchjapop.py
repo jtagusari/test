@@ -14,7 +14,8 @@ from qgis.core import (
   QgsRasterShader,
   QgsColorRampShader,
   QgsProcessingLayerPostProcessorInterface,
-  QgsRasterBandStats
+  QgsRasterBandStats,
+  QgsProcessingParameterString
   )
 from qgis import processing
 
@@ -45,6 +46,22 @@ class fetchjapop(fetchabstract, jameshpop):
         "parentParameterName": "TARGET_CRS"
       }
     },
+    "MAP_BASEURL": {
+      "ui_func": QgsProcessingParameterString,
+      "advanced": True,
+      "ui_args": {
+        "description": QT_TRANSLATE_NOOP("fetchjapop","URL of the vector map tile"),
+        "defaultValue": "https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData"
+      }
+    },
+    "MAP_CRS": {
+      "ui_func": QgsProcessingParameterCrs,
+      "advanced": True,
+      "ui_args": {
+        "description": QT_TRANSLATE_NOOP("fetchjapop","CRS of the vector map tile"),
+        "defaultValue": QgsCoordinateReferenceSystem("EPSG:6668")
+      }
+    },
     "OUTPUT": {
       "ui_func": QgsProcessingParameterRasterDestination,
       "ui_args": {
@@ -55,51 +72,49 @@ class fetchjapop(fetchabstract, jameshpop):
   
   
   # set information about the map tile
-  def setMapTileMeta(self, uri, crs, geom_type, z):
+  def setMapUrlMeta(self, parameters, context, feedback):
         
-    self.MAP_TILE["URI"] = uri
-    self.MAP_TILE["CRS"] = crs
-    self.MAP_TILE["GEOM_TYPE"] = geom_type
-    self.MAP_TILE["Z"] = z
-    if self.CALC_AREA is not None:
+    self.MAP_URL["URL"] = self.parameterAsString(parameters, "MAP_BASEURL", context)
+    self.MAP_URL["CRS"] = self.parameterAsString(parameters, "MAP_CRS", context)
+    self.MAP_URL["GEOM_TYPE"] = "Point"
       
-      lng_min = self.CALC_AREA.xMinimum()
-      lng_max = self.CALC_AREA.xMaximum()
-      lat_min = self.CALC_AREA.yMinimum()
-      lat_max = self.CALC_AREA.yMaximum()
-      
-      lat_grid = [lat_min + self.LAT_UNIT_5 * i for i in range(0, 2 + int((lat_max - lat_min) / self.LAT_UNIT_5))]
-      lng_grid = [lng_min + self.LNG_UNIT_5 * i for i in range(0, 2 + int((lng_max - lng_min) / self.LNG_UNIT_5))]
+    lng_min = self.CALC_AREA.xMinimum()
+    lng_max = self.CALC_AREA.xMaximum()
+    lat_min = self.CALC_AREA.yMinimum()
+    lat_max = self.CALC_AREA.yMaximum()
     
-      self.MAP_TILE["MESH"] = {}
-      
-      m1_str = None
-      mesh_dict = {}
-      for lat, lng in itertools.product(lat_grid, lng_grid):
-        (mesh_str, lng_lat_coords) = self.coordsToMesh(lng, lat)
-        if m1_str is not None and m1_str != mesh_str[:4]:
-          self.MAP_TILE["MESH"][m1_str] = mesh_dict
-          mesh_dict = {}
-        else:
-          m1_str = mesh_str[:4]
-          mesh_dict[mesh_str] = {"LONG": lng_lat_coords[0], "LAT": lng_lat_coords[1]}
-      
-      if len(mesh_dict) > 0:
-        self.MAP_TILE["MESH"][m1_str] = mesh_dict
+    lat_grid = [lat_min + self.LAT_UNIT_5 * i for i in range(0, 2 + int((lat_max - lat_min) / self.LAT_UNIT_5))]
+    lng_grid = [lng_min + self.LNG_UNIT_5 * i for i in range(0, 2 + int((lng_max - lng_min) / self.LNG_UNIT_5))]
+  
+    self.MAP_URL["MESH"] = {}
+    
+    m1_str = None
+    mesh_dict = {}
+    for lat, lng in itertools.product(lat_grid, lng_grid):
+      (mesh_str, lng_lat_coords) = self.coordsToMesh(lng, lat)
+      if m1_str is not None and m1_str != mesh_str[:4]:
+        self.MAP_URL["MESH"][m1_str] = mesh_dict
+        mesh_dict = {}
+      else:
+        m1_str = mesh_str[:4]
+        mesh_dict[mesh_str] = {"LONG": lng_lat_coords[0], "LAT": lng_lat_coords[1]}
+    
+    if len(mesh_dict) > 0:
+      self.MAP_URL["MESH"][m1_str] = mesh_dict
 
-    if self.MAP_TILE["URI"] is not None and self.MAP_TILE["CRS"] is not None and\
-      self.MAP_TILE["GEOM_TYPE"] is not None and self.MAP_TILE["MESH"] is not None:
-        self.MAP_TILE["SET"] = True
+    if self.MAP_URL["URL"] is not None and self.MAP_URL["CRS"] is not None and\
+      self.MAP_URL["GEOM_TYPE"] is not None and self.MAP_URL["MESH"] is not None:
+        self.MAP_URL["SET"] = True
   
   # fetch features from the map tile
-  def fetchFeaturesFromTile(self):
+  def fetchFeaturesFromTile(self, parameters, context, feedback):
     
-    if self.MAP_TILE["SET"]:
-      init_string = self.MAP_TILE["GEOM_TYPE"] + "?crs=" + self.MAP_TILE["CRS"].authid() + "&index=yes&field=population:integer"
+    if self.MAP_URL["SET"]:
+      init_string = self.MAP_URL["GEOM_TYPE"] + "?crs=" + self.MAP_URL["CRS"].authid() + "&index=yes&field=population:integer"
       vec_layer = QgsVectorLayer(init_string,baseName = "layer_from_tile", providerLib = "memory")
       vec_pr = vec_layer.dataProvider()
       
-      for mesh1, mesh_dict in self.MAP_TILE["MESH"].items():
+      for mesh1, mesh_dict in self.MAP_URL["MESH"].items():
         mesh_dict_pop = self.fetchPop(mesh1, list(mesh_dict.keys()))
         for key, value in mesh_dict_pop.items():
           ft = QgsFeature(vec_layer.fields())
@@ -119,13 +134,9 @@ class fetchjapop(fetchabstract, jameshpop):
   
   def processAlgorithm(self, parameters, context, feedback):        
     self.setCalcArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
-    self.setMapTileMeta(
-      self.ESTAT_API_URI,
-      QgsCoordinateReferenceSystem("EPSG:6668"),
-      "Point", 18
-    )
+    self.setMapTileMeta(parameters, context, feedback)
     
-    pop_raw = self.fetchFeaturesFromTile()
+    pop_raw = self.fetchFeaturesFromTile(parameters, context, feedback)
     
     pop_raster = processing.run(
       "gdal:rasterize",

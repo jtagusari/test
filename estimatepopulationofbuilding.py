@@ -53,7 +53,7 @@ class estimatepopulationofbuilding(algabstract, jameshpop):
 
   def cmptBldgPntLayer(self, bldg_layer, pop_raster):
     
-    building_cent_pnt = processing.run(
+    bldg_cent_pnt = processing.run(
       "native:centroids",
       {
         "INPUT": bldg_layer,
@@ -61,10 +61,10 @@ class estimatepopulationofbuilding(algabstract, jameshpop):
       }
     )["OUTPUT"]
     
-    building_cent_pnt_transformed = processing.run(
+    bldg_cent_pnt_transformed = processing.run(
       "native:reprojectlayer",
       {
-        "INPUT": building_cent_pnt,
+        "INPUT": bldg_cent_pnt,
         "TARGET_CRS" : pop_raster.crs(),
         "OUTPUT" : "TEMPORARY_OUTPUT"
       }
@@ -72,17 +72,17 @@ class estimatepopulationofbuilding(algabstract, jameshpop):
     
     # sampling the population from raster
     # the population is stored in the first band (1)
-    building_cent_pnt_pop = processing.run(
+    bldg_cent_pnt_pop = processing.run(
       "native:rastersampling",
       {
-        "INPUT": building_cent_pnt_transformed,
+        "INPUT": bldg_cent_pnt_transformed,
         "RASTERCOPY": pop_raster,
         "COLUMN_PREFIX": "",
         "OUTPUT" : "TEMPORARY_OUTPUT"
       }
     )["OUTPUT"]
     
-    return(building_cent_pnt_pop)
+    return(bldg_cent_pnt_pop)
 
   def processAlgorithm(self, parameters, context, feedback):
     pop = self.parameterAsRasterLayer(parameters, "POP", context)
@@ -133,10 +133,6 @@ class estimatepopulationofbuilding(algabstract, jameshpop):
               
     return {"OUTPUT": dest_id}
   
-  # Post processing; append layers
-  def postProcessAlgorithm(self, context, feedback):
-    return {}
-
   def displayName(self):
     return self.tr("Estimate populations of buildings")
 

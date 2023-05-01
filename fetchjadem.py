@@ -6,7 +6,9 @@ from qgis.core import (
   QgsProcessingParameterCrs, 
   QgsProcessingParameterFeatureSink,
   QgsProcessingParameterRasterDestination,
-  QgsProperty
+  QgsProperty,
+  QgsProcessingParameterString,
+  QgsProcessingParameterNumber
   )
 from qgis import processing
 
@@ -35,6 +37,31 @@ class fetchjadem(fetchabstract):
         "parentParameterName": "TARGET_CRS"
       }
     },
+    "MAPTILE_URL": {
+      "ui_func": QgsProcessingParameterString,
+      "advanced": True,
+      "ui_args": {
+        "description": QT_TRANSLATE_NOOP("fetchjabuilding","URL of the vector map tile"),
+        "defaultValue": "https://cyberjapandata.gsi.go.jp/xyz/experimental_dem10b/{z}/{x}/{y}.geojson"
+      }
+    },
+    "MAPTILE_CRS": {
+      "ui_func": QgsProcessingParameterCrs,
+      "advanced": True,
+      "ui_args": {
+        "description": QT_TRANSLATE_NOOP("fetchjabuilding","CRS of the vector map tile"),
+        "defaultValue": QgsCoordinateReferenceSystem("EPSG:6668")
+      }
+    },
+    "MAPTILE_ZOOM": {
+      "ui_func": QgsProcessingParameterNumber,
+      "advanced": True,
+      "ui_args": {
+        "description": QT_TRANSLATE_NOOP("fetchjabuilding","Zoom level of the vector map tile"),
+        "type": QgsProcessingParameterNumber.Integer,
+        "defaultValue": 18
+      }
+    },
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
@@ -56,13 +83,9 @@ class fetchjadem(fetchabstract):
   def processAlgorithm(self, parameters, context, feedback):
     
     self.setCalcArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
-    self.setMapTileMeta(
-      "https://cyberjapandata.gsi.go.jp/xyz/experimental_dem10b/{z}/{x}/{y}.geojson",
-      QgsCoordinateReferenceSystem("EPSG:6668"),
-      "Point", 18
-    )
+    self.setMapTileMeta(parameters, context, feedback, "Point")
     
-    dem_raw = self.fetchFeaturesFromTile()
+    dem_raw = self.fetchFeaturesFromTile(context, feedback)
     
     # CRS transform    
     dem_transformed = self.transformToTargetCrs(parameters,context,feedback,dem_raw)
@@ -81,9 +104,9 @@ class fetchjadem(fetchabstract):
     dem_final = dem_z    
     
     (sink, dest_id) = self.parameterAsSink(
-          parameters, "OUTPUT", context,
-          dem_final.fields(), dem_final.wkbType(), dem_final.sourceCrs()
-          )
+      parameters, "OUTPUT", context,
+      dem_final.fields(), dem_final.wkbType(), dem_final.sourceCrs()
+    )
     sink.addFeatures(dem_final.getFeatures())
     
     dem_raster = processing.run(

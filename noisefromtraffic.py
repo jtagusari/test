@@ -255,7 +255,7 @@ class noisefromtraffic(noiseabstract):
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
                 
     # execute groovy script using wps_scripts
-    self.execNoiseModelling(feedback)   
+    self.execNoiseModelling(parameters, context, feedback))   
     feedback.setProgress(100)
     
     self.NOISEMODELLING["WPS_ARGS"].update({"time_stamp": datetime.datetime.now().isoformat()})
