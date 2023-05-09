@@ -24,8 +24,9 @@ class algabstract(QgsProcessingAlgorithm):
   NOISEMODELLING = {}
   
   def initNoiseModelling(self, groovy_script_str):
-    self.NOISEMODELLING["HOME"] = os.environ["NoiseModelling"]
-    self.NOISEMODELLING["SCRIPT"] = os.path.join(os.path.dirname(__file__), "groovy", groovy_script_str)
+    self.NOISEMODELLING["CMD_HOME"] = os.path.dirname(__file__)#os.environ["NOISEMODELLING"]
+    self.NOISEMODELLING["WPS_SCRIPTS"] = os.path.join(os.path.dirname(__file__), "noisemodelling","bin", "wps_scripts")
+    self.NOISEMODELLING["SCRIPT"] = os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", groovy_script_str)
   
     # folder where the files are saved
     self.NOISEMODELLING["TEMP_DIR"] = os.path.normpath(os.path.dirname(QgsProcessingUtils.generateTempFilename("")))
@@ -80,7 +81,7 @@ class algabstract(QgsProcessingAlgorithm):
   
   # method just to generate the command to execute a groovy script
   def genCmd(self):
-    self.NOISEMODELLING["CMD"] = os.path.join("bin","wps_scripts") + \
+    self.NOISEMODELLING["CMD"] = os.path.join("noisemodelling","bin","wps_scripts") + \
       "".join([" -" + k + " " + str(v) for k, v in self.NOISEMODELLING["WPS_ARGS"].items()])
   
   # add parameters using PARAMETERS attribute
@@ -128,7 +129,7 @@ class algabstract(QgsProcessingAlgorithm):
       cmd,
       stdout=asyncio.subprocess.PIPE,
       stderr=asyncio.subprocess.PIPE,
-      cwd = self.NOISEMODELLING["HOME"]
+      cwd = self.NOISEMODELLING["CMD_HOME"]
     )
 
     while True:

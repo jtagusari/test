@@ -2,20 +2,22 @@ SOURCES = \
 estimatelevelofbuilding.py \
 estimatepopulationofbuilding.py \
 estimateriskofbuilding.py \
-fetchabstract.py \
 fetchjabuilding.py \
 fetchjadem.py \
 fetchjageom.py \
 fetchjapop.py \
 fetchjaroad.py \
+fetchosmbuilding.py \
+fetchosmroad.py \
+fetchsrtmdem.py \
 hrisk_provider.py \
+initbuilding.py \
+initdem.py \
+initroad.py \
 isosurface.py \
-noisefromsource.py \
+noisefromemission.py \
 noisefromtraffic.py \
-receiverfacade.py \
-receiverregulargrid.py \
 receiverdelaunaygrid.py \
-sourceemissionfield.py \
-sourceemissionfromroadtraffic.py \
-sourceroadtrafficfield.py
+receiverfacade.py \
+receiverregulargrid.py 
 TRANSLATIONS = i18n/hrisk_ja.ts

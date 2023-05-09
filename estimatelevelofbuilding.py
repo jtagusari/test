@@ -28,7 +28,7 @@ class estimatelevelofbuilding(algabstract):
     "BUILDING_BID": {
       "ui_func": QgsProcessingParameterField,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Field of Building ID in Building layer"),
+        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Building ID Field of the Building layer"),
         "parentLayerParameterName": "BUILDING"
       }
     },
@@ -42,35 +42,35 @@ class estimatelevelofbuilding(algabstract):
     "RECEIVER_BID": {
       "ui_func": QgsProcessingParameterField,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Field of Building ID in Receiver layer"),
+        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Building ID Field of the Receiver layer"),
         "parentLayerParameterName": "RECEIVER"
       }
     },
     "RECEIVER_RID": {
       "ui_func": QgsProcessingParameterField,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Field of Receiver ID in Receiver layer"),
+        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Receiver ID Field of the Receiver layer"),
         "parentLayerParameterName": "RECEIVER"
       }
     },                          
     "LEVEL": {
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Level layer"),
+        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Sound level layer"),
         "types": [QgsProcessing.TypeVectorPoint]
       }
     },
     "LEVEL_RID": {
       "ui_func": QgsProcessingParameterField,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Field of Receiver ID in Level layer"),
+        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Receiver ID Field of the Sound level layer"),
         "parentLayerParameterName": "LEVEL"
       }
     },
     "LEVEL_ASSIGN": {
       "ui_func": QgsProcessingParameterField,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Field of Assining level in Level layer"),
+        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Sound level field(s) of the Sound level layer"),
         "parentLayerParameterName": "LEVEL",
         "allowMultiple": True
       }
@@ -78,21 +78,21 @@ class estimatelevelofbuilding(algabstract):
     "LEVEL_PREFIX": {
       "ui_func": QgsProcessingParameterString,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Prefix of the field of assigned level"),
+        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Prefix of the Sound level field(s)"),
         "defaultValue": "Level_"
       }
     },
     "OVERWRITE": {
       "ui_func": QgsProcessingParameterBoolean,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Overwrite fields if they already exist"),
+        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Overwrite fields if they already exist?"),
         "defaultValue": True
       }
     },
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Building with facade levels")
+        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Building features with facade levels")
       }
     }
   }
@@ -214,7 +214,7 @@ class estimatelevelofbuilding(algabstract):
   
 
   def displayName(self):
-    return self.tr("Assign levels to buildings")
+    return self.tr("Estimate levels to buildings")
 
   def group(self):
     return self.tr("Noise prediction / evaluation")

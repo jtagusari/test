@@ -1,0 +1,6 @@
+Download and Install Java (Open JDK, for running NoiseModelling), NoiseModelling (command line version), H-RISK (QGIS plug-in).
+
+Notes
+The environment variable JAVA_FOR_NOISEMODELLING is set with the installation of Java. If there is an existing setting, it will be overwritten.
+When NoiseModelling is installed, the environment variable NOISEMODELLING_HOME is set. If there is an existing setting, it will be overwritten.
+H-RISK is a plug-in for QGIS. QGIS must be installed beforehand.

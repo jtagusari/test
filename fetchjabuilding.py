@@ -6,9 +6,7 @@ from qgis.core import (
   QgsProcessingParameterFeatureSink,
   QgsProcessingParameterCrs, 
   QgsProcessingParameterString,
-  QgsProcessingParameterNumber,
-  QgsField,
-  QgsFeature
+  QgsProcessingParameterNumber
   )
 from qgis import processing
 
@@ -21,19 +19,19 @@ class fetchjabuilding(fetchabstract):
     "EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("fetchjabuilding","Extent of the calculation area")
+        "description": QT_TRANSLATE_NOOP("fetchjabuilding","Extent for fetching data")
       }
     },
     "TARGET_CRS": {
       "ui_func": QgsProcessingParameterCrs,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjabuilding","Target CRS")
+        "description": QT_TRANSLATE_NOOP("fetchjabuilding","Target CRS (Cartesian coordinates)")
       }
     },
     "BUFFER": {
       "ui_func": QgsProcessingParameterDistance,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjabuilding","Buffer of the calculation area based on Target CRS"),
+        "description": QT_TRANSLATE_NOOP("fetchjabuilding","Buffer of the fetch area (using Target CRS)"),
         "defaultValue": 0.0,
         "parentParameterName": "TARGET_CRS"
       }
@@ -42,7 +40,7 @@ class fetchjabuilding(fetchabstract):
       "ui_func": QgsProcessingParameterString,
       "advanced": True,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjabuilding","URL of the vector map tile"),
+        "description": QT_TRANSLATE_NOOP("fetchjabuilding","Base-URL of the vector-tile map"),
         "defaultValue": "https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf|layername=building|geometrytype=Polygon"
       }
     },
@@ -50,7 +48,7 @@ class fetchjabuilding(fetchabstract):
       "ui_func": QgsProcessingParameterCrs,
       "advanced": True,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjabuilding","CRS of the vector map tile"),
+        "description": QT_TRANSLATE_NOOP("fetchjabuilding","CRS of the vector-tile map"),
         "defaultValue": QgsCoordinateReferenceSystem("EPSG:3857")
       }
     },
@@ -58,7 +56,7 @@ class fetchjabuilding(fetchabstract):
       "ui_func": QgsProcessingParameterNumber,
       "advanced": True,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjabuilding","Zoom level of the vector map tile"),
+        "description": QT_TRANSLATE_NOOP("fetchjabuilding","Zoom level of the vector-tile map"),
         "type": QgsProcessingParameterNumber.Integer,
         "defaultValue": 16
       }
@@ -66,7 +64,7 @@ class fetchjabuilding(fetchabstract):
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjabuilding","Output")
+        "description": QT_TRANSLATE_NOOP("fetchjabuilding","Building")
       }
     }
   }  

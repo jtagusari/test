@@ -40,17 +40,13 @@ class emissionfromroadtraffic(algabstract):
     self.NOISEMODELLING["ROAD_JOINED_PATH"] = os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LW_ROADS_JOINED.geojson")
 
   def processAlgorithm(self, parameters, context, feedback):
-        
-    import ptvsd
-    ptvsd.debug_this_thread()
-    
     self.initNoiseModelling("emissionfromroadtraffic.groovy")
     self.initWpsArgs(parameters,context,feedback)    
     
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
     
     # execute groovy script using wps_scripts
-    self.execNoiseModelling(parameters, context, feedback))
+    self.execNoiseModelling(parameters, context, feedback)
     
     # join to the source geom
     

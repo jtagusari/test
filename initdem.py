@@ -23,7 +23,7 @@ class initdem(initabstract):
     "OVERWRITE_MODE": {
       "ui_func": QgsProcessingParameterEnum,
       "ui_args":{
-        "description" : QT_TRANSLATE_NOOP("initdem","Overwrite or Append?"),
+        "description" : QT_TRANSLATE_NOOP("initdem","Overwrite existing fields??"),
         "options":[
           QT_TRANSLATE_NOOP("initdem","Overwrite"),
           QT_TRANSLATE_NOOP("initdem","Append")
@@ -34,7 +34,7 @@ class initdem(initabstract):
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("sourceemissionfield","DEM" )
+        "description": QT_TRANSLATE_NOOP("initdem","Elevation points" )
       }
     }
   }
@@ -56,7 +56,7 @@ class initdem(initabstract):
     return initdem()
 
   def displayName(self):
-    return self.tr("DEM")
+    return self.tr("Elevation point")
 
   def group(self):
     return self.tr("Initialize features")

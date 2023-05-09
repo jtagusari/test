@@ -102,7 +102,7 @@ class receiverdelaunaygrid(receiverabstract):
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
     
     # execute groovy script using wps_scripts
-    self.execNoiseModelling(parameters, context, feedback))
+    self.execNoiseModelling(parameters, context, feedback)
       
     dest_id_rcv = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT",self.NOISEMODELLING["RECEIVER_PATH"])
     dest_id_tri = self.importNoiseModellingResultsAsSink(parameters, context, "TRIANGLE",self.NOISEMODELLING["TRIANGLE_PATH"])

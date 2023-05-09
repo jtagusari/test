@@ -18,19 +18,19 @@ class fetchosmroad(fetchabstract):
     "EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("fetchosmroad","Extent of the calculation area")
+        "description": QT_TRANSLATE_NOOP("fetchosmroad","Extent for fetching data")
       }
     },
     "TARGET_CRS": {
       "ui_func": QgsProcessingParameterCrs,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchosmroad","Target CRS")
+        "description": QT_TRANSLATE_NOOP("fetchosmroad","Target CRS (Cartesian coordinates)")
       }
     },
     "BUFFER": {
       "ui_func": QgsProcessingParameterDistance,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchosmroad","Buffer of the calculation area based on Target CRS"),
+        "description": QT_TRANSLATE_NOOP("fetchosmroad","Buffer of the fetch area (using Target CRS)"),
         "defaultValue": 0.0,
         "parentParameterName": "TARGET_CRS"
       }
@@ -39,7 +39,7 @@ class fetchosmroad(fetchabstract):
       "ui_func": QgsProcessingParameterString,
       "advanced": True,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchosmroad","URL of the OpenStreetMap"),
+        "description": QT_TRANSLATE_NOOP("fetchosmroad","Query URL of the OpenStreetMap"),
         "defaultValue": "https://lz4.overpass-api.de/api/interpreter"
       }
     },
@@ -71,7 +71,7 @@ class fetchosmroad(fetchabstract):
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchosmroad","Output")
+        "description": QT_TRANSLATE_NOOP("fetchosmroad","Road")
       }
     }
   }
@@ -120,10 +120,10 @@ class fetchosmroad(fetchabstract):
   
 
   def displayName(self):
-    return self.tr("Road centerlines")
+    return self.tr("Road centerlines (OSM)")
 
   def group(self):
-    return self.tr('Fetch geometries (OSM)')
+    return self.tr('Fetch geometries (Global)')
 
   def groupId(self):
     return 'fetchosmgeometry'

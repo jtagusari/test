@@ -25,19 +25,19 @@ class fetchjageom(fetchabstract, receiverabstract):
     "EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("fetchjageom","Extent of the calculation area")
+        "description": QT_TRANSLATE_NOOP("fetchjageom","Extent for fetching data")
       }
     },
     "TARGET_CRS": {
       "ui_func": QgsProcessingParameterCrs,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjageom","Target CRS")
+        "description": QT_TRANSLATE_NOOP("fetchjageom","Target CRS (Cartesian coordinates)")
       }
     },
     "BUFFER": {
       "ui_func": QgsProcessingParameterDistance,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjageom","Buffer of the calculation area based on Target CRS"),
+        "description": QT_TRANSLATE_NOOP("fetchjageom","Buffer of the fetch area (using Target CRS)"),
         "defaultValue": 0.0,
         "parentParameterName": "TARGET_CRS"
       }
@@ -45,7 +45,7 @@ class fetchjageom(fetchabstract, receiverabstract):
     "RECEIVER_TYPE": {
       "ui_func": QgsProcessingParameterEnum,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjageom","Whether receiver points are computed"),
+        "description": QT_TRANSLATE_NOOP("fetchjageom","Set receiver points?"),
         "options":[
           QT_TRANSLATE_NOOP("fetchjageom","None"),
           QT_TRANSLATE_NOOP("fetchjageom","Receivers at facade"),
@@ -170,14 +170,14 @@ class fetchjageom(fetchabstract, receiverabstract):
     "DEM": {
       "ui_func": QgsProcessingParameterVectorDestination,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjageom","DEM" )
+        "description": QT_TRANSLATE_NOOP("fetchjageom","Elevation point (DEM)" )
       },
       "visibleByDefault": False
     },    
     "DEM_RASTER": {
       "ui_func": QgsProcessingParameterRasterDestination,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjageom","DEM (Raster output)" )
+        "description": QT_TRANSLATE_NOOP("fetchjageom","Elevation raster (DEM)" )
       },
       "visibleByDefault": False
     },

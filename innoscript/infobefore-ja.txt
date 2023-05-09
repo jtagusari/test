@@ -1,0 +1,6 @@
+﻿Java (Open JDK，NoiseModelling実行用)，NoiseModelling (コマンドライン動作版)，H-RISK (QGISプラグイン)，のダウンロード・インストールを行います。
+
+注意点
+・Javaのインストールに伴い，環境変数JAVA_FOR_NOISEMODELLINGが設定されます。既存の設定がある場合，上書きされます。
+・NoiseModellingのインストールに伴い，環境変数NOISEMODELLING_HOMEが設定されます。既存の設定がある場合，上書きされます。
+・H-RISKはQGISのプラグインです。事前にQGISのインストールが必要です。

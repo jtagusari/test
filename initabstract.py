@@ -25,7 +25,7 @@ class initabstract(algabstract):
     "OVERWRITE_MODE": {
       "ui_func": QgsProcessingParameterEnum,
       "ui_args":{
-        "description" : QT_TRANSLATE_NOOP("initabstract","Overwrite or Append?"),
+        "description" : QT_TRANSLATE_NOOP("initabstract","Overwrite existing fields??"),
         "options":[
           QT_TRANSLATE_NOOP("initabstract","Overwrite"),
           QT_TRANSLATE_NOOP("initabstract","Append")

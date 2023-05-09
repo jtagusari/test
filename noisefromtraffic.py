@@ -48,7 +48,7 @@ class noisefromtraffic(noiseabstract):
     "DEM": {
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("noisefromtraffic","DEM layer"),
+        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Elevation point layer"),
         "types": [QgsProcessing.TypeVectorPoint],
         "optional": True
       },
@@ -244,18 +244,14 @@ class noisefromtraffic(noiseabstract):
     self.initParameters()
 
 
-  def processAlgorithm(self, parameters, context, feedback):
-        
-    import ptvsd
-    ptvsd.debug_this_thread()    
-    
+  def processAlgorithm(self, parameters, context, feedback):    
     self.initNoiseModelling("noisefromtraffic.groovy")
     self.initWpsArgs(parameters, context, feedback)
 
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
                 
     # execute groovy script using wps_scripts
-    self.execNoiseModelling(parameters, context, feedback))   
+    self.execNoiseModelling(parameters, context, feedback)   
     feedback.setProgress(100)
     
     self.NOISEMODELLING["WPS_ARGS"].update({"time_stamp": datetime.datetime.now().isoformat()})
@@ -302,7 +298,7 @@ class noisefromtraffic(noiseabstract):
     return self.PROC_RESULTS
   
   def displayName(self):
-    return self.tr("Level from traffic")
+    return self.tr("Prediction from traffic")
 
   def group(self):
     return self.tr("Noise prediction / evaluation")

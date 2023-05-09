@@ -21,19 +21,19 @@ class fetchjaroad(fetchabstract):
     "EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("fetchjaroad","Extent of the calculation area")
+        "description": QT_TRANSLATE_NOOP("fetchjaroad","Extent for fetching data")
       }
     },
     "TARGET_CRS": {
       "ui_func": QgsProcessingParameterCrs,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjaroad","Target CRS")
+        "description": QT_TRANSLATE_NOOP("fetchjaroad","Target CRS (Cartesian coordinates)")
       }
     },
     "BUFFER": {
       "ui_func": QgsProcessingParameterDistance,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjaroad","Buffer of the calculation area based on Target CRS"),
+        "description": QT_TRANSLATE_NOOP("fetchjaroad","Buffer of the fetch area (using Target CRS)"),
         "defaultValue": 0.0,
         "parentParameterName": "TARGET_CRS"
       }
@@ -42,7 +42,7 @@ class fetchjaroad(fetchabstract):
       "ui_func": QgsProcessingParameterString,
       "advanced": True,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjaroad","URL of the vector map tile"),
+        "description": QT_TRANSLATE_NOOP("fetchjaroad","Base-URL of the vector-tile map"),
         "defaultValue": "https://cyberjapandata.gsi.go.jp/xyz/experimental_rdcl/{z}/{x}/{y}.geojson"
       }
     },
@@ -50,7 +50,7 @@ class fetchjaroad(fetchabstract):
       "ui_func": QgsProcessingParameterCrs,
       "advanced": True,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjaroad","CRS of the vector map tile"),
+        "description": QT_TRANSLATE_NOOP("fetchjaroad","CRS of the vector-tile map"),
         "defaultValue": QgsCoordinateReferenceSystem("EPSG:6668")
       }
     },
@@ -58,7 +58,7 @@ class fetchjaroad(fetchabstract):
       "ui_func": QgsProcessingParameterNumber,
       "advanced": True,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjaroad","Zoom level of the vector map tile"),
+        "description": QT_TRANSLATE_NOOP("fetchjaroad","Zoom level of the vector-tile map"),
         "type": QgsProcessingParameterNumber.Integer,
         "defaultValue": 16
       }
@@ -66,7 +66,7 @@ class fetchjaroad(fetchabstract):
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjaroad","Output")
+        "description": QT_TRANSLATE_NOOP("fetchjaroad","Road")
       }
     }
   }

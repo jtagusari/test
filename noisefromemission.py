@@ -48,7 +48,7 @@ class noisefromemission(noiseabstract):
     "DEM": {
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("noisefromemission","DEM layer"),
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Elevation point layer"),
         "types": [QgsProcessing.TypeVectorPoint],
         "optional": True
       },
@@ -199,7 +199,7 @@ class noisefromemission(noiseabstract):
     "WPS_ARGS": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromemission","Arguments for the calculation" )
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Arguments used for the calculation" )
       },
       "visibleByDefault": False
     },    
@@ -243,7 +243,6 @@ class noisefromemission(noiseabstract):
   def initAlgorithm(self, config):
     self.initParameters()
 
-
   def processAlgorithm(self, parameters, context, feedback):
     self.initNoiseModelling("noisefromemission.groovy")
     self.initWpsArgs(parameters, context, feedback)
@@ -251,7 +250,7 @@ class noisefromemission(noiseabstract):
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
                 
     # execute groovy script using wps_scripts
-    self.execNoiseModelling(parameters, context, feedback))   
+    self.execNoiseModelling(parameters, context, feedback)
     feedback.setProgress(100)
     
     self.NOISEMODELLING["WPS_ARGS"].update({"time_stamp": datetime.datetime.now().isoformat()})
@@ -298,7 +297,7 @@ class noisefromemission(noiseabstract):
     return self.PROC_RESULTS
   
   def displayName(self):
-    return self.tr("Level from emission")
+    return self.tr("Prediction from emission")
 
   def group(self):
     return self.tr("Noise prediction / evaluation")

@@ -29,14 +29,14 @@ class isosurface(algabstract):
       "crs_referrence": True, # this parameter is used as CRS referrence
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("isosurface","Sound-level results layer"),
+        "description": QT_TRANSLATE_NOOP("isosurface","Sound level layer"),
         "types": [QgsProcessing.TypeVectorPoint]
       }
     },
     "LEVEL_RID": {
       "ui_func": QgsProcessingParameterField,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("estimatelevelofbuilding","Field of Receiver ID in Level layer"),
+        "description": QT_TRANSLATE_NOOP("isosurface","Receiver ID Field of the Sound level layer"),
         "parentLayerParameterName": "LEVEL_RESULT",
         "defaultValue": "IDRECEIVER"
       }
@@ -101,7 +101,7 @@ class isosurface(algabstract):
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
     
     # execute groovy script using wps_scripts
-    self.execNoiseModelling(parameters, context, feedback))
+    self.execNoiseModelling(parameters, context, feedback)
     
     # import the result    
     dest_id = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT", self.NOISEMODELLING["ISOSURFACE_PATH"])

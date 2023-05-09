@@ -104,7 +104,7 @@ class fetchabstract(algabstract):
     
     # check whether the target CRS is x-y coordinates
     if target_crs.isGeographic():
-      sys.exit(self.tr("The Target CRS is NOT a Cartesian Coordinate System"))
+      sys.exit(self.tr("The Buffer of the fetch area (using Target CRS) is NOT a Cartesian Coordinate System"))
     
     # get the extent, using the target CRS
     extent = self.parameterAsExtent(

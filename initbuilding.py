@@ -23,7 +23,7 @@ class initbuilding(initabstract):
     "OVERWRITE_MODE": {
       "ui_func": QgsProcessingParameterEnum,
       "ui_args":{
-        "description" : QT_TRANSLATE_NOOP("initbuilding","Overwrite or Append?"),
+        "description" : QT_TRANSLATE_NOOP("initbuilding","Overwrite existing fields??"),
         "options":[
           QT_TRANSLATE_NOOP("initbuilding","Overwrite"),
           QT_TRANSLATE_NOOP("initbuilding","Append")
@@ -34,7 +34,7 @@ class initbuilding(initabstract):
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("sourceemissionfield","Buildings" )
+        "description": QT_TRANSLATE_NOOP("initbuilding","Building" )
       }
     }
   }

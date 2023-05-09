@@ -23,7 +23,7 @@ class initroad(initabstract):
     "OVERWRITE_MODE": {
       "ui_func": QgsProcessingParameterEnum,
       "ui_args":{
-        "description" : QT_TRANSLATE_NOOP("initroad","Overwrite or Append?"),
+        "description" : QT_TRANSLATE_NOOP("initroad","Overwrite existing fields??"),
         "options":[
           QT_TRANSLATE_NOOP("initroad","Overwrite"),
           QT_TRANSLATE_NOOP("initroad","Append")
@@ -34,7 +34,7 @@ class initroad(initabstract):
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("sourceemissionfield","Road with emission fields" )
+        "description": QT_TRANSLATE_NOOP("initroad","Road" )
       }
     }
   }

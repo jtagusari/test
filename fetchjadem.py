@@ -20,19 +20,19 @@ class fetchjadem(fetchabstract):
     "EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("fetchjadem","Extent of the calculation area")
+        "description": QT_TRANSLATE_NOOP("fetchjadem","Extent for fetching data")
       }
     },
     "TARGET_CRS": {
       "ui_func": QgsProcessingParameterCrs,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjadem","Target CRS")
+        "description": QT_TRANSLATE_NOOP("fetchjadem","Target CRS (Cartesian coordinates)")
       }
     },
     "BUFFER": {
       "ui_func": QgsProcessingParameterDistance,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjadem","Buffer of the calculation area based on Target CRS"),
+        "description": QT_TRANSLATE_NOOP("fetchjadem","Buffer of the fetch area (using Target CRS)"),
         "defaultValue": 0.0,
         "parentParameterName": "TARGET_CRS"
       }
@@ -41,7 +41,7 @@ class fetchjadem(fetchabstract):
       "ui_func": QgsProcessingParameterString,
       "advanced": True,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjabuilding","URL of the vector map tile"),
+        "description": QT_TRANSLATE_NOOP("fetchjadem","Base-URL of the vector-tile map"),
         "defaultValue": "https://cyberjapandata.gsi.go.jp/xyz/experimental_dem10b/{z}/{x}/{y}.geojson"
       }
     },
@@ -49,7 +49,7 @@ class fetchjadem(fetchabstract):
       "ui_func": QgsProcessingParameterCrs,
       "advanced": True,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjabuilding","CRS of the vector map tile"),
+        "description": QT_TRANSLATE_NOOP("fetchjadem","CRS of the vector-tile map"),
         "defaultValue": QgsCoordinateReferenceSystem("EPSG:6668")
       }
     },
@@ -57,7 +57,7 @@ class fetchjadem(fetchabstract):
       "ui_func": QgsProcessingParameterNumber,
       "advanced": True,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjabuilding","Zoom level of the vector map tile"),
+        "description": QT_TRANSLATE_NOOP("fetchjadem","Zoom level of the vector-tile map"),
         "type": QgsProcessingParameterNumber.Integer,
         "defaultValue": 18
       }
@@ -65,13 +65,13 @@ class fetchjadem(fetchabstract):
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjadem","Output")
+        "description": QT_TRANSLATE_NOOP("fetchjadem","Elevation point (DEM)")
       }
     },
     "OUTPUT_RASTER": {
       "ui_func": QgsProcessingParameterRasterDestination,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjadem","DEM (Raster output)" )
+        "description": QT_TRANSLATE_NOOP("fetchjadem","Elevation raster (DEM)" )
       }
     }
   }  

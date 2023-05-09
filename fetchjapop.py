@@ -29,19 +29,19 @@ class fetchjapop(fetchabstract, jameshpop):
     "EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("fetchjapop","Extent of the calculation area")
+        "description": QT_TRANSLATE_NOOP("fetchjapop","Extent for fetching data")
       }
     },
     "TARGET_CRS": {
       "ui_func": QgsProcessingParameterCrs,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjapop","Target CRS")
+        "description": QT_TRANSLATE_NOOP("fetchjapop","Target CRS (Cartesian coordinates)")
       }
     },
     "BUFFER": {
       "ui_func": QgsProcessingParameterDistance,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjapop","Buffer of the calculation area based on Target CRS"),
+        "description": QT_TRANSLATE_NOOP("fetchjapop","Buffer of the fetch area (using Target CRS)"),
         "defaultValue": 0.0,
         "parentParameterName": "TARGET_CRS"
       }
@@ -50,7 +50,7 @@ class fetchjapop(fetchabstract, jameshpop):
       "ui_func": QgsProcessingParameterString,
       "advanced": True,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjapop","URL of the vector map tile"),
+        "description": QT_TRANSLATE_NOOP("fetchjapop","Base-URL of the vector-tile map"),
         "defaultValue": "https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData"
       }
     },
@@ -58,7 +58,7 @@ class fetchjapop(fetchabstract, jameshpop):
       "ui_func": QgsProcessingParameterCrs,
       "advanced": True,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjapop","CRS of the vector map tile"),
+        "description": QT_TRANSLATE_NOOP("fetchjapop","CRS of the vector-tile map"),
         "defaultValue": QgsCoordinateReferenceSystem("EPSG:6668")
       }
     },

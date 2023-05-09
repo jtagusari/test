@@ -73,7 +73,7 @@ class estimateriskofbuilding(algabstract):
     "OVERWRITE": {
       "ui_func": QgsProcessingParameterBoolean,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("estimateriskofbuilding","Overwrite fields if they already exist"),
+        "description": QT_TRANSLATE_NOOP("estimateriskofbuilding","Overwrite fields if they already exist?"),
         "defaultValue": True
       }
     },

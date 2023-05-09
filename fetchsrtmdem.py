@@ -6,7 +6,6 @@ from qgis.core import (
   QgsProcessingParameterCrs, 
   QgsProcessingParameterFeatureSink,
   QgsProcessingParameterRasterDestination,
-  QgsProperty,
   QgsProcessingUtils,
   QgsProcessingParameterString,
   QgsRasterLayer
@@ -28,19 +27,19 @@ class fetchsrtmdem(fetchabstract):
     "EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("fetchsrtmdem","Extent of the calculation area")
+        "description": QT_TRANSLATE_NOOP("fetchsrtmdem","Extent for fetching data")
       }
     },
     "TARGET_CRS": {
       "ui_func": QgsProcessingParameterCrs,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchsrtmdem","Target CRS")
+        "description": QT_TRANSLATE_NOOP("fetchsrtmdem","Target CRS (Cartesian coordinates)")
       }
     },
     "BUFFER": {
       "ui_func": QgsProcessingParameterDistance,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchsrtmdem","Buffer of the calculation area based on Target CRS"),
+        "description": QT_TRANSLATE_NOOP("fetchsrtmdem","Buffer of the fetch area (using Target CRS)"),
         "defaultValue": 0.0,
         "parentParameterName": "TARGET_CRS"
       }
@@ -49,7 +48,7 @@ class fetchsrtmdem(fetchabstract):
       "ui_func": QgsProcessingParameterString,
       "advanced": True,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchsrtmdem","Base url to find SRTM data"),
+        "description": QT_TRANSLATE_NOOP("fetchsrtmdem","Base-URL of the SRTM data"),
         "defaultValue": "https://e4ftl01.cr.usgs.gov/DP133/SRTM/SRTMGL1.003/2000.02.11/"
       }
     },
@@ -68,13 +67,13 @@ class fetchsrtmdem(fetchabstract):
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchsrtmdem","Output")
+        "description": QT_TRANSLATE_NOOP("fetchsrtmdem","Elevation points (DEM)")
       }
     },
     "OUTPUT_RASTER": {
       "ui_func": QgsProcessingParameterRasterDestination,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchsrtmdem","DEM (Raster output)" )
+        "description": QT_TRANSLATE_NOOP("fetchsrtmdem","Elevation raster (DEM)" )
       }
     }
   }  
@@ -82,10 +81,10 @@ class fetchsrtmdem(fetchabstract):
   def checkCalcArea(self):
     # check whether the CRS is long-lat coordinates
     if self.CALC_AREA.crs().isGeographic() is not True:
-      sys.exit(self.tr("The Set CRS is NOT a Geographic Coordinate System"))
+      sys.exit(self.tr("The CRS is NOT a Geographic Coordinate System"))
       
     if self.CALC_AREA.yMinimum() < -56 or self.CALC_AREA.yMaximum() > 59 : 
-      sys.exit(self.tr("The Box is out of SRTM-covered area"))
+      sys.exit(self.tr("The extent is out of SRTM-covered area"))
 
   def setMapUrlMeta(self, parameters, context, feedback):
     
@@ -233,7 +232,7 @@ class fetchsrtmdem(fetchabstract):
     return self.tr("Elevation points (DEM)")
 
   def group(self):
-    return self.tr('Fetch geometries (SRTM)')
+    return self.tr('Fetch geometries (Global)')
 
   def groupId(self):
     return 'fetchsrtmgeometry'
