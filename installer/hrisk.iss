@@ -6,7 +6,6 @@ AppPublisherURL=https://gitlab.com/jtagusari/hrisk-qgis/
 OutputDir=.
 OutputBaseFilename=hrisk-setup
 Compression=none
-Uninstallable=yes
 DisableDirPage=yes
 DefaultDirName={commonpf64}\H-RISK\withNoiseModelling
 Uninstallable=no
@@ -75,6 +74,16 @@ procedure XCopyFile(sourcePath, destPath: String);
 var
   FindRec: TFindRec;
 begin
+
+  if not DirExists(destPath) then
+  begin
+    if not CreateDir(destPath) then
+    begin
+      MsgBox('Failed to create folder.', mbError, MB_OK);
+      Exit;
+    end;
+  end;
+
   if FindFirst(sourcePath+'\*', FindRec) then begin
     try
       repeat
@@ -116,7 +125,7 @@ begin
   components_page.Add(Hrisk_name);
   components_page.Values[0] := True;
   components_page.Values[1] := True;
-  components_page.Values[2] := True;
+  components_page.Values[2] := False;
   after_id := components_page.ID;
 
   // Javaインストール先の設定画面

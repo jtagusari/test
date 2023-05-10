@@ -18,11 +18,6 @@
         <translation>各建物の騒音レベルを推定</translation>
     </message>
     <message>
-        <location filename="../estimatelevelofbuilding.py" line="220"/>
-        <source>Predict sound level</source>
-        <translation>騒音予測・評価</translation>
-    </message>
-    <message>
         <location filename="../estimatelevelofbuilding.py" line="111"/>
         <source>The following attribute does not exist in the bldg layer:</source>
         <translation>次のフィールドが建物レイヤに存在しません：</translation>
@@ -77,6 +72,11 @@
         <source>Building features with facade levels</source>
         <translation>建物（壁面レベル）</translation>
     </message>
+    <message>
+        <location filename="../estimatelevelofbuilding.py" line="220"/>
+        <source>Evaluate health risk</source>
+        <translation>リスクの評価</translation>
+    </message>
 </context>
 <context>
     <name>estimatepopulationofbuilding</name>
@@ -102,8 +102,8 @@
     </message>
     <message>
         <location filename="../estimatepopulationofbuilding.py" line="140"/>
-        <source>Predict sound level</source>
-        <translation>騒音予測・評価</translation>
+        <source>Evaluate health risk</source>
+        <translation>リスクの評価</translation>
     </message>
 </context>
 <context>
@@ -127,11 +127,6 @@
         <location filename="../estimateriskofbuilding.py" line="173"/>
         <source>Estimate health risk of buildings</source>
         <translation>各建物の健康リスクを推定</translation>
-    </message>
-    <message>
-        <location filename="../estimateriskofbuilding.py" line="176"/>
-        <source>Predict sound level</source>
-        <translation>騒音予測・評価</translation>
     </message>
     <message>
         <location filename="../estimateriskofbuilding.py" line="31"/>
@@ -168,6 +163,11 @@
         <source>Base-line risk of IHD death, per 100000</source>
         <translation>虚血性心疾患のベースラインリスク（人口10万人対年間死亡数）</translation>
     </message>
+    <message>
+        <location filename="../estimateriskofbuilding.py" line="176"/>
+        <source>Evaluate health risk</source>
+        <translation>リスクの評価</translation>
+    </message>
 </context>
 <context>
     <name>fetchjabuilding</name>
@@ -175,16 +175,6 @@
         <location filename="../fetchjabuilding.py" line="166"/>
         <source>Fetch geometries (Ja)</source>
         <translation>地物取得（日本国内）</translation>
-    </message>
-    <message>
-        <location filename="../fetchjabuilding.py" line="160"/>
-        <source>Buildings</source>
-        <translation>建物</translation>
-    </message>
-    <message>
-        <location filename="../fetchjabuilding.py" line="163"/>
-        <source>Fetch the buildings data inside the requested area. Source: Geospatial Information Authority of Japan Vector Map Provisioning Experiment (https://github.com/gsi-cyberjapan/gsimaps-vector-experiment).</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../fetchjabuilding.py" line="22"/>
@@ -220,6 +210,11 @@
         <location filename="../fetchjabuilding.py" line="34"/>
         <source>Buffer of the fetch area (using Target CRS)</source>
         <translation>情報取得範囲の外側のバッファー（変換先の参照座標系使用）</translation>
+    </message>
+    <message>
+        <location filename="../fetchjabuilding.py" line="163"/>
+        <source>Buildings (Ja)</source>
+        <translation>建物</translation>
     </message>
 </context>
 <context>
@@ -271,8 +266,8 @@
     </message>
     <message>
         <location filename="../fetchjadem.py" line="133"/>
-        <source>Elevation points (DEM)</source>
-        <translation>標高点（DEM）</translation>
+        <source>Elevation points (Ja)</source>
+        <translation>標高点</translation>
     </message>
 </context>
 <context>
@@ -419,8 +414,8 @@
     </message>
     <message>
         <location filename="../fetchjageom.py" line="326"/>
-        <source>Fetch geometry of buildings and Assign the population</source>
-        <translation>建物壁面に受音点を設定</translation>
+        <source>Fetch geometry of buildings and estimate the population</source>
+        <translation>建物情報を取得</translation>
     </message>
     <message>
         <location filename="../fetchjageom.py" line="34"/>
@@ -441,7 +436,7 @@
         <translation>地物取得（日本国内）</translation>
     </message>
     <message>
-        <location filename="../fetchjapop.py" line="168"/>
+        <location filename="../fetchjapop.py" line="68"/>
         <source>Population</source>
         <translation>人口</translation>
     </message>
@@ -470,6 +465,11 @@
         <source>Target CRS (Cartesian coordinates)</source>
         <translation>変換先の参照座標系（直交座標系）</translation>
     </message>
+    <message>
+        <location filename="../fetchjapop.py" line="168"/>
+        <source>Population (Ja)</source>
+        <translation>人口</translation>
+    </message>
 </context>
 <context>
     <name>fetchjaroad</name>
@@ -482,11 +482,6 @@
         <location filename="../fetchjaroad.py" line="186"/>
         <source>Fetch geometries (Ja)</source>
         <translation>地物取得（日本国内）</translation>
-    </message>
-    <message>
-        <location filename="../fetchjaroad.py" line="183"/>
-        <source>Road centerlines</source>
-        <translation>道路中心線</translation>
     </message>
     <message>
         <location filename="../fetchjaroad.py" line="24"/>
@@ -516,6 +511,11 @@
     <message>
         <location filename="../fetchjaroad.py" line="69"/>
         <source>Road</source>
+        <translation>道路</translation>
+    </message>
+    <message>
+        <location filename="../fetchjaroad.py" line="183"/>
+        <source>Road centerline (Ja)</source>
         <translation>道路中心線</translation>
     </message>
 </context>
@@ -530,11 +530,6 @@
         <location filename="../fetchosmbuilding.py" line="33"/>
         <source>Buffer of the fetch area (using Target CRS)</source>
         <translation>情報取得範囲の外側のバッファー（変換先の参照座標系使用）</translation>
-    </message>
-    <message>
-        <location filename="../fetchosmbuilding.py" line="33"/>
-        <source>Buffer of the calculation area based on Buffer of the fetch area (using Target CRS)</source>
-        <translation type="obsolete">情報取得範囲の外側のバッファー</translation>
     </message>
     <message>
         <location filename="../fetchosmbuilding.py" line="49"/>
@@ -568,7 +563,7 @@
     </message>
     <message>
         <location filename="../fetchosmbuilding.py" line="123"/>
-        <source>Fetch geometries (Global)</source>
+        <source>Fetch geometries</source>
         <translation>地物取得（グローバル対応）</translation>
     </message>
     <message>
@@ -602,12 +597,7 @@
     <message>
         <location filename="../fetchosmroad.py" line="74"/>
         <source>Road</source>
-        <translation>道路中心線</translation>
-    </message>
-    <message>
-        <location filename="../fetchosmroad.py" line="123"/>
-        <source>Road centerlines (OSM)</source>
-        <translation>道路中心線（OSM）</translation>
+        <translation>道路</translation>
     </message>
     <message>
         <location filename="../fetchosmroad.py" line="27"/>
@@ -621,8 +611,13 @@
     </message>
     <message>
         <location filename="../fetchosmroad.py" line="126"/>
-        <source>Fetch geometries (Global)</source>
+        <source>Fetch geometries</source>
         <translation>地物取得（グローバル対応）</translation>
+    </message>
+    <message>
+        <location filename="../fetchosmroad.py" line="123"/>
+        <source>Road centerline (OSM)</source>
+        <translation>道路中心線（OSM）</translation>
     </message>
 </context>
 <context>
@@ -658,7 +653,7 @@
         <translation>SRTMファイルはダウンロードされませんでした</translation>
     </message>
     <message>
-        <location filename="../fetchsrtmdem.py" line="232"/>
+        <location filename="../fetchsrtmdem.py" line="70"/>
         <source>Elevation points (DEM)</source>
         <translation>標高点（DEM）</translation>
     </message>
@@ -669,7 +664,7 @@
     </message>
     <message>
         <location filename="../fetchsrtmdem.py" line="235"/>
-        <source>Fetch geometries (Global)</source>
+        <source>Fetch geometries</source>
         <translation>地物取得（グローバル対応）</translation>
     </message>
     <message>
@@ -686,6 +681,11 @@
         <location filename="../fetchsrtmdem.py" line="51"/>
         <source>Base-URL of the SRTM data</source>
         <translation>SRTMのベースURL</translation>
+    </message>
+    <message>
+        <location filename="../fetchsrtmdem.py" line="232"/>
+        <source>Elevation points (SRTM)</source>
+        <translation>標高点（SRTM）</translation>
     </message>
 </context>
 <context>
@@ -792,7 +792,7 @@
     <message>
         <location filename="../initroad.py" line="111"/>
         <source>Road with acoustic information</source>
-        <translation>道路中心線</translation>
+        <translation>道路</translation>
     </message>
     <message>
         <location filename="../initroad.py" line="114"/>
@@ -802,7 +802,30 @@
     <message>
         <location filename="../initroad.py" line="37"/>
         <source>Road</source>
-        <translation>道路中心線</translation>
+        <translation>道路</translation>
+    </message>
+</context>
+<context>
+    <name>initroademissionfromtraffic</name>
+    <message>
+        <location filename="../initroademissionfromtraffic.py" line="20"/>
+        <source>Road layer</source>
+        <translation>道路レイヤ</translation>
+    </message>
+    <message>
+        <location filename="../initroademissionfromtraffic.py" line="29"/>
+        <source>Road</source>
+        <translation>道路</translation>
+    </message>
+    <message>
+        <location filename="../initroademissionfromtraffic.py" line="94"/>
+        <source>Road emission calculated from traffic</source>
+        <translation>道路</translation>
+    </message>
+    <message>
+        <location filename="../initroademissionfromtraffic.py" line="97"/>
+        <source>Initialize features</source>
+        <translation>地物の初期化</translation>
     </message>
 </context>
 <context>
@@ -830,7 +853,7 @@
     <message>
         <location filename="../isosurface.py" line="125"/>
         <source>Predict sound level</source>
-        <translation>騒音予測・評価</translation>
+        <translation>騒音予測</translation>
     </message>
     <message>
         <location filename="../isosurface.py" line="32"/>
@@ -968,7 +991,7 @@
     <message>
         <location filename="../noisefromemission.py" line="302"/>
         <source>Predict sound level</source>
-        <translation>騒音予測・評価</translation>
+        <translation>騒音予測</translation>
     </message>
     <message>
         <location filename="../noisefromemission.py" line="201"/>
@@ -1056,7 +1079,7 @@
     <message>
         <location filename="../noisefromtraffic.py" line="303"/>
         <source>Predict sound level</source>
-        <translation>騒音予測・評価</translation>
+        <translation>騒音予測</translation>
     </message>
     <message>
         <location filename="../noisefromtraffic.py" line="201"/>

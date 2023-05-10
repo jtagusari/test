@@ -14,6 +14,7 @@ hrisk_provider.py \
 initbuilding.py \
 initdem.py \
 initroad.py \
+initroademissionfromtraffic.py \
 isosurface.py \
 noisefromemission.py \
 noisefromtraffic.py \

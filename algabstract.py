@@ -137,7 +137,11 @@ class algabstract(QgsProcessingAlgorithm):
         break  
 
       stderr_raw = await proc.stderr.readline() # for debugging
-      stderr = stderr_raw.decode()
+      try:
+        stderr = stderr_raw.decode()
+      except:
+        stderr = ""
+        sys.exit(self.tr("Error in NoiseModelling script!"))
       
       if stderr:
         feedback.pushInfo(stderr.replace("\n",""))

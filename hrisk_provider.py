@@ -2,7 +2,7 @@ from qgis.core import QgsProcessingProvider
 
 from .noisefromtraffic import noisefromtraffic
 from .noisefromemission import noisefromemission
-from .emissionfromroadtraffic import emissionfromroadtraffic
+from .initroademissionfromtraffic import initroademissionfromtraffic
 from .initroad import initroad
 from .initbuilding import initbuilding
 from .fetchjageom import fetchjageom
@@ -43,7 +43,7 @@ class hrisk_provider(QgsProcessingProvider):
         self.addAlgorithm(noisefromemission())
         self.addAlgorithm(initroad())
         self.addAlgorithm(initbuilding())
-        self.addAlgorithm(emissionfromroadtraffic())
+        self.addAlgorithm(initroademissionfromtraffic())
         self.addAlgorithm(receiverfacade())
         self.addAlgorithm(receiverregulargrid())
         self.addAlgorithm(receiverdelaunaygrid())

@@ -81,3 +81,5 @@ It employs NoiseModelling algorithms.
 The health risks are estimated using the sound level of each building, base-line risk level and exposure-response relationships.
 The algorithms are stored in `Evaluate health risk` group.
 The affected population can also be evaluated if each building has the population field.
+
+## How to uninstall

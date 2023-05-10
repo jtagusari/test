@@ -48,16 +48,16 @@ class fetchjapop(fetchabstract, jameshpop):
     },
     "MAP_BASEURL": {
       "ui_func": QgsProcessingParameterString,
-      "advanced": True,
       "ui_args": {
+        "optional": True,
         "description": QT_TRANSLATE_NOOP("fetchjapop","Base-URL of the vector-tile map"),
         "defaultValue": "https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData"
       }
     },
     "MAP_CRS": {
       "ui_func": QgsProcessingParameterCrs,
-      "advanced": True,
       "ui_args": {
+        "optional": True,
         "description": QT_TRANSLATE_NOOP("fetchjapop","CRS of the vector-tile map"),
         "defaultValue": QgsCoordinateReferenceSystem("EPSG:6668")
       }
@@ -75,7 +75,7 @@ class fetchjapop(fetchabstract, jameshpop):
   def setMapUrlMeta(self, parameters, context, feedback):
         
     self.MAP_URL["URL"] = self.parameterAsString(parameters, "MAP_BASEURL", context)
-    self.MAP_URL["CRS"] = self.parameterAsString(parameters, "MAP_CRS", context)
+    self.MAP_URL["CRS"] = self.parameterAsCrs(parameters, "MAP_CRS", context)
     self.MAP_URL["GEOM_TYPE"] = "Point"
       
     lng_min = self.CALC_AREA.xMinimum()
@@ -116,6 +116,7 @@ class fetchjapop(fetchabstract, jameshpop):
       
       for mesh1, mesh_dict in self.MAP_URL["MESH"].items():
         mesh_dict_pop = self.fetchPop(mesh1, list(mesh_dict.keys()))
+        feedback.pushInfo(f"fetched from {mesh1}- " + ", ".join([mesh5_str[4:] for mesh5_str in mesh_dict.keys()]))
         for key, value in mesh_dict_pop.items():
           ft = QgsFeature(vec_layer.fields())
           ft.setGeometry(QgsPoint(mesh_dict[key]["LONG"], mesh_dict[key]["LAT"]))
@@ -132,9 +133,10 @@ class fetchjapop(fetchabstract, jameshpop):
     self.initParameters()
   
   
-  def processAlgorithm(self, parameters, context, feedback):        
+  def processAlgorithm(self, parameters, context, feedback):   
+    
     self.setCalcArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
-    self.setMapTileMeta(parameters, context, feedback)
+    self.setMapUrlMeta(parameters, context, feedback)
     
     pop_raw = self.fetchFeaturesFromTile(parameters, context, feedback)
     
@@ -165,7 +167,7 @@ class fetchjapop(fetchabstract, jameshpop):
     return {}
 
   def displayName(self):
-    return self.tr("Population")
+    return self.tr("Population (Ja)")
 
   def group(self):
     return self.tr('Fetch geometries (Ja)')

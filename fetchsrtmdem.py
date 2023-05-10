@@ -46,8 +46,8 @@ class fetchsrtmdem(fetchabstract):
     },
     "MAP_BASEURL": {
       "ui_func": QgsProcessingParameterString,
-      "advanced": True,
       "ui_args": {
+        "optional": True,
         "description": QT_TRANSLATE_NOOP("fetchsrtmdem","Base-URL of the SRTM data"),
         "defaultValue": "https://e4ftl01.cr.usgs.gov/DP133/SRTM/SRTMGL1.003/2000.02.11/"
       }
@@ -229,13 +229,13 @@ class fetchsrtmdem(fetchabstract):
     
   
   def displayName(self):
-    return self.tr("Elevation points (DEM)")
+    return self.tr("Elevation points (SRTM)")
 
   def group(self):
-    return self.tr('Fetch geometries (Global)')
+    return self.tr('Fetch geometries')
 
   def groupId(self):
-    return 'fetchsrtmgeometry'
+    return 'fetchgeometry'
 
   def createInstance(self):
     return fetchsrtmdem()

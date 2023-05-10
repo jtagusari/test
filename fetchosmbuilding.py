@@ -37,8 +37,8 @@ class fetchosmbuilding(fetchabstract):
     },
     "OSM_URL": {
       "ui_func": QgsProcessingParameterString,
-      "advanced": True,
       "ui_args": {
+        "optional": True,
         "description": QT_TRANSLATE_NOOP("fetchosmbuilding","Query URL of the OpenStreetMap"),
         "defaultValue": "https://lz4.overpass-api.de/api/interpreter"
       }
@@ -46,17 +46,17 @@ class fetchosmbuilding(fetchabstract):
     "OSM_KEY": {
       "ui_func": QgsProcessingParameterString,
       "ui_args": {
+        "optional": True,
         "description": QT_TRANSLATE_NOOP("fetchosmbuilding","Key of OpenStreetMap for buildings. By default, 'building'"),
-        "defaultValue": "building",
-        "optional": True
+        "defaultValue": "building"
       }
     },
     "OSM_VALUE": {
       "ui_func": QgsProcessingParameterString,
       "ui_args": {
+        "optional": True,
         "description": QT_TRANSLATE_NOOP("fetchosmbuilding","Value of OpenStreetMap for buildings. By default, '' (all buildings)"),
-        "defaultValue": "",
-        "optional": True
+        "defaultValue": ""
       }
     },
     "OSM_TIMEOUT": {
@@ -120,10 +120,10 @@ class fetchosmbuilding(fetchabstract):
     return self.tr("Building (OSM)")
 
   def group(self):
-    return self.tr('Fetch geometries (Global)')
+    return self.tr('Fetch geometries')
 
   def groupId(self):
-    return 'fetchosmgeometry'
+    return 'fetchgeometry'
 
   def createInstance(self):
     return fetchosmbuilding()

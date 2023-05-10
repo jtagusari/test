@@ -40,24 +40,24 @@ class fetchjaroad(fetchabstract):
     },
     "MAPTILE_URL": {
       "ui_func": QgsProcessingParameterString,
-      "advanced": True,
       "ui_args": {
+        "optional": True,
         "description": QT_TRANSLATE_NOOP("fetchjaroad","Base-URL of the vector-tile map"),
         "defaultValue": "https://cyberjapandata.gsi.go.jp/xyz/experimental_rdcl/{z}/{x}/{y}.geojson"
       }
     },
     "MAPTILE_CRS": {
       "ui_func": QgsProcessingParameterCrs,
-      "advanced": True,
       "ui_args": {
+        "optional": True,
         "description": QT_TRANSLATE_NOOP("fetchjaroad","CRS of the vector-tile map"),
-        "defaultValue": QgsCoordinateReferenceSystem("EPSG:6668")
+        "defaultValue": "EPSG:6668" # must be specified as string, because optional parameter cannot be set as QgsCoordinateReferenceSystem
       }
     },
     "MAPTILE_ZOOM": {
       "ui_func": QgsProcessingParameterNumber,
-      "advanced": True,
       "ui_args": {
+        "optional": True,
         "description": QT_TRANSLATE_NOOP("fetchjaroad","Zoom level of the vector-tile map"),
         "type": QgsProcessingParameterNumber.Integer,
         "defaultValue": 16
@@ -94,7 +94,7 @@ class fetchjaroad(fetchabstract):
       road_final = processing.run(
         "hrisk:initroad",{
           "INPUT": road_dissolve,
-          "OVERWRITE_MODE": 0,
+          "OVERWRITE": True,
           "OUTPUT": "TEMPORARY_OUTPUT"
         }
       )["OUTPUT"]
@@ -180,7 +180,7 @@ class fetchjaroad(fetchabstract):
     return {}
 
   def displayName(self):
-    return self.tr("Road centerlines")
+    return self.tr("Road centerline (Ja)")
 
   def group(self):
     return self.tr('Fetch geometries (Ja)')

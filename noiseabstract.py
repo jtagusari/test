@@ -135,7 +135,7 @@ class noiseabstract(algabstract):
       cmd,
       stdout=asyncio.subprocess.PIPE,
       stderr=asyncio.subprocess.PIPE,
-      cwd = self.NOISEMODELLING["HOME"]
+      cwd = self.NOISEMODELLING["CMD_HOME"]
     )
 
     while True:

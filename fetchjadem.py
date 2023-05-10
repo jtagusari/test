@@ -39,24 +39,24 @@ class fetchjadem(fetchabstract):
     },
     "MAPTILE_URL": {
       "ui_func": QgsProcessingParameterString,
-      "advanced": True,
       "ui_args": {
+        "optional": True,
         "description": QT_TRANSLATE_NOOP("fetchjadem","Base-URL of the vector-tile map"),
         "defaultValue": "https://cyberjapandata.gsi.go.jp/xyz/experimental_dem10b/{z}/{x}/{y}.geojson"
       }
     },
     "MAPTILE_CRS": {
       "ui_func": QgsProcessingParameterCrs,
-      "advanced": True,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjadem","CRS of the vector-tile map"),
-        "defaultValue": QgsCoordinateReferenceSystem("EPSG:6668")
+        "optional": True,
+        "description": QT_TRANSLATE_NOOP("fetchjadem","CRS of the vector-tile map"),        
+        "defaultValue": "EPSG:6668" # must be specified as string, because optional parameter cannot be set as QgsCoordinateReferenceSystem
       }
     },
     "MAPTILE_ZOOM": {
       "ui_func": QgsProcessingParameterNumber,
-      "advanced": True,
       "ui_args": {
+        "optional": True,
         "description": QT_TRANSLATE_NOOP("fetchjadem","Zoom level of the vector-tile map"),
         "type": QgsProcessingParameterNumber.Integer,
         "defaultValue": 18
@@ -85,7 +85,7 @@ class fetchjadem(fetchabstract):
     self.setCalcArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
     self.setMapTileMeta(parameters, context, feedback, "Point")
     
-    dem_raw = self.fetchFeaturesFromTile(context, feedback)
+    dem_raw = self.fetchFeaturesFromTile(parameters, context, feedback)
     
     # CRS transform    
     dem_transformed = self.transformToTargetCrs(parameters,context,feedback,dem_raw)
@@ -130,7 +130,7 @@ class fetchjadem(fetchabstract):
     return {}
 
   def displayName(self):
-    return self.tr("Elevation points (DEM)")
+    return self.tr("Elevation points (Ja)")
 
   def group(self):
     return self.tr('Fetch geometries (Ja)')

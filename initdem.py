@@ -20,15 +20,11 @@ class initdem(initabstract):
         "optional": True
       }
     },
-    "OVERWRITE_MODE": {
+    "OVERWRITE": {
       "ui_func": QgsProcessingParameterEnum,
       "ui_args":{
-        "description" : QT_TRANSLATE_NOOP("initdem","Overwrite existing fields??"),
-        "options":[
-          QT_TRANSLATE_NOOP("initdem","Overwrite"),
-          QT_TRANSLATE_NOOP("initdem","Append")
-        ],
-        "defaultValue": 0
+        "description" : QT_TRANSLATE_NOOP("initdem","Overwrite existing fields?"),
+        "defaultValue": True
       }
     },
     "OUTPUT": {

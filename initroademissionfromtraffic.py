@@ -12,13 +12,13 @@ from qgis import processing
 import os
 from .algabstract import algabstract
 
-class emissionfromroadtraffic(algabstract):
+class initroademissionfromtraffic(algabstract):
   PARAMETERS = {  
     "INPUT": {
       "crs_referrence": True, # this parameter is used as CRS referrence
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("emissionfromroadtraffic","Road layer"),
+        "description": QT_TRANSLATE_NOOP("initroademissionfromtraffic","Road layer"),
         "types": [QgsProcessing.TypeVectorLine]
       },
       "n_mdl":"roadGeomPath",
@@ -27,7 +27,7 @@ class emissionfromroadtraffic(algabstract):
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("emissionfromroadtraffic","Road with LW" )
+        "description": QT_TRANSLATE_NOOP("initroademissionfromtraffic","Road" )
       }
     }
   }
@@ -40,7 +40,7 @@ class emissionfromroadtraffic(algabstract):
     self.NOISEMODELLING["ROAD_JOINED_PATH"] = os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LW_ROADS_JOINED.geojson")
 
   def processAlgorithm(self, parameters, context, feedback):
-    self.initNoiseModelling("emissionfromroadtraffic.groovy")
+    self.initNoiseModelling("initroademissionfromtraffic.groovy")
     self.initWpsArgs(parameters,context,feedback)    
     
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
@@ -92,13 +92,13 @@ class emissionfromroadtraffic(algabstract):
     return {}
 
   def displayName(self):
-    return self.tr("Road emission from traffic")
+    return self.tr("Road emission calculated from traffic")
 
   def group(self):
-    return self.tr("Set sources")
+    return self.tr("Initialize features")
 
   def groupId(self):
-    return "source"
+    return "initfeature"
 
   def createInstance(self):
-    return emissionfromroadtraffic()
+    return initroademissionfromtraffic()

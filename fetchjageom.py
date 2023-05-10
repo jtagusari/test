@@ -9,7 +9,7 @@ from qgis.core import (
   QgsProcessingParameterVectorDestination,
   QgsProcessingParameterRasterDestination,
   QgsProcessingParameterNumber,
-  QgsCoordinateReferenceSystem
+  QgsProcessingParameterBoolean
   )
 from qgis import processing
 
@@ -42,18 +42,31 @@ class fetchjageom(fetchabstract, receiverabstract):
         "parentParameterName": "TARGET_CRS"
       }
     },
-    "RECEIVER_TYPE": {
-      "ui_func": QgsProcessingParameterEnum,
+
+    "FETCH_DEM": {
+      "ui_func": QgsProcessingParameterBoolean,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjageom","Set receiver points?"),
-        "options":[
-          QT_TRANSLATE_NOOP("fetchjageom","None"),
-          QT_TRANSLATE_NOOP("fetchjageom","Receivers at facade"),
-          QT_TRANSLATE_NOOP("fetchjageom","Receivers at delaunary grid"),
-          QT_TRANSLATE_NOOP("fetchjageom","Receivers at regular grid")
-        ],
-        "defaultValue": 0,
-        "allowMultiple": True
+        "optional": True,
+        "description": QT_TRANSLATE_NOOP("fetchjageom","Fetch DEM?"),
+        "defaultValue": False
+      }
+    },
+        
+    "SET_RECEIVER_FACADE": {
+      "ui_func": QgsProcessingParameterBoolean,
+      "ui_args": {
+        "optional": True,
+        "description": QT_TRANSLATE_NOOP("fetchjageom","Set receiver at building facade?"),
+        "defaultValue": False
+      }
+    },
+    
+    "SET_RECEIVER_DELAUNAYGRID": {
+      "ui_func": QgsProcessingParameterBoolean,
+      "ui_args": {
+        "optional": True,
+        "description": QT_TRANSLATE_NOOP("fetchjageom","Set receiver at delaynay grid point?"),
+        "defaultValue": False
       }
     },
     
@@ -322,23 +335,23 @@ class fetchjageom(fetchabstract, receiverabstract):
     self.fetchRoad(parameters, context, feedback)
     feedback.setProgress(15)    
     
-    feedback.pushInfo(self.tr("Fetch geometry of buildings and Assign the population"))
+    feedback.pushInfo(self.tr("Fetch geometry of buildings and estimate the population"))
     self.fetchBuilding(parameters, context, feedback)
     feedback.setProgress(25)
     
-    feedback.pushInfo(self.tr("Fetch geometry of DEM"))
-    self.fetchDem(parameters, context, feedback)
-    feedback.setProgress(50)    
+    if self.parameterAsBoolean(parameters, "FETCH_DEM", context):
+      feedback.pushInfo(self.tr("Fetch geometry of DEM"))
+      self.fetchDem(parameters, context, feedback)
+      feedback.setProgress(50)    
     
-    if 1 in self.parameterAsEnums(parameters, "RECEIVER_TYPE", context):
-    
+    if self.parameterAsBoolean(parameters, "SET_RECEIVER_FACADE", context):    
       feedback.pushInfo(self.tr("Set receivers at building facade"))
       self.setReceiverFacade(parameters, context, feedback)
       feedback.setProgress(75) 
          
-    if 2 in self.parameterAsEnums(parameters, "RECEIVER_TYPE", context):
-    
+    if self.parameterAsBoolean(parameters, "SET_RECEIVER_DELAUNAYGRID", context):        
       feedback.pushInfo(self.tr("Set receivers of delaunay grid"))
+      self.setReceiverDelaunayGrid(parameters, context, feedback)
       
     feedback.setProgress(100)
       

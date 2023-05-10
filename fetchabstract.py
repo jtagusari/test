@@ -25,6 +25,7 @@ import itertools
 import os
 import shutil
 import glob
+import concurrent.futures
 
 from .algabstract import algabstract
 
@@ -142,7 +143,7 @@ class fetchabstract(algabstract):
     return(vec_layer)
       
   # set information about the map tile
-  def setMapTileMeta(self, parameters, context, feedback, geom_type):
+  def setMapTileMeta(self, parameters, context, feedback, geom_type = None):
     # set parameters (from UIs)
     self.MAP_TILE["URL"] = self.parameterAsString(parameters,"MAPTILE_URL", context)
     self.MAP_TILE["CRS"] = self.parameterAsCrs(parameters,"MAPTILE_CRS", context)
@@ -165,8 +166,7 @@ class fetchabstract(algabstract):
     
     # finally check if there are values in required fields
     if self.MAP_TILE["URL"] is not None and self.MAP_TILE["CRS"] is not None and\
-      self.MAP_TILE["GEOM_TYPE"] is not None and self.MAP_TILE["Z"] is not None and \
-      self.CALC_AREA is not None:
+      self.MAP_TILE["Z"] is not None and self.CALC_AREA is not None:
         self.MAP_TILE["SET"] = True
   
   
@@ -208,19 +208,33 @@ class fetchabstract(algabstract):
       providerLib = "memory"
       )
     vec_pr = vec_layer.dataProvider()
-  
-    # fetch features for each tx and ty
-    for tx, ty in itertools.product(list(range(self.MAP_TILE["XMIN"], self.MAP_TILE["XMAX"]+1)), list(range(self.MAP_TILE["YMIN"],self.MAP_TILE["YMAX"]+1))):
-      # get URL
+    
+    # iterator and the number of tiles
+    iter_obj = enumerate(itertools.product(list(range(self.MAP_TILE["XMIN"], self.MAP_TILE["XMAX"]+1)), list(range(self.MAP_TILE["YMIN"],self.MAP_TILE["YMAX"]+1))))
+    n_tiles = (self.MAP_TILE["XMAX"] - self.MAP_TILE["XMIN"] + 1) * (self.MAP_TILE["YMAX"] - self.MAP_TILE["YMIN"] + 1)
+
+    # fetch features from each tile
+    # txy is a tuple of (tx, ty)
+    def fetchFromSingleTile(i, txy):
+      tx, ty = txy
+      # set URL and fetch data
       url = self.MAP_TILE["URL"].replace("{z}", str(self.MAP_TILE["Z"])).replace("{x}", str(tx)).replace("{y}",str(ty))
-      # get tile data
-      vec_from_tile = QgsVectorLayer(url, "v", "ogr")
+      vec_from_tile = QgsVectorLayer(url, "v", "ogr")      
+      
+      # give feedback
+      feedback.pushInfo(f"({i+1}/{n_tiles}) Fetched from: {url}")
+      return tx, ty, vec_from_tile
+    
+    # fetch procedure is done in parallel
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+      results = executor.map(lambda args: fetchFromSingleTile(*args), iter_obj)
+    
+    # add features to the layer
+    for tx, ty, vec_from_tile in results:
       
       # if there are features
-      if vec_from_tile.featureCount() > 0:
-        # modify the feature (if necessary)
+      if vec_from_tile.featureCount() > 0:        
         vec_from_tile_rev = self.modifyFeaturesFromTile(vec_from_tile, self.MAP_TILE["Z"], tx, ty)
-        
         # features added using the data provider
         for ft in vec_from_tile_rev.getFeatures():
           # set the fields if it is not set 
@@ -228,7 +242,7 @@ class fetchabstract(algabstract):
             vec_pr.addAttributes([ft.fields().at(idx) for idx in range(ft.fields().count())])
             vec_layer.updateFields()
           vec_pr.addFeatures([ft])
-    
+          
     return vec_layer
     
   # fetch features from the URL

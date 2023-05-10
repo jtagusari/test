@@ -37,8 +37,8 @@ class fetchosmroad(fetchabstract):
     },
     "OSM_URL": {
       "ui_func": QgsProcessingParameterString,
-      "advanced": True,
       "ui_args": {
+        "optional": True,
         "description": QT_TRANSLATE_NOOP("fetchosmroad","Query URL of the OpenStreetMap"),
         "defaultValue": "https://lz4.overpass-api.de/api/interpreter"
       }
@@ -120,13 +120,13 @@ class fetchosmroad(fetchabstract):
   
 
   def displayName(self):
-    return self.tr("Road centerlines (OSM)")
+    return self.tr("Road centerline (OSM)")
 
   def group(self):
-    return self.tr('Fetch geometries (Global)')
+    return self.tr('Fetch geometries')
 
   def groupId(self):
-    return 'fetchosmgeometry'
+    return 'fetchgeometry'
 
   def createInstance(self):
     return fetchosmroad()

@@ -5,7 +5,7 @@ from qgis.core import (
   QgsProcessing,
   QgsProcessingParameterFeatureSource,
   QgsProcessingParameterFeatureSink,
-  QgsProcessingParameterEnum
+  QgsProcessingParameterBoolean
   )
 
 from .initabstract import initabstract
@@ -20,15 +20,11 @@ class initbuilding(initabstract):
         "optional": True
       }
     },
-    "OVERWRITE_MODE": {
-      "ui_func": QgsProcessingParameterEnum,
+    "OVERWRITE": {
+      "ui_func": QgsProcessingParameterBoolean,
       "ui_args":{
-        "description" : QT_TRANSLATE_NOOP("initbuilding","Overwrite existing fields??"),
-        "options":[
-          QT_TRANSLATE_NOOP("initbuilding","Overwrite"),
-          QT_TRANSLATE_NOOP("initbuilding","Append")
-        ],
-        "defaultValue": 0
+        "description" : QT_TRANSLATE_NOOP("initbuilding","Overwrite existing fields?"),
+        "defaultValue": True
       }
     },
     "OUTPUT": {
@@ -40,7 +36,7 @@ class initbuilding(initabstract):
   }
   
   FIELDS_ADD = {    
-    "pk":         {"TYPE": QVariant.Int   , "DEFAULT_VALUE": None},
+    "PK":         {"TYPE": QVariant.Int   , "DEFAULT_VALUE": None},
     "height":     {"TYPE": QVariant.Double, "DEFAULT_VALUE": 6.0}
   }
       

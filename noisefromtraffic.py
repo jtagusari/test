@@ -245,6 +245,11 @@ class noisefromtraffic(noiseabstract):
 
 
   def processAlgorithm(self, parameters, context, feedback):    
+    
+    
+    import ptvsd
+    ptvsd.debug_this_thread()
+    
     self.initNoiseModelling("noisefromtraffic.groovy")
     self.initWpsArgs(parameters, context, feedback)
 

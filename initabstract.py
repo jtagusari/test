@@ -5,7 +5,7 @@ from qgis.core import (
   QgsProcessing,
   QgsProcessingParameterFeatureSource,
   QgsProcessingParameterFeatureSink,
-  QgsProcessingParameterEnum,
+  QgsProcessingParameterBoolean,
   QgsField,
   QgsFeature
   )
@@ -22,15 +22,11 @@ class initabstract(algabstract):
         "optional": True
       }
     },
-    "OVERWRITE_MODE": {
-      "ui_func": QgsProcessingParameterEnum,
+    "OVERWRITE": {
+      "ui_func": QgsProcessingParameterBoolean,
       "ui_args":{
-        "description" : QT_TRANSLATE_NOOP("initabstract","Overwrite existing fields??"),
-        "options":[
-          QT_TRANSLATE_NOOP("initabstract","Overwrite"),
-          QT_TRANSLATE_NOOP("initabstract","Append")
-        ],
-        "defaultValue": 0
+        "description" : QT_TRANSLATE_NOOP("initabstract","Overwrite existing fields?"),
+        "defaultValue": True
       }
     },
     "OUTPUT": {
@@ -42,7 +38,7 @@ class initabstract(algabstract):
   }
   
   FIELDS_ADD = {    
-    "pk":        {"TYPE": QVariant.Int, "DEFAULT_VALUE": None}
+    "PK":        {"TYPE": QVariant.Int, "DEFAULT_VALUE": None}
   }
   
   FIELDS_INIT = None
@@ -51,6 +47,7 @@ class initabstract(algabstract):
 
   # set the fields that are added / overwritten / not changed
   def setFields(self, parameters, context, feedback):
+    self.FIELDS_FROM = {}
     input_layer = self.parameterAsSource(parameters, "INPUT", context)
     fields_init = input_layer.fields()
     
@@ -65,7 +62,7 @@ class initabstract(algabstract):
         self.FIELDS_FROM.update({fld_name: "ADD"})
         fld_names_added.append(fld_name)
       else:
-        if self.parameterAsEnum(parameters, "OVERWRITE_MODE", context) == 0:
+        if self.parameterAsBoolean(parameters, "OVERWRITE", context):
           self.FIELDS_FROM.update({fld_name: "ADD"})
           fld_names_overwritten.append(fld_name)
     

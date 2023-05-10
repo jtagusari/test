@@ -1,4 +1,4 @@
-from qgis.PyQt.QtCore import (QCoreApplication, QT_TRANSLATE_NOOP, QVariant)
+from qgis.PyQt.QtCore import (QT_TRANSLATE_NOOP)
 from qgis.core import (
   QgsCoordinateReferenceSystem,
   QgsProcessingParameterExtent,
@@ -38,24 +38,24 @@ class fetchjabuilding(fetchabstract):
     },
     "MAPTILE_URL": {
       "ui_func": QgsProcessingParameterString,
-      "advanced": True,
       "ui_args": {
+        "optional": True,
         "description": QT_TRANSLATE_NOOP("fetchjabuilding","Base-URL of the vector-tile map"),
         "defaultValue": "https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf|layername=building|geometrytype=Polygon"
       }
     },
     "MAPTILE_CRS": {
       "ui_func": QgsProcessingParameterCrs,
-      "advanced": True,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjabuilding","CRS of the vector-tile map"),
-        "defaultValue": QgsCoordinateReferenceSystem("EPSG:3857")
+        "optional": True,
+        "description": QT_TRANSLATE_NOOP("fetchjabuilding","CRS of the vector-tile map"),        
+        "defaultValue": "EPSG:3857" # must be specified as string, because optional parameter cannot be set as QgsCoordinateReferenceSystem
       }
     },
     "MAPTILE_ZOOM": {
       "ui_func": QgsProcessingParameterNumber,
-      "advanced": True,
       "ui_args": {
+        "optional": True,
         "description": QT_TRANSLATE_NOOP("fetchjabuilding","Zoom level of the vector-tile map"),
         "type": QgsProcessingParameterNumber.Integer,
         "defaultValue": 16
@@ -77,28 +77,31 @@ class fetchjabuilding(fetchabstract):
   
   # modification of the feature obtained from the map tile
   def modifyFeaturesFromTile(self, fts, z, tx, ty):    
-    # constants
-    EQUATOR_M = 40075016.68557849
-    N_PIXELS_IN_GSI_VTILE = 4096
-    n_pixels_all = N_PIXELS_IN_GSI_VTILE * 2 ** z
-    meter_per_tile  = EQUATOR_M / 2 ** z
-    meter_per_pixel = EQUATOR_M / n_pixels_all
-    
-    # affine transformation to obtain x and y for a given CRS
-    affine_parameters = {        
-      "INPUT": fts,
-      "DELTA_X":    tx    * meter_per_tile - EQUATOR_M / 2,
-      "DELTA_Y": - (ty+1) * meter_per_tile + EQUATOR_M / 2,
-      "SCALE_X": meter_per_pixel,
-      "SCALE_Y": meter_per_pixel,
-      "OUTPUT": "TEMPORARY_OUTPUT"
-    }        
-    fts_modified = processing.run("native:affinetransform", affine_parameters)["OUTPUT"]
-    return(fts_modified)
+    if fts.featureCount() <= 0:
+      return(fts)
+    else:
+      # constants
+      EQUATOR_M = 40075016.68557849
+      N_PIXELS_IN_GSI_VTILE = 4096
+      n_pixels_all = N_PIXELS_IN_GSI_VTILE * 2 ** z
+      meter_per_tile  = EQUATOR_M / 2 ** z
+      meter_per_pixel = EQUATOR_M / n_pixels_all
+      
+      # affine transformation to obtain x and y for a given CRS
+      affine_parameters = {        
+        "INPUT": fts,
+        "DELTA_X":    tx    * meter_per_tile - EQUATOR_M / 2,
+        "DELTA_Y": - (ty+1) * meter_per_tile + EQUATOR_M / 2,
+        "SCALE_X": meter_per_pixel,
+        "SCALE_Y": meter_per_pixel,
+        "OUTPUT": "TEMPORARY_OUTPUT"
+      }        
+      fts_modified = processing.run("native:affinetransform", affine_parameters)["OUTPUT"]
+      return(fts_modified)
         
   # execution of the algorithm
   def processAlgorithm(self, parameters, context, feedback):    
-        
+    
     self.setCalcArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
     self.setMapTileMeta(parameters, context, feedback, "Polygon")
     
@@ -129,7 +132,7 @@ class fetchjabuilding(fetchabstract):
       bldg_final = processing.run(
         "hrisk:initbuilding",{
           "INPUT": bldg_dissolve,
-          "OVERWRITE_MODE": 0,
+          "OVERWRITE": True,
           "OUTPUT": "TEMPORARY_OUTPUT"
         }
       )["OUTPUT"]
@@ -157,11 +160,8 @@ class fetchjabuilding(fetchabstract):
     return {}
 
   def displayName(self):
-    return self.tr("Buildings")
+    return self.tr("Buildings (Ja)")
   
-  def shortHelpString(self) -> str:
-    return self.tr("Fetch the buildings data inside the requested area. Source: Geospatial Information Authority of Japan Vector Map Provisioning Experiment (https://github.com/gsi-cyberjapan/gsimaps-vector-experiment).")
-
   def group(self):
     return self.tr('Fetch geometries (Ja)')
 
