@@ -173,10 +173,10 @@ class estimateriskofbuilding(algabstract):
     return self.tr("Estimate health risk of buildings")
 
   def group(self):
-    return self.tr("Noise prediction / evaluation")
+    return self.tr("Evaluate health risk")
 
   def groupId(self):
-    return "noisepredictionevaluation"
+    return "healthrisk"
   
   def createInstance(self):
     return estimateriskofbuilding()

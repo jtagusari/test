@@ -8,7 +8,9 @@ OutputBaseFilename=hrisk-setup
 Compression=none
 Uninstallable=yes
 DisableDirPage=yes
-DefaultDirName={userappdata}\QGIS\QGIS3\profiles\default\python\plugins\hrisk
+DefaultDirName={commonpf64}\H-RISK\withNoiseModelling
+Uninstallable=no
+UninstallFilesDir={app}\uninst
 ArchitecturesInstallIn64BitMode=x64 ia64 arm64
 ChangesEnvironment=yes
 PrivilegesRequired=admin
@@ -17,7 +19,7 @@ PrivilegesRequired=admin
 Source: "..\*"; DestDir: "{tmp}\hrisk"; Flags: ignoreversion dontcopy;
 Source: "..\i18n\*"; DestDir: "{tmp}\hrisk\i18n"; Flags: recursesubdirs dontcopy;
 Source: "..\noisemodelling/*"; DestDir: "{tmp}\hrisk\noisemodelling"; Flags: recursesubdirs dontcopy;
-Source: "..\innoscript\unzip.exe"; DestDir: "{app}"; Flags: ignoreversion dontcopy;
+Source: "..\installer\unzip.exe"; DestDir: "{app}"; Flags: ignoreversion dontcopy;
 
 
 [Languages]

@@ -1,28 +1,25 @@
 [general]
-name=hrisk
+name=hrisk with noisemodelling
 qgisMinimumVersion=3.16
 description=Calculation of environmental noise and estimation of health risks
-version=0.0.0900
+about=To evaluate environmental noise and its health risks, this plugin helps in fetching geometrical information about sound sources, obstacles and environments that affects sound propagation, calculating the sound levels using NoiseModelling procedures, and estimating health risks based on existing exposure-response relationships between noise and health effects such as ischaemic heart disease.
+version=0.0.1
 author= Junta Tagusari
 email=j.tagusari@eng.hokudai.ac.jp
-about=This plugin calculates the sound levels of environmental noise such as from automobile. Then the health risks due to the noise are estimated. The sound-level calculation is based on NoiseModelling software that implements CNOSSOS-EU.
 
-tracker=https://gitlab.com/jtagusari/hrisk-qgis-plugin
-repository=https://gitlab.com/jtagusari/hrisk-qgis-plugin
+repository=https://gitlab.com/jtagusari/hrisk-noisemodelling
+
 # end of mandatory metadata
 
 # recommended items:
 hasProcessingProvider=yes
-changelog=Developing
+changelog=None
 
 tags=environmental noise, health risk, japan
 
-homepage=https://gitlab.com/jtagusari/hrisk-qgis-plugin
+homepage=https://gitlab.com/jtagusari/hrisk-noisemodelling
 category=Analysis
-
-icon=icon.png
-
-experimental=True
 deprecated=False
 
 server=False
+plugin_dependencies=QuickOSM==2.2.0

@@ -122,10 +122,10 @@ class isosurface(algabstract):
     return self.tr("Isosurface")
 
   def group(self):
-    return self.tr('Noise prediction / evaluation')
+    return self.tr('Predict sound level')
 
   def groupId(self):
-    return 'noisepredictionevaluation'
+    return 'soundlevel'
 
   def createInstance(self):
     return isosurface()

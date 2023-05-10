@@ -19,7 +19,7 @@
     </message>
     <message>
         <location filename="../estimatelevelofbuilding.py" line="220"/>
-        <source>Noise prediction / evaluation</source>
+        <source>Predict sound level</source>
         <translation>騒音予測・評価</translation>
     </message>
     <message>
@@ -102,7 +102,7 @@
     </message>
     <message>
         <location filename="../estimatepopulationofbuilding.py" line="140"/>
-        <source>Noise prediction / evaluation</source>
+        <source>Predict sound level</source>
         <translation>騒音予測・評価</translation>
     </message>
 </context>
@@ -130,7 +130,7 @@
     </message>
     <message>
         <location filename="../estimateriskofbuilding.py" line="176"/>
-        <source>Noise prediction / evaluation</source>
+        <source>Predict sound level</source>
         <translation>騒音予測・評価</translation>
     </message>
     <message>
@@ -829,7 +829,7 @@
     </message>
     <message>
         <location filename="../isosurface.py" line="125"/>
-        <source>Noise prediction / evaluation</source>
+        <source>Predict sound level</source>
         <translation>騒音予測・評価</translation>
     </message>
     <message>
@@ -967,7 +967,7 @@
     </message>
     <message>
         <location filename="../noisefromemission.py" line="302"/>
-        <source>Noise prediction / evaluation</source>
+        <source>Predict sound level</source>
         <translation>騒音予測・評価</translation>
     </message>
     <message>
@@ -1055,7 +1055,7 @@
     </message>
     <message>
         <location filename="../noisefromtraffic.py" line="303"/>
-        <source>Noise prediction / evaluation</source>
+        <source>Predict sound level</source>
         <translation>騒音予測・評価</translation>
     </message>
     <message>

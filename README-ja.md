@@ -40,12 +40,13 @@ NoiseModellingによる騒音予測を実装しています。
 
 以下のコンポーネントをそれぞれインストールする必要がある。
 
+- QGIS
 - Java（NoiseModellingで必要，環境変数`JAVA_FOR_NOISEMODELLING`の設定も必要）
 - NoiseModelling（環境変数`NOISEMODELLING_HOME`の設定も必要）
-- QGIS
 - H-RISK
 
 例えば，次の手順で設定を行う
+
 1. QGIS (https://qgis.org/) をダウンロード・インストールする
 2. このリポジトリのファイルをすべてダウンロードし、QGISのプラグインが保存されているパスに保存する
 3. Java実行環境をダウンロードし，適当なフォルダに展開する（NoiseModellingのRequirementsを参照）。
@@ -163,7 +164,7 @@ path/to/wps_script/wps_scripts -2 ./ -s path/to/groovy/test.groovy
 
 #### inno setup
 
-上記のプロセスを，inno setupを使ってプログラミング(`innoscript`フォルダ)
+上記のプロセスを，inno setupを使ってプログラミング(`installer`フォルダ)
 
 
 ### QGISプラグイン作成メモ

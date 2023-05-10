@@ -137,10 +137,10 @@ class estimatepopulationofbuilding(algabstract, jameshpop):
     return self.tr("Estimate populations of buildings")
 
   def group(self):
-    return self.tr("Noise prediction / evaluation")
+    return self.tr("Evaluate health risk")
 
   def groupId(self):
-    return "noisepredictionevaluation"
+    return "healthrisk"
   
   def createInstance(self):
     return estimatepopulationofbuilding()
