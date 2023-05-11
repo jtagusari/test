@@ -5,32 +5,32 @@ from qgis.core import (
   QgsProcessing,
   QgsProcessingParameterFeatureSource,
   QgsProcessingParameterFeatureSink,
-  QgsProcessingParameterBoolean
+  QgsProcessingParameterEnum
   )
 
 from .initabstract import initabstract
 
-class initbuilding(initabstract):
+class initelevationpoint(initabstract):
   PARAMETERS = {                  
     "INPUT": {
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("initbuilding","Polygon layer"),
-        "types": [QgsProcessing.TypeVectorPolygon],
+        "description": QT_TRANSLATE_NOOP("initelevationpoint","Point layer"),
+        "types": [QgsProcessing.TypeVectorPoint],
         "optional": True
       }
     },
     "OVERWRITE": {
-      "ui_func": QgsProcessingParameterBoolean,
+      "ui_func": QgsProcessingParameterEnum,
       "ui_args":{
-        "description" : QT_TRANSLATE_NOOP("initbuilding","Overwrite existing fields?"),
+        "description" : QT_TRANSLATE_NOOP("initelevationpoint","Overwrite existing fields?"),
         "defaultValue": True
       }
     },
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("initbuilding","Building" )
+        "description": QT_TRANSLATE_NOOP("initelevationpoint","Elevation points" )
       }
     }
   }
@@ -38,7 +38,7 @@ class initbuilding(initabstract):
   def __init__(self) -> None:
     super().__init__()
     self.FIELDS_ADD.update(
-      {"height":     {"TYPE": QVariant.Double, "DEFAULT_VALUE": 6.0}}
+      {"alti":       {"TYPE": QVariant.Double, "DEFAULT_VALUE": None}}
     )
       
   def initAlgorithm(self, config):
@@ -51,10 +51,10 @@ class initbuilding(initabstract):
     return {"OUTPUT": dest_id}
   
   def createInstance(self):
-    return initbuilding()
+    return initelevationpoint()
 
   def displayName(self):
-    return self.tr("Building")
+    return self.tr("Elevation point")
 
   def group(self):
     return self.tr("Initialize features")
@@ -63,4 +63,4 @@ class initbuilding(initabstract):
     return "initfeature"
 
   def createInstance(self):
-    return initbuilding()
+    return initelevationpoint()

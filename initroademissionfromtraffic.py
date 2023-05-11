@@ -40,6 +40,8 @@ class initroademissionfromtraffic(algabstract):
     self.NOISEMODELLING["ROAD_JOINED_PATH"] = os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LW_ROADS_JOINED.geojson")
 
   def processAlgorithm(self, parameters, context, feedback):
+    import ptvsd
+    ptvsd.debug_this_thread()
     self.initNoiseModelling("initroademissionfromtraffic.groovy")
     self.initWpsArgs(parameters,context,feedback)    
     
@@ -70,7 +72,7 @@ class initroademissionfromtraffic(algabstract):
       "native:joinattributestable",
       {
         "INPUT": road_tr_layer,
-        "FIELD": "pk",
+        "FIELD": "PK",
         "INPUT_2": road_lw_layer,
         "FIELD_2": "PK",
         "FIELDS_TO_COPY": [fld for fld in road_lw_layer.fields().names() if fld not in ["PK"]],

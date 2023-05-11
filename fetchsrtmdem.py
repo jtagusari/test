@@ -18,13 +18,13 @@ import sys
 import math
 import os
 import requests
-import shutil
+import itertools
 import re
 
 class fetchsrtmdem(fetchabstract):
   
   PARAMETERS = {  
-    "EXTENT": {
+    "FETCH_EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
         "description": QT_TRANSLATE_NOOP("fetchsrtmdem","Extent for fetching data")
@@ -44,12 +44,20 @@ class fetchsrtmdem(fetchabstract):
         "parentParameterName": "TARGET_CRS"
       }
     },
-    "MAP_BASEURL": {
+    "WEBFETCH_URL": {
       "ui_func": QgsProcessingParameterString,
       "ui_args": {
         "optional": True,
         "description": QT_TRANSLATE_NOOP("fetchsrtmdem","Base-URL of the SRTM data"),
         "defaultValue": "https://e4ftl01.cr.usgs.gov/DP133/SRTM/SRTMGL1.003/2000.02.11/"
+      }
+    },
+    "WEBLOGIN_URL": {
+      "ui_func": QgsProcessingParameterString,
+      "ui_args": {
+        "optional": True,
+        "description": QT_TRANSLATE_NOOP("fetchsrtmdem","Login-URL of the SRTM data"),
+        "defaultValue": "https://urs.earthdata.nasa.gov"
       }
     },
     "USERNAME": {
@@ -78,39 +86,31 @@ class fetchsrtmdem(fetchabstract):
     }
   }  
   
-  def checkCalcArea(self):
+  def checkFetchArea(self):
     # check whether the CRS is long-lat coordinates
-    if self.CALC_AREA.crs().isGeographic() is not True:
+    if self.FETCH_AREA.crs().isGeographic() is not True:
       sys.exit(self.tr("The CRS is NOT a Geographic Coordinate System"))
       
-    if self.CALC_AREA.yMinimum() < -56 or self.CALC_AREA.yMaximum() > 59 : 
+    if self.FETCH_AREA.yMinimum() < -56 or self.FETCH_AREA.yMaximum() > 59 : 
       sys.exit(self.tr("The extent is out of SRTM-covered area"))
 
-  def setMapUrlMeta(self, parameters, context, feedback):
+  def setWebFetchArgs(self, parameters, context, feedback):
     
     # set url and file names
-    lat_min = math.floor(self.CALC_AREA.yMinimum())
-    lat_max = math.ceil(self.CALC_AREA.yMaximum())
-    lng_min = math.floor(self.CALC_AREA.xMinimum())
-    lng_max = math.ceil(self.CALC_AREA.xMaximum())
+    lat_min = math.floor(self.FETCH_AREA.yMinimum())
+    lat_max = math.ceil(self.FETCH_AREA.yMaximum())
+    lng_min = math.floor(self.FETCH_AREA.xMinimum())
+    lng_max = math.ceil(self.FETCH_AREA.xMaximum())
     
-    self.MAP_URL["BASEURL"] = self.parameterAsString(parameters, "MAP_BASEURL", context)
-    self.MAP_URL["URL"] = []
-    self.MAP_URL["DIR"] = os.path.normpath(os.path.dirname(QgsProcessingUtils.generateTempFilename("")))
-    self.MAP_URL["FILE"] = []
-    for lat in range(lat_min, lat_max):
-      for lng in range(lng_min, lng_max):
-        lng_str = f"{lng:+04}".replace("+","E").replace("-","W")
-        lat_str = f"{lat:+03}".replace("+","N").replace("-","S")
-        self.MAP_URL["URL"].append(
-          self.MAP_URL["BASEURL"] + f"{lat_str}{lng_str}.SRTMGL1.hgt.zip"
-        )    
-        self.MAP_URL["FILE"].append(
-          os.path.join(self.MAP_URL["DIR"], f"{lat_str}{lng_str}.SRTMGL1.hgt.zip")
-        )
+    base_url = self.parameterAsString(parameters, "WEBFETCH_URL", context)
     
-    # set login data
-    login_url = "https://urs.earthdata.nasa.gov"
+    for lat, lng in itertools.product(list(range(lat_min, lat_max)), list(range(lng_min, lng_max))):
+      lng_str = f"{lng:+04}".replace("+","E").replace("-","W")
+      lat_str = f"{lat:+03}".replace("+","N").replace("-","S")
+      self.WEBFETCH_ARGS["URL"].append(base_url + f"{lat_str}{lng_str}.SRTMGL1.hgt.zip")    
+    
+    # set login data and login
+    login_url = self.parameterAsString(parameters, "WEBLOGIN_URL", context)
     session = requests.Session()
     login_html = session.get(login_url).text
     token = re.search(
@@ -118,7 +118,7 @@ class fetchsrtmdem(fetchabstract):
       login_html
     ).group(1)
     
-    self.MAP_URL["LOGIN"] = {
+    self.WEBFETCH_ARGS["LOGIN"] = {
       "URL": login_url + "/login",
       "PARAMETERS": {
         "utf8": "✓",
@@ -129,26 +129,27 @@ class fetchsrtmdem(fetchabstract):
     }
     
     session.post(
-      url = self.MAP_URL["LOGIN"]["URL"], 
-      data = self.MAP_URL["LOGIN"]["PARAMETERS"]
+      url = self.WEBFETCH_ARGS["LOGIN"]["URL"], 
+      data = self.WEBFETCH_ARGS["LOGIN"]["PARAMETERS"]
     )
     
+    self.WEBFETCH_ARGS["LOGIN"]["SESSION"] = session
+    
     # set that it is zipped file
-    self.MAP_URL["ZIPPED"] = True
+    self.WEBFETCH_ARGS["ARCHIVED"] = ".zip"
     
-    if self.MAP_URL["URL"] is not None and self.MAP_URL["FILE"] is not None and \
-      self.MAP_URL["LOGIN"] is not None:
-          self.MAP_URL["SET"] = True
+    if self.WEBFETCH_ARGS["URL"] is not None and self.WEBFETCH_ARGS["LOGIN"] is not None:
+          self.WEBFETCH_ARGS["SET"] = True
     
-    # return session, which will be used at downloading the data
-    return session
+    # # return session, which will be used at downloading the data
+    # return session
   
   
   # create the raster from downloaded hgt files
-  def createMergedFeature(self, parameters, context, feedback):
+  def mergeFetchedFeatures(self, parameters, context, feedback):
     # list the files that has hgt extension
     files_to_be_merged = []
-    for file in self.MAP_URL["DOWNLOADED_FILE"]:
+    for file in self.WEBFETCH_ARGS["DOWNLOADED_FILE"]:
       if re.search(".hgt", file):
         files_to_be_merged.append(file)
     
@@ -180,25 +181,25 @@ class fetchsrtmdem(fetchabstract):
 
   # execution of the algorithm
   def processAlgorithm(self, parameters, context, feedback):
-    # set the calculation area, of which CRS is the same as SRTM's
-    self.setCalcArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:4326"))
-    self.checkCalcArea()
+    # set the fetch area, of which CRS is the same as SRTM's
+    self.setFetchArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:4326"))
+    self.checkFetchArea()
     
     # set the meta information for obtaining SRTM data
-    session = self.setMapUrlMeta(parameters, context, feedback)
+    self.setWebFetchArgs(parameters, context, feedback)
     
     # download files using the session info
-    self.fetchFeaturesFromURL(parameters, context, feedback, session)
+    self.fetchFeaturesFromWeb(parameters, context, feedback)
     
     # create raster from file(s)
-    dem_raster = self.createMergedFeature(parameters, context, feedback)
+    dem_raster = self.mergeFetchedFeatures(parameters, context, feedback)
     
     # clip the raster because it is too large as a point vector
     dem_raster_clipped = processing.run(
       "gdal:cliprasterbyextent", 
       {
         "INPUT": dem_raster,
-        "PROJWIN": self.CALC_AREA,
+        "PROJWIN": self.FETCH_AREA,
         "OUTPUT": self.parameterAsOutputLayer(parameters, "OUTPUT_RASTER", context)
       }
     )["OUTPUT"]

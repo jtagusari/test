@@ -12,7 +12,8 @@ fetchosmroad.py \
 fetchsrtmdem.py \
 hrisk_provider.py \
 initbuilding.py \
-initdem.py \
+initelevationpoint.py \
+initgroundabsorption.py \
 initroad.py \
 initroademissionfromtraffic.py \
 isosurface.py \

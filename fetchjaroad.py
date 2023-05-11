@@ -1,4 +1,4 @@
-from qgis.PyQt.QtCore import (QCoreApplication, QT_TRANSLATE_NOOP, QVariant)
+from qgis.PyQt.QtCore import (QT_TRANSLATE_NOOP)
 from qgis.core import (
   QgsCoordinateReferenceSystem,
   QgsProcessingParameterExtent,
@@ -18,7 +18,7 @@ class fetchjaroad(fetchabstract):
   
   # UIs
   PARAMETERS = {  
-    "EXTENT": {
+    "FETCH_EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
         "description": QT_TRANSLATE_NOOP("fetchjaroad","Extent for fetching data")
@@ -38,7 +38,7 @@ class fetchjaroad(fetchabstract):
         "parentParameterName": "TARGET_CRS"
       }
     },
-    "MAPTILE_URL": {
+    "TILEMAP_URL": {
       "ui_func": QgsProcessingParameterString,
       "ui_args": {
         "optional": True,
@@ -46,7 +46,7 @@ class fetchjaroad(fetchabstract):
         "defaultValue": "https://cyberjapandata.gsi.go.jp/xyz/experimental_rdcl/{z}/{x}/{y}.geojson"
       }
     },
-    "MAPTILE_CRS": {
+    "TILEMAP_CRS": {
       "ui_func": QgsProcessingParameterCrs,
       "ui_args": {
         "optional": True,
@@ -54,7 +54,7 @@ class fetchjaroad(fetchabstract):
         "defaultValue": "EPSG:6668" # must be specified as string, because optional parameter cannot be set as QgsCoordinateReferenceSystem
       }
     },
-    "MAPTILE_ZOOM": {
+    "TILEMAP_ZOOM": {
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
         "optional": True,
@@ -77,9 +77,9 @@ class fetchjaroad(fetchabstract):
     self.initParameters()
   
   # execution of the algorithm
-  def processAlgorithm(self, parameters, context, feedback):
-    self.setCalcArea(parameters, context, feedback, QgsCoordinateReferenceSystem("EPSG:6668"))
-    self.setMapTileMeta(parameters, context, feedback, "Linestring")
+  def processAlgorithm(self, parameters, context, feedback):    
+    self.setFetchArea(parameters, context, feedback, QgsCoordinateReferenceSystem("EPSG:6668"))
+    self.setTileMapArgs(parameters, context, feedback, "Linestring")
     
     # fetch the data from vector map tile
     road_raw = self.fetchFeaturesFromTile(parameters, context, feedback)
@@ -107,13 +107,7 @@ class fetchjaroad(fetchabstract):
       
       # set attributes values
       for ft in road_final.getFeatures():
-        (lv_d, hv_d, lv_e, hv_e, lv_n, hv_n) = self.cmptDefaultTrafficVolumeJa(ft)
-        ft["lv_d"] = lv_d
-        ft["hv_d"] = hv_d
-        ft["lv_e"] = lv_e
-        ft["hv_e"] = hv_e
-        ft["lv_n"] = lv_n
-        ft["hv_n"] = hv_n
+        self.setDefaultTrafficVolumeJa(ft)
         sink.addFeature(ft)
       
     else:  
@@ -127,11 +121,11 @@ class fetchjaroad(fetchabstract):
   
   
   # default traffic volume in Ja
-  def cmptDefaultTrafficVolumeJa(self, roadFeature):
+  def setDefaultTrafficVolumeJa(self, roadFeature):
     
     # return zero if the road width is not set
     if roadFeature["Width"] == None and roadFeature["rnkWidth"] == None:
-      return (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+      return
     
     # get road width
     if roadFeature["Width"] != None and roadFeature["Width"] != "":
@@ -144,36 +138,35 @@ class fetchjaroad(fetchabstract):
     
     # compute the traffic volume
     if roadFeature["rdCtg"] == "高速自動車国道等":
-      lv_d = -44.34 + 8.74 + (41.13 + 47.10) * road_width
-      hv_d = -22.52 -464.23 + (6.51 + 43.30) * road_width
-      lv_e = -166.53 -99.14 + (23.13 + 7.88) * road_width
-      hv_e = -7.07 - 120.40 + (1.10 + 11.92) * road_width
-      lv_n = -49.15 - 38.195 + (6.887 + 3.221) * road_width
-      hv_n = -4.55 -124.43 + (0.99 + 11.40) * road_width
+      LV_d = -44.34 + 8.74 + (41.13 + 47.10) * road_width
+      HV_d = -22.52 -464.23 + (6.51 + 43.30) * road_width
+      LV_e = -166.53 -99.14 + (23.13 + 7.88) * road_width
+      HV_e = -7.07 - 120.40 + (1.10 + 11.92) * road_width
+      LV_n = -49.15 - 38.195 + (6.887 + 3.221) * road_width
+      HV_n = -4.55 -124.43 + (0.99 + 11.40) * road_width
     elif roadFeature["rdCtg"] == "国道":
-      lv_d = -44.34 + 183.62 + (41.13 + 3.19) * road_width
-      hv_d = -22.52 + 12.60 + (6.51 + 3.26) * road_width
-      lv_e = -166.53 +16.81 + (23.13 + 4.70) * road_width
-      hv_e = -7.07 +4.93 + (1.10 + 0.96) * road_width
-      lv_n = -49.15 +9.24 + (6.887 + 1.48) * road_width
-      hv_n = -4.55 +4.88 + (0.99 + 1.29) * road_width
+      LV_d = -44.34 + 183.62 + (41.13 + 3.19) * road_width
+      HV_d = -22.52 + 12.60 + (6.51 + 3.26) * road_width
+      LV_e = -166.53 +16.81 + (23.13 + 4.70) * road_width
+      HV_e = -7.07 +4.93 + (1.10 + 0.96) * road_width
+      LV_n = -49.15 +9.24 + (6.887 + 1.48) * road_width
+      HV_n = -4.55 +4.88 + (0.99 + 1.29) * road_width
     elif roadFeature["rdCtg"] == "都道府県道" or roadFeature["rdCtg"] == "市区町村道等" :
-      lv_d = -44.34 + 41.13 * road_width
-      hv_d = -22.52 + 6.51 * road_width
-      lv_e = -166.53 + 23.13 * road_width
-      hv_e = -7.07 + 1.10 * road_width
-      lv_n = -49.15 + 6.887 * road_width
-      hv_n = -4.55 + 0.99 * road_width
+      LV_d = -44.34 + 41.13 * road_width
+      HV_d = -22.52 + 6.51 * road_width
+      LV_e = -166.53 + 23.13 * road_width
+      HV_e = -7.07 + 1.10 * road_width
+      LV_n = -49.15 + 6.887 * road_width
+      HV_n = -4.55 + 0.99 * road_width
     
     # check results
-    lv_d = 0 if lv_d < 0 else round(lv_d, 1)
-    hv_d = 0 if hv_d < 0 else round(hv_d, 1)
-    lv_e = 0 if lv_e < 0 else round(lv_e, 1)
-    hv_e = 0 if hv_e < 0 else round(hv_e, 1)
-    lv_n = 0 if lv_n < 0 else round(lv_n, 1)
-    hv_n = 0 if hv_n < 0 else round(hv_n, 1)
+    roadFeature["LV_d"] = 0 if LV_d < 0 else round(LV_d, 1)
+    roadFeature["HV_d"] = 0 if HV_d < 0 else round(HV_d, 1)
+    roadFeature["LV_e"] = 0 if LV_e < 0 else round(LV_e, 1)
+    roadFeature["HV_e"] = 0 if HV_e < 0 else round(HV_e, 1)
+    roadFeature["LV_n"] = 0 if LV_n < 0 else round(LV_n, 1)
+    roadFeature["HV_n"] = 0 if HV_n < 0 else round(HV_n, 1)
     
-    return (lv_d, hv_d, lv_e, hv_e, lv_n, hv_n)
     
   # Post processing; append layers
   def postProcessAlgorithm(self, context, feedback):

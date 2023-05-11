@@ -17,7 +17,7 @@ from .fetchabstract import fetchabstract
 class fetchjadem(fetchabstract):
   
   PARAMETERS = {  
-    "EXTENT": {
+    "FETCH_EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
         "description": QT_TRANSLATE_NOOP("fetchjadem","Extent for fetching data")
@@ -37,7 +37,7 @@ class fetchjadem(fetchabstract):
         "parentParameterName": "TARGET_CRS"
       }
     },
-    "MAPTILE_URL": {
+    "TILEMAP_URL": {
       "ui_func": QgsProcessingParameterString,
       "ui_args": {
         "optional": True,
@@ -45,7 +45,7 @@ class fetchjadem(fetchabstract):
         "defaultValue": "https://cyberjapandata.gsi.go.jp/xyz/experimental_dem10b/{z}/{x}/{y}.geojson"
       }
     },
-    "MAPTILE_CRS": {
+    "TILEMAP_CRS": {
       "ui_func": QgsProcessingParameterCrs,
       "ui_args": {
         "optional": True,
@@ -53,7 +53,7 @@ class fetchjadem(fetchabstract):
         "defaultValue": "EPSG:6668" # must be specified as string, because optional parameter cannot be set as QgsCoordinateReferenceSystem
       }
     },
-    "MAPTILE_ZOOM": {
+    "TILEMAP_ZOOM": {
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
         "optional": True,
@@ -82,8 +82,8 @@ class fetchjadem(fetchabstract):
 
   def processAlgorithm(self, parameters, context, feedback):
     
-    self.setCalcArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
-    self.setMapTileMeta(parameters, context, feedback, "Point")
+    self.setFetchArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
+    self.setTileMapArgs(parameters, context, feedback, "Point")
     
     dem_raw = self.fetchFeaturesFromTile(parameters, context, feedback)
     

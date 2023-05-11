@@ -159,7 +159,7 @@ class noisefromtraffic(noiseabstract):
       "ui_func": QgsProcessingParameterBoolean,
       "ui_args": {
         "description": QT_TRANSLATE_NOOP("noisefromtraffic","Estimate sound levels and health risks (only for facade receivers)"),
-        "defaultValue": True
+        "defaultValue": False
       }
     },
     "MAKE_ISOSURFACE": {
@@ -167,7 +167,7 @@ class noisefromtraffic(noiseabstract):
       "ui_func": QgsProcessingParameterBoolean,
       "ui_args": {
         "description": QT_TRANSLATE_NOOP("noisefromtraffic","Make isosurface (only for delaunay receivers and triangle layer is necessary)"),
-        "defaultValue": True
+        "defaultValue": False
       }
     },
     "TRIANGLE": {
@@ -246,9 +246,6 @@ class noisefromtraffic(noiseabstract):
 
   def processAlgorithm(self, parameters, context, feedback):    
     
-    
-    import ptvsd
-    ptvsd.debug_this_thread()
     
     self.initNoiseModelling("noisefromtraffic.groovy")
     self.initWpsArgs(parameters, context, feedback)

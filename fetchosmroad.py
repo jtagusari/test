@@ -15,7 +15,7 @@ from .fetchabstract import fetchabstract
 class fetchosmroad(fetchabstract):
   
   PARAMETERS = {  
-    "EXTENT": {
+    "FETCH_EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
         "description": QT_TRANSLATE_NOOP("fetchosmroad","Extent for fetching data")
@@ -81,8 +81,8 @@ class fetchosmroad(fetchabstract):
     self.initParameters()
   
   def processAlgorithm(self, parameters, context, feedback):
-    self.setCalcArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:4326"))
-    self.setOsmMeta(parameters, context, feedback, geom_type="Linestring")
+    self.setFetchArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:4326"))
+    self.setOsmArgs(parameters, context, feedback, geom_type="Linestring")
     
     road_raw = self.fetchFeaturesFromOsm(context, feedback)
     

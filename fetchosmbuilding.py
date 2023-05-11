@@ -15,7 +15,7 @@ from .fetchabstract import fetchabstract
 class fetchosmbuilding(fetchabstract):
   
   PARAMETERS = {  
-    "EXTENT": {
+    "FETCH_EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
         "description": QT_TRANSLATE_NOOP("fetchosmbuilding","Extent for fetching data")
@@ -81,8 +81,8 @@ class fetchosmbuilding(fetchabstract):
     self.initParameters()
   
   def processAlgorithm(self, parameters, context, feedback):
-    self.setCalcArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
-    self.setOsmMeta(parameters, context, feedback, geom_type="Polygon")
+    self.setFetchArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
+    self.setOsmArgs(parameters, context, feedback, geom_type="Polygon")
     
     bldg_raw = self.fetchFeaturesFromOsm(context, feedback)
     

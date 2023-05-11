@@ -6,7 +6,7 @@ from qgis.core import (
   QgsCoordinateTransform,
   QgsVectorLayer,
   QgsCoordinateReferenceSystem,
-  QgsProcessingParameterExtent,
+  QgsProcessingUtils,
   QgsProcessingParameterDistance,
   QgsProcessingParameterCrs, 
   QgsProcessingParameterFeatureSink,
@@ -26,6 +26,8 @@ import os
 import shutil
 import glob
 import concurrent.futures
+import requests
+import uuid
 
 from .algabstract import algabstract
 
@@ -35,11 +37,11 @@ class fetchabstract(algabstract):
   # input UIs
   PARAMETERS = {}
   
-  # calculation area
-  CALC_AREA = None
+  # fetch area
+  FETCH_AREA = None
     
   # parameters for fetching data from map tile
-  MAP_TILE = {
+  TILEMAP_ARGS = {
     "SET": False,
     "URL": None,
     "CRS": None,
@@ -49,7 +51,7 @@ class fetchabstract(algabstract):
     }
   
   # parameters for fetching data from OpenStreetMap
-  MAP_OSM = {
+  OSM_ARGS = {
     "SET": False,
     "URL": "https://lz4.overpass-api.de/api/interpreter",
     "CRS": QgsCoordinateReferenceSystem("EPSG:4326"),
@@ -57,20 +59,20 @@ class fetchabstract(algabstract):
     "QUICKOSM_ARGS": {
       "KEY": None,
       "VALUE": None,
-      "EXTENT": None,
+      "FETCH_EXTENT": None,
       "TIMEOUT": 25
     }
   }
   
   # parameters for fetching data from other URL (e.g. SRTM)
-  MAP_URL = {
+  WEBFETCH_ARGS = {
     "SET": False,
-    "URL": None,
-    "FILE": None,
+    "URL": [],
+    "DOWNLOADED_FILE": [],
     "CRS": None,
     "GEOM_TYPE": None,
     "LOGIN": None,
-    "ZIPPED": None
+    "ARCHIVED": ""
   }
   
   # initialize extent and CRS using the canvas
@@ -82,7 +84,7 @@ class fetchabstract(algabstract):
     else:
       default_crs = map_crs
       
-    self.PARAMETERS["EXTENT"]["ui_args"]["defaultValue"] = map_rectangle
+    self.PARAMETERS["FETCH_EXTENT"]["ui_args"]["defaultValue"] = map_rectangle
     self.PARAMETERS["TARGET_CRS"]["ui_args"]["defaultValue"] = default_crs
       
   
@@ -95,12 +97,12 @@ class fetchabstract(algabstract):
     else:
         return None
     
-  # set calc_area
+  # set fetch_area
   # it is used mainly for fetching the data, 
   # so the crs for fetching the data should be used
-  def setCalcArea(self, parameters, context, feedback, new_crs = None):
+  def setFetchArea(self, parameters, context, feedback, new_crs = None):
     
-    # get target x-y CRS, to apply the buffer and determine the calculation area
+    # get target x-y CRS, to apply the buffer and determine the fetch area
     target_crs = self.parameterAsCrs(parameters, "TARGET_CRS", context)
     
     # check whether the target CRS is x-y coordinates
@@ -108,21 +110,21 @@ class fetchabstract(algabstract):
       sys.exit(self.tr("The Buffer of the fetch area (using Target CRS) is NOT a Cartesian Coordinate System"))
     
     # get the extent, using the target CRS
-    extent = self.parameterAsExtent(
-      parameters, "EXTENT", context, 
+    fetch_extent = self.parameterAsExtent(
+      parameters, "FETCH_EXTENT", context, 
       self.parameterAsCrs(parameters, "TARGET_CRS", context)
       )
     
     # get the buffer
     buffer = self.parameterAsDouble(parameters, "BUFFER",context)
     
-    # get the calculation area, using the extent and buffer
-    calc_area = QgsReferencedRectangle(
+    # get the fetch area, using the extent and buffer
+    fetch_area = QgsReferencedRectangle(
       QgsRectangle(
-        extent.xMinimum() - buffer,
-        extent.yMinimum() - buffer,
-        extent.xMaximum() + buffer,
-        extent.yMaximum() + buffer
+        fetch_extent.xMinimum() - buffer,
+        fetch_extent.yMinimum() - buffer,
+        fetch_extent.xMaximum() + buffer,
+        fetch_extent.yMaximum() + buffer
       ),
       target_crs
     )
@@ -130,95 +132,95 @@ class fetchabstract(algabstract):
     # if the crs is specified, transform the area
     if new_crs is not None:
       transform = QgsCoordinateTransform(target_crs, new_crs, QgsProject.instance())
-      self.CALC_AREA = QgsReferencedRectangle(transform.transformBoundingBox(calc_area), new_crs)
+      self.FETCH_AREA = QgsReferencedRectangle(transform.transformBoundingBox(fetch_area), new_crs)
     else:
-      self.CALC_AREA = calc_area
+      self.FETCH_AREA = fetch_area
   
-  # get the calculation area as a polygon vector layer
-  def calcAreaAsVectorLayer(self):
-    vec_layer = QgsVectorLayer("Polygon?crs=" + self.CALC_AREA.crs().authid(), "calc_area", "memory")
+  # get the fetch area as a polygon vector layer
+  def fetchAreaAsVectorLayer(self):
+    vec_layer = QgsVectorLayer("Polygon?crs=" + self.FETCH_AREA.crs().authid(), "fetch_area", "memory")
     ft = QgsFeature()
-    ft.setGeometry(QgsGeometry.fromRect(self.CALC_AREA))
+    ft.setGeometry(QgsGeometry.fromRect(self.FETCH_AREA))
     vec_layer.dataProvider().addFeatures([ft])    
     return(vec_layer)
       
   # set information about the map tile
-  def setMapTileMeta(self, parameters, context, feedback, geom_type = None):
+  def setTileMapArgs(self, parameters, context, feedback, geom_type = None):
     # set parameters (from UIs)
-    self.MAP_TILE["URL"] = self.parameterAsString(parameters,"MAPTILE_URL", context)
-    self.MAP_TILE["CRS"] = self.parameterAsCrs(parameters,"MAPTILE_CRS", context)
-    z = self.parameterAsInt(parameters, "MAPTILE_ZOOM", context) #used later
-    self.MAP_TILE["Z"] = z
-    self.MAP_TILE["GEOM_TYPE"] = geom_type
+    self.TILEMAP_ARGS["URL"] = self.parameterAsString(parameters,"TILEMAP_URL", context)
+    self.TILEMAP_ARGS["CRS"] = self.parameterAsCrs(parameters,"TILEMAP_CRS", context)
+    z = self.parameterAsInt(parameters, "TILEMAP_ZOOM", context) #used later
+    self.TILEMAP_ARGS["Z"] = z
+    self.TILEMAP_ARGS["GEOM_TYPE"] = geom_type
     
-    # set the extent using self.CALC_AREA
-    if self.CALC_AREA is not None:
-      lng_min = self.CALC_AREA.xMinimum()
-      lng_max = self.CALC_AREA.xMaximum()
-      lat_min = self.CALC_AREA.yMinimum()
-      lat_max = self.CALC_AREA.yMaximum()
+    # set the extent using self.FETCH_AREA
+    if self.FETCH_AREA is not None:
+      lng_min = self.FETCH_AREA.xMinimum()
+      lng_max = self.FETCH_AREA.xMaximum()
+      lat_min = self.FETCH_AREA.yMinimum()
+      lat_max = self.FETCH_AREA.yMaximum()
       
       # Note that YMIN is obtained from lat_max / YMAX is from lat_min
-      self.MAP_TILE["XMIN"] = int(2**(z+7) * (lng_min / 180 + 1) / 256)
-      self.MAP_TILE["XMAX"] = int(2**(z+7) * (lng_max / 180 + 1) / 256)
-      self.MAP_TILE["YMIN"] = int(2**(z+7) / math.pi * (-math.atanh(math.sin(math.pi/180*lat_max)) + math.atanh(math.sin(math.pi/180*85.05112878))) / 256)
-      self.MAP_TILE["YMAX"] = int(2**(z+7) / math.pi * (-math.atanh(math.sin(math.pi/180*lat_min)) + math.atanh(math.sin(math.pi/180*85.05112878))) / 256)
+      self.TILEMAP_ARGS["XMIN"] = int(2**(z+7) * (lng_min / 180 + 1) / 256)
+      self.TILEMAP_ARGS["XMAX"] = int(2**(z+7) * (lng_max / 180 + 1) / 256)
+      self.TILEMAP_ARGS["YMIN"] = int(2**(z+7) / math.pi * (-math.atanh(math.sin(math.pi/180*lat_max)) + math.atanh(math.sin(math.pi/180*85.05112878))) / 256)
+      self.TILEMAP_ARGS["YMAX"] = int(2**(z+7) / math.pi * (-math.atanh(math.sin(math.pi/180*lat_min)) + math.atanh(math.sin(math.pi/180*85.05112878))) / 256)
     
     # finally check if there are values in required fields
-    if self.MAP_TILE["URL"] is not None and self.MAP_TILE["CRS"] is not None and\
-      self.MAP_TILE["Z"] is not None and self.CALC_AREA is not None:
-        self.MAP_TILE["SET"] = True
+    if self.TILEMAP_ARGS["URL"] is not None and self.TILEMAP_ARGS["CRS"] is not None and\
+      self.TILEMAP_ARGS["Z"] is not None and self.FETCH_AREA is not None:
+        self.TILEMAP_ARGS["SET"] = True
   
   
   # set information about the map tile
-  def setOsmMeta(self, parameters, context, feedback, geom_type=None):
-    self.MAP_TILE["URL"] = self.parameterAsString(parameters, "OSM_URL", context)
-    self.MAP_OSM["GEOM_TYPE"] = geom_type
-    self.MAP_OSM["QUICKOSM_ARGS"]["KEY"] = self.parameterAsString(parameters, "OSM_KEY", context)
-    self.MAP_OSM["QUICKOSM_ARGS"]["VALUE"] = self.parameterAsString(parameters, "OSM_VALUE", context)
-    self.MAP_OSM["QUICKOSM_ARGS"]["TIMEOUT"] = self.parameterAsDouble(parameters, "OSM_TIMEOUT", context)
+  def setOsmArgs(self, parameters, context, feedback, geom_type=None):
+    self.TILEMAP_ARGS["URL"] = self.parameterAsString(parameters, "OSM_URL", context)
+    self.OSM_ARGS["GEOM_TYPE"] = geom_type
+    self.OSM_ARGS["QUICKOSM_ARGS"]["KEY"] = self.parameterAsString(parameters, "OSM_KEY", context)
+    self.OSM_ARGS["QUICKOSM_ARGS"]["VALUE"] = self.parameterAsString(parameters, "OSM_VALUE", context)
+    self.OSM_ARGS["QUICKOSM_ARGS"]["TIMEOUT"] = self.parameterAsDouble(parameters, "OSM_TIMEOUT", context)
     
-    if self.CALC_AREA is not None:
-      lng_min_str = str(self.CALC_AREA.xMinimum())
-      lng_max_str = str(self.CALC_AREA.xMaximum())
-      lat_min_str = str(self.CALC_AREA.yMinimum())
-      lat_max_str = str(self.CALC_AREA.yMaximum())
-      crs_str = self.CALC_AREA.crs().authid()
-      self.MAP_OSM["QUICKOSM_ARGS"]["EXTENT"] = f"{lng_min_str},{lng_max_str},{lat_min_str},{lat_max_str} [{crs_str}]"
+    if self.FETCH_AREA is not None:
+      lng_min_str = str(self.FETCH_AREA.xMinimum())
+      lng_max_str = str(self.FETCH_AREA.xMaximum())
+      lat_min_str = str(self.FETCH_AREA.yMinimum())
+      lat_max_str = str(self.FETCH_AREA.yMaximum())
+      crs_str = self.FETCH_AREA.crs().authid()
+      self.OSM_ARGS["QUICKOSM_ARGS"]["FETCH_EXTENT"] = f"{lng_min_str},{lng_max_str},{lat_min_str},{lat_max_str} [{crs_str}]"
       
-    if self.MAP_OSM["GEOM_TYPE"] is not None and self.MAP_OSM["QUICKOSM_ARGS"]["EXTENT"] is not None and \
-      self.MAP_OSM["QUICKOSM_ARGS"]["KEY"] is not None and self.MAP_OSM["QUICKOSM_ARGS"]["VALUE"] is not None:
-        self.MAP_OSM["SET"] = True
+    if self.OSM_ARGS["GEOM_TYPE"] is not None and self.OSM_ARGS["QUICKOSM_ARGS"]["FETCH_EXTENT"] is not None and \
+      self.OSM_ARGS["QUICKOSM_ARGS"]["KEY"] is not None and self.OSM_ARGS["QUICKOSM_ARGS"]["VALUE"] is not None:
+        self.OSM_ARGS["SET"] = True
   
   # to set the parameters for using data over the Internet
-  def setMapUrlMeta(self, parameters, context, feedback):
+  def setWebFetchArgs(self, parameters, context, feedback):
     pass
   
   # fetch features from the map tile
   def fetchFeaturesFromTile(self, parameters, context, feedback):
     
     # if not all the parameters were set, stop
-    if self.MAP_TILE["SET"] is not True:
+    if self.TILEMAP_ARGS["SET"] is not True:
       sys.exit(self.tr("NOT required parameters are filled"))
     
     # initialize the vector layer  
     vec_layer = QgsVectorLayer(
-      self.MAP_TILE["GEOM_TYPE"] + "?crs=" + self.MAP_TILE["CRS"].authid() + "&index=yes",
+      self.TILEMAP_ARGS["GEOM_TYPE"] + "?crs=" + self.TILEMAP_ARGS["CRS"].authid() + "&index=yes",
       baseName = "layer_from_tile", 
       providerLib = "memory"
       )
     vec_pr = vec_layer.dataProvider()
     
     # iterator and the number of tiles
-    iter_obj = enumerate(itertools.product(list(range(self.MAP_TILE["XMIN"], self.MAP_TILE["XMAX"]+1)), list(range(self.MAP_TILE["YMIN"],self.MAP_TILE["YMAX"]+1))))
-    n_tiles = (self.MAP_TILE["XMAX"] - self.MAP_TILE["XMIN"] + 1) * (self.MAP_TILE["YMAX"] - self.MAP_TILE["YMIN"] + 1)
+    iter_obj = enumerate(itertools.product(list(range(self.TILEMAP_ARGS["XMIN"], self.TILEMAP_ARGS["XMAX"]+1)), list(range(self.TILEMAP_ARGS["YMIN"],self.TILEMAP_ARGS["YMAX"]+1))))
+    n_tiles = (self.TILEMAP_ARGS["XMAX"] - self.TILEMAP_ARGS["XMIN"] + 1) * (self.TILEMAP_ARGS["YMAX"] - self.TILEMAP_ARGS["YMIN"] + 1)
 
     # fetch features from each tile
     # txy is a tuple of (tx, ty)
     def fetchFromSingleTile(i, txy):
       tx, ty = txy
       # set URL and fetch data
-      url = self.MAP_TILE["URL"].replace("{z}", str(self.MAP_TILE["Z"])).replace("{x}", str(tx)).replace("{y}",str(ty))
+      url = self.TILEMAP_ARGS["URL"].replace("{z}", str(self.TILEMAP_ARGS["Z"])).replace("{x}", str(tx)).replace("{y}",str(ty))
       vec_from_tile = QgsVectorLayer(url, "v", "ogr")      
       
       # give feedback
@@ -234,7 +236,7 @@ class fetchabstract(algabstract):
       
       # if there are features
       if vec_from_tile.featureCount() > 0:        
-        vec_from_tile_rev = self.modifyFeaturesFromTile(vec_from_tile, self.MAP_TILE["Z"], tx, ty)
+        vec_from_tile_rev = self.modifyFeaturesFromTile(vec_from_tile, self.TILEMAP_ARGS["Z"], tx, ty)
         # features added using the data provider
         for ft in vec_from_tile_rev.getFeatures():
           # set the fields if it is not set 
@@ -247,62 +249,75 @@ class fetchabstract(algabstract):
     
   # fetch features from the URL
   # note that it only downloads file(s)
-  def fetchFeaturesFromURL(self, parameters, context, feedback, session = None):
-    if self.MAP_URL["SET"]:
-      
-      # if login is needed, session is also needed
-      if self.MAP_URL["LOGIN"] is not None:
-        if session is None:
-          sys.exit(self.tr("Session must be given for Log-in procedure"))
-          
-      # start downloading
-      self.MAP_URL["DOWNLOADED_FILE"] = []
-      for url, file in zip(self.MAP_URL["URL"], self.MAP_URL["FILE"]):
-        feedback.pushInfo(self.tr("Downloading ") + url)
-        response = session.get(url)
+  def fetchFeaturesFromWeb(self, parameters, context, feedback):
+    if not self.WEBFETCH_ARGS["SET"]:
+      return
+    # if login is needed, session is also needed
+    if self.WEBFETCH_ARGS["LOGIN"] is not None:
+      try:
+        session = self.WEBFETCH_ARGS["LOGIN"]["SESSION"]
+      except:
+        sys.exit(self.tr("Session must be given for Log-in procedure"))
+    else:
+      session = requests.Session()
         
-        # if download was succeeded, save as a file
-        if response.status_code == 200:
-          feedback.pushInfo(self.tr("... Succeeded!"))
-          with open(file, "wb") as f:
-            f.write(response.content)
-          
-          # if it is a zip file, unpack it
-          if self.MAP_URL["ZIPPED"]:
-            zip_dir = os.path.splitext(file)[0]
-            shutil.unpack_archive(file, zip_dir)
-            archived_files = glob.glob(os.path.join(zip_dir, "*"))
-            for afile in archived_files:
-              self.MAP_URL["DOWNLOADED_FILE"].append(afile)
-          else:
-            self.MAP_URL["DOWNLOADED_FILE"].append(file)
-            
-        # if the download was not succeeded
+    # start downloading
+    iter_obj = enumerate(self.WEBFETCH_ARGS["URL"])
+    n_url = len(self.WEBFETCH_ARGS["URL"])
+    def fetchFromSingleURL(i, url):
+      
+      feedback.pushInfo(f"({i+1}/{n_url}) Downloading " + url)
+      response = session.get(url)
+      
+      # if download was succeeded, save as a file
+      if response.status_code == 200:
+        feedback.pushInfo(self.tr("... Succeeded!"))
+        
+        # write the contents in a temporary file
+        tmp_file = os.path.join(
+          os.path.normpath(os.path.dirname(QgsProcessingUtils.generateTempFilename(""))), 
+          str(uuid.uuid4()) + self.WEBFETCH_ARGS["ARCHIVED"]
+          )
+        with open(tmp_file, "wb") as f:
+          f.write(response.content)
+        
+        # if it is a zip file, unpack it
+        if self.WEBFETCH_ARGS["ARCHIVED"]:
+          zip_dir = os.path.splitext(tmp_file)[0]
+          shutil.unpack_archive(tmp_file, zip_dir)
+          archived_files = glob.glob(os.path.join(zip_dir, "*"))
+          for a_file in archived_files:
+            self.WEBFETCH_ARGS["DOWNLOADED_FILE"].append(a_file)
         else:
-          feedback.pushInfo(self.tr("... ERROR!"))
+          self.WEBFETCH_ARGS["DOWNLOADED_FILE"].append(tmp_file)
+          
+      # if the download was not succeeded
+      else:
+        feedback.pushInfo(self.tr("... ERROR!"))
+      return
       
-      if len(self.MAP_URL["DOWNLOADED_FILE"]) == 0:
-        sys.exit(self.tr("No Files were downloaded!"))
+    # fetch procedure is done in parallel
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+      executor.map(lambda args: fetchFromSingleURL(*args), iter_obj)
       
-      self.createMergedFeature(parameters, context, feedback)
   
   # function to create a feature from the downloaded file(s)
-  def createMergedFeature(self, parameters, context, feedback):
+  def mergeFetchedFeatures(self, parameters, context, feedback):
     pass
   
   
   # fetch features from the map tile
   def fetchFeaturesFromOsm(self, context, feedback):
-    if self.MAP_OSM["SET"]:
+    if self.OSM_ARGS["SET"]:
       
       quickosm_results = processing.run(
         "quickosm:downloadosmdataextentquery", 
         {
-          "KEY": self.MAP_OSM["QUICKOSM_ARGS"]["KEY"],
-          "VALUE": self.MAP_OSM["QUICKOSM_ARGS"]["VALUE"],
-          "EXTENT": self.MAP_OSM["QUICKOSM_ARGS"]["EXTENT"],
-          "TIMEOUT": self.MAP_OSM["QUICKOSM_ARGS"]["TIMEOUT"],
-          "SERVER": self.MAP_OSM["URL"],
+          "KEY": self.OSM_ARGS["QUICKOSM_ARGS"]["KEY"],
+          "VALUE": self.OSM_ARGS["QUICKOSM_ARGS"]["VALUE"],
+          "EXTENT": self.OSM_ARGS["QUICKOSM_ARGS"]["FETCH_EXTENT"],
+          "TIMEOUT": self.OSM_ARGS["QUICKOSM_ARGS"]["TIMEOUT"],
+          "SERVER": self.OSM_ARGS["URL"],
           "FILE": "TEMPORARY_OUTPUT"
         },
         # context = context, # not pass the context, so as not to show the warnings
@@ -310,13 +325,13 @@ class fetchabstract(algabstract):
       )
       
       
-      if self.MAP_OSM["GEOM_TYPE"] == "Point":
+      if self.OSM_ARGS["GEOM_TYPE"] == "Point":
         vec_layer = quickosm_results["OUTPUT_POINTS"]
-      elif self.MAP_OSM["GEOM_TYPE"] == "Linestring":
+      elif self.OSM_ARGS["GEOM_TYPE"] == "Linestring":
         vec_layer = quickosm_results["OUTPUT_LINES"]
-      elif self.MAP_OSM["GEOM_TYPE"] == "Multilinestring":
+      elif self.OSM_ARGS["GEOM_TYPE"] == "Multilinestring":
         vec_layer = quickosm_results["OUTPUT_MULTILINESTRINGS"]
-      elif self.MAP_OSM["GEOM_TYPE"] == "Polygon":
+      elif self.OSM_ARGS["GEOM_TYPE"] == "Polygon":
         vec_layer = quickosm_results["OUTPUT_MULTIPOLYGONS"]
       else:
         vec_layer = None

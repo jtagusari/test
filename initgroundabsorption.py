@@ -10,34 +10,36 @@ from qgis.core import (
 
 from .initabstract import initabstract
 
-class initdem(initabstract):
+class initgroundabsorption(initabstract):
   PARAMETERS = {                  
     "INPUT": {
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("initdem","Point layer"),
-        "types": [QgsProcessing.TypeVectorPoint],
+        "description": QT_TRANSLATE_NOOP("initgroundabsorption","Polygon layer"),
+        "types": [QgsProcessing.TypeVectorPolygon],
         "optional": True
       }
     },
     "OVERWRITE": {
       "ui_func": QgsProcessingParameterEnum,
       "ui_args":{
-        "description" : QT_TRANSLATE_NOOP("initdem","Overwrite existing fields?"),
+        "description" : QT_TRANSLATE_NOOP("initgroundabsorption","Overwrite existing fields?"),
         "defaultValue": True
       }
     },
     "OUTPUT": {
       "ui_func": QgsProcessingParameterFeatureSink,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("initdem","Elevation points" )
+        "description": QT_TRANSLATE_NOOP("initgroundabsorption","Ground absorption" )
       }
     }
   }
   
-  FIELDS_ADD = {    
-    "alti":       {"TYPE": QVariant.Double, "DEFAULT_VALUE": None}
-  }
+  def __init__(self) -> None:
+    super().__init__()
+    self.FIELDS_ADD.update(
+      {"G":       {"TYPE": QVariant.Double, "DEFAULT_VALUE": 0.0}}
+    )
       
   def initAlgorithm(self, config):
     self.initParameters()
@@ -49,10 +51,10 @@ class initdem(initabstract):
     return {"OUTPUT": dest_id}
   
   def createInstance(self):
-    return initdem()
+    return initgroundabsorption()
 
   def displayName(self):
-    return self.tr("Elevation point")
+    return self.tr("Ground absorption")
 
   def group(self):
     return self.tr("Initialize features")
@@ -61,4 +63,4 @@ class initdem(initabstract):
     return "initfeature"
 
   def createInstance(self):
-    return initdem()
+    return initgroundabsorption()

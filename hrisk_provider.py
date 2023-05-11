@@ -5,6 +5,8 @@ from .noisefromemission import noisefromemission
 from .initroademissionfromtraffic import initroademissionfromtraffic
 from .initroad import initroad
 from .initbuilding import initbuilding
+from .initgroundabsorption import initgroundabsorption
+from .initelevationpoint import initelevationpoint
 from .fetchjageom import fetchjageom
 from .fetchjaroad import fetchjaroad
 from .fetchosmroad import fetchosmroad
@@ -24,7 +26,7 @@ from .estimateriskofbuilding import estimateriskofbuilding
 
 class hrisk_provider(QgsProcessingProvider):
 
-    def __init__(self):
+    def __init__(self):        
         QgsProcessingProvider.__init__(self)
 
     def unload(self):
@@ -43,6 +45,8 @@ class hrisk_provider(QgsProcessingProvider):
         self.addAlgorithm(noisefromemission())
         self.addAlgorithm(initroad())
         self.addAlgorithm(initbuilding())
+        self.addAlgorithm(initelevationpoint())
+        self.addAlgorithm(initgroundabsorption())
         self.addAlgorithm(initroademissionfromtraffic())
         self.addAlgorithm(receiverfacade())
         self.addAlgorithm(receiverregulargrid())

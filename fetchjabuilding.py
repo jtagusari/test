@@ -16,7 +16,7 @@ class fetchjabuilding(fetchabstract):
   
   # UIs
   PARAMETERS = {  
-    "EXTENT": {
+    "FETCH_EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
         "description": QT_TRANSLATE_NOOP("fetchjabuilding","Extent for fetching data")
@@ -36,7 +36,7 @@ class fetchjabuilding(fetchabstract):
         "parentParameterName": "TARGET_CRS"
       }
     },
-    "MAPTILE_URL": {
+    "TILEMAP_URL": {
       "ui_func": QgsProcessingParameterString,
       "ui_args": {
         "optional": True,
@@ -44,7 +44,7 @@ class fetchjabuilding(fetchabstract):
         "defaultValue": "https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf|layername=building|geometrytype=Polygon"
       }
     },
-    "MAPTILE_CRS": {
+    "TILEMAP_CRS": {
       "ui_func": QgsProcessingParameterCrs,
       "ui_args": {
         "optional": True,
@@ -52,7 +52,7 @@ class fetchjabuilding(fetchabstract):
         "defaultValue": "EPSG:3857" # must be specified as string, because optional parameter cannot be set as QgsCoordinateReferenceSystem
       }
     },
-    "MAPTILE_ZOOM": {
+    "TILEMAP_ZOOM": {
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
         "optional": True,
@@ -102,8 +102,8 @@ class fetchjabuilding(fetchabstract):
   # execution of the algorithm
   def processAlgorithm(self, parameters, context, feedback):    
     
-    self.setCalcArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
-    self.setMapTileMeta(parameters, context, feedback, "Polygon")
+    self.setFetchArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
+    self.setTileMapArgs(parameters, context, feedback, "Polygon")
     
     # fetch the data from vector map tile
     bldg_raw = self.fetchFeaturesFromTile(parameters, context, feedback)

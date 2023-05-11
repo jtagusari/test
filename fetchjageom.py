@@ -22,7 +22,7 @@ from .receiverabstract import receiverabstract
 
 class fetchjageom(fetchabstract, receiverabstract):
   PARAMETERS = {  
-    "EXTENT": {
+    "FETCH_EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
         "description": QT_TRANSLATE_NOOP("fetchjageom","Extent for fetching data")
@@ -47,7 +47,7 @@ class fetchjageom(fetchabstract, receiverabstract):
       "ui_func": QgsProcessingParameterBoolean,
       "ui_args": {
         "optional": True,
-        "description": QT_TRANSLATE_NOOP("fetchjageom","Fetch DEM?"),
+        "description": QT_TRANSLATE_NOOP("fetchjageom","Fetch elevation points?"),
         "defaultValue": False
       }
     },
@@ -138,10 +138,10 @@ class fetchjageom(fetchabstract, receiverabstract):
     #   },
     #   "n_mdl": "isoSurfaceInBuildings"
     # }
-    "CALC_AREA": {
+    "FETCH_AREA": {
       "ui_func": QgsProcessingParameterVectorDestination,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("fetchjageom","Calculation area" )
+        "description": QT_TRANSLATE_NOOP("fetchjageom","Fetch area" )
       },
       "visibleByDefault": False
     },
@@ -216,7 +216,7 @@ class fetchjageom(fetchabstract, receiverabstract):
     self.PROC_RESULTS["POP"] = processing.run(
       "hrisk:fetchjapop",
       {
-        "EXTENT": self.parameterAsString(parameters, "EXTENT", context), # Note that parameterAsExtent is NG because CRS is not included
+        "FETCH_EXTENT": self.parameterAsString(parameters, "FETCH_EXTENT", context), # Note that parameterAsExtent is NG because CRS is not included
         "TARGET_CRS": self.parameterAsCrs(parameters, "TARGET_CRS", context),
         "BUFFER": self.parameterAsDouble(parameters, "BUFFER",context),
         "OUTPUT": self.parameterAsOutputLayer(parameters, "POP", context)
@@ -230,7 +230,7 @@ class fetchjageom(fetchabstract, receiverabstract):
     self.PROC_RESULTS["ROAD"] = processing.run(
       "hrisk:fetchjaroad",
       {
-        "EXTENT": self.parameterAsString(parameters, "EXTENT", context),# Note that parameterAsExtent is NG because CRS is not included
+        "FETCH_EXTENT": self.parameterAsString(parameters, "FETCH_EXTENT", context),# Note that parameterAsExtent is NG because CRS is not included
         "TARGET_CRS": self.parameterAsCrs(parameters, "TARGET_CRS", context),
         "BUFFER": self.parameterAsDouble(parameters, "BUFFER",context),
         "OUTPUT": self.parameterAsOutputLayer(parameters, "ROAD", context)
@@ -245,7 +245,7 @@ class fetchjageom(fetchabstract, receiverabstract):
     bldg_raw = processing.run(
       "hrisk:fetchjabuilding",
       {
-        "EXTENT": self.parameterAsString(parameters, "EXTENT", context),# Note that parameterAsExtent is NG because CRS is not included
+        "FETCH_EXTENT": self.parameterAsString(parameters, "FETCH_EXTENT", context),# Note that parameterAsExtent is NG because CRS is not included
         "TARGET_CRS": self.parameterAsCrs(parameters, "TARGET_CRS", context),
         "BUFFER": self.parameterAsDouble(parameters, "BUFFER",context),
         "OUTPUT": "TEMPORARY_OUTPUT"
@@ -269,7 +269,7 @@ class fetchjageom(fetchabstract, receiverabstract):
     dem_processing = processing.run(
       "hrisk:fetchjadem",
       {
-        "EXTENT": self.parameterAsString(parameters, "EXTENT", context),
+        "FETCH_EXTENT": self.parameterAsString(parameters, "FETCH_EXTENT", context),
         "TARGET_CRS": self.parameterAsCrs(parameters, "TARGET_CRS", context),
         "BUFFER": self.parameterAsDouble(parameters, "BUFFER",context),
         "OUTPUT": self.parameterAsOutputLayer(parameters, "DEM", context),
@@ -322,9 +322,9 @@ class fetchjageom(fetchabstract, receiverabstract):
     
     self.GRP_ID = "ja_geom_" + str(uuid.uuid4())[:6]
     
-    feedback.pushInfo(self.tr("Set calculation area"))
-    self.setCalcArea(parameters,context,feedback)
-    self.PROC_RESULTS["CALC_AREA"] = self.calcAreaAsVectorLayer()
+    feedback.pushInfo(self.tr("Set fetch area"))
+    self.setFetchArea(parameters,context,feedback)
+    self.PROC_RESULTS["FETCH_AREA"] = self.fetchAreaAsVectorLayer()
     feedback.setProgress(5)      
     
     feedback.pushInfo(self.tr("Fetch geometry of population"))

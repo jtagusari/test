@@ -278,117 +278,112 @@
         <translation>情報取得範囲の外側のバッファー（変換先の参照座標系使用）</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="73"/>
+        <location filename="../fetchjageom.py" line="86"/>
         <source>Distance between receivers (m)</source>
         <translation>受音点間の距離 (m)</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="83"/>
+        <location filename="../fetchjageom.py" line="96"/>
         <source>Height of receivers (m)</source>
         <translation>受音点高さ (m)</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="308"/>
+        <location filename="../fetchjageom.py" line="321"/>
         <source>Configurations</source>
         <translation>設定・初期化</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="368"/>
+        <location filename="../fetchjageom.py" line="381"/>
         <source>Fetch geometries (Ja)</source>
         <translation>地物取得（日本国内）</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="313"/>
-        <source>Set calculation area</source>
+        <location filename="../fetchjageom.py" line="326"/>
+        <source>Set fetch area</source>
         <translation>計算範囲を設定</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="318"/>
+        <location filename="../fetchjageom.py" line="331"/>
         <source>Fetch geometry of population</source>
         <translation>人口情報を取得</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="322"/>
+        <location filename="../fetchjageom.py" line="335"/>
         <source>Fetch geometry of roads</source>
         <translation>道路中心線を取得</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="330"/>
+        <location filename="../fetchjageom.py" line="344"/>
         <source>Fetch geometry of DEM</source>
         <translation>標高点（DEM）を取得</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="336"/>
+        <location filename="../fetchjageom.py" line="349"/>
         <source>Set receivers at building facade</source>
         <translation>建物壁面の受音点を設定</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="342"/>
+        <location filename="../fetchjageom.py" line="354"/>
         <source>Set receivers of delaunay grid</source>
         <translation>ドロネー三角形分割点に受音点を設定</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="93"/>
+        <location filename="../fetchjageom.py" line="106"/>
         <source>Maximum propagation distance between sources and receivers (m)</source>
         <translation>騒音の最大伝搬距離 (m)</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="103"/>
+        <location filename="../fetchjageom.py" line="116"/>
         <source>Road width (m), where no receivers will be set closer than it</source>
         <translation>音源と最近接受音点の距離 (m)</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="113"/>
+        <location filename="../fetchjageom.py" line="126"/>
         <source>Maximum trianglar area (m2)</source>
         <translation>三角形の面積の最大値 (m2)</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="131"/>
-        <source>Calculation area</source>
-        <translation>計算範囲</translation>
-    </message>
-    <message>
-        <location filename="../fetchjageom.py" line="138"/>
+        <location filename="../fetchjageom.py" line="151"/>
         <source>Roads</source>
         <translation>道路</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="145"/>
+        <location filename="../fetchjageom.py" line="158"/>
         <source>Buildings</source>
         <translation>建物</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="152"/>
+        <location filename="../fetchjageom.py" line="165"/>
         <source>Receivers at facade</source>
         <translation>受音点（建物壁面）</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="159"/>
+        <location filename="../fetchjageom.py" line="172"/>
         <source>Receivers of delaunay</source>
         <translation>受音点（ドロネー三角形分割点）</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="166"/>
+        <location filename="../fetchjageom.py" line="179"/>
         <source>Triangles of delaunay</source>
         <translation>ドロネー三角形分割ポリゴン</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="173"/>
+        <location filename="../fetchjageom.py" line="186"/>
         <source>Elevation point (DEM)</source>
         <translation>標高点（DEM）</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="180"/>
+        <location filename="../fetchjageom.py" line="193"/>
         <source>Elevation raster (DEM)</source>
         <translation>標高ラスタ（DEM）</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="187"/>
+        <location filename="../fetchjageom.py" line="200"/>
         <source>Population</source>
         <translation>人口</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="365"/>
+        <location filename="../fetchjageom.py" line="378"/>
         <source>All geometries and set receivers</source>
         <translation>全て取得・受音点設定</translation>
     </message>
@@ -398,22 +393,7 @@
         <translation>情報取得範囲</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="50"/>
-        <source>None</source>
-        <translation>受音点を設定しない</translation>
-    </message>
-    <message>
-        <location filename="../fetchjageom.py" line="52"/>
-        <source>Receivers at delaunary grid</source>
-        <translation>ドロネー分割点に受音点を設定</translation>
-    </message>
-    <message>
-        <location filename="../fetchjageom.py" line="53"/>
-        <source>Receivers at regular grid</source>
-        <translation>格子点に受音点を設定</translation>
-    </message>
-    <message>
-        <location filename="../fetchjageom.py" line="326"/>
+        <location filename="../fetchjageom.py" line="339"/>
         <source>Fetch geometry of buildings and estimate the population</source>
         <translation>建物情報を取得</translation>
     </message>
@@ -423,52 +403,72 @@
         <translation>変換先の参照座標系（直交座標系）</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="48"/>
-        <source>Set receiver points?</source>
-        <translation>受音点の設定</translation>
+        <location filename="../fetchjageom.py" line="50"/>
+        <source>Fetch elevation points?</source>
+        <translation>標高点情報を取得</translation>
+    </message>
+    <message>
+        <location filename="../fetchjageom.py" line="59"/>
+        <source>Set receiver at building facade?</source>
+        <translation>建物壁面に受音点を設定</translation>
+    </message>
+    <message>
+        <location filename="../fetchjageom.py" line="68"/>
+        <source>Set receiver at delaynay grid point?</source>
+        <translation>ドロネー分割点に受音点を設定</translation>
+    </message>
+    <message>
+        <location filename="../fetchjageom.py" line="144"/>
+        <source>Fetch area</source>
+        <translation>地物取得範囲</translation>
     </message>
 </context>
 <context>
     <name>fetchjapop</name>
     <message>
-        <location filename="../fetchjapop.py" line="171"/>
+        <location filename="../fetchjapop.py" line="200"/>
         <source>Fetch geometries (Ja)</source>
         <translation>地物取得（日本国内）</translation>
     </message>
     <message>
-        <location filename="../fetchjapop.py" line="68"/>
+        <location filename="../fetchjapop.py" line="71"/>
         <source>Population</source>
         <translation>人口</translation>
     </message>
     <message>
-        <location filename="../fetchjapop.py" line="32"/>
+        <location filename="../fetchjapop.py" line="35"/>
         <source>Extent for fetching data</source>
         <translation>情報取得範囲</translation>
     </message>
     <message>
-        <location filename="../fetchjapop.py" line="44"/>
+        <location filename="../fetchjapop.py" line="47"/>
         <source>Buffer of the fetch area (using Target CRS)</source>
         <translation>情報取得範囲の外側のバッファー</translation>
     </message>
     <message>
-        <location filename="../fetchjapop.py" line="53"/>
+        <location filename="../fetchjapop.py" line="56"/>
         <source>Base-URL of the vector-tile map</source>
         <translation>ベクトルタイル地図のベースURL</translation>
     </message>
     <message>
-        <location filename="../fetchjapop.py" line="61"/>
+        <location filename="../fetchjapop.py" line="64"/>
         <source>CRS of the vector-tile map</source>
         <translation>ベクトルタイル地図の参照座標系</translation>
     </message>
     <message>
-        <location filename="../fetchjapop.py" line="38"/>
+        <location filename="../fetchjapop.py" line="41"/>
         <source>Target CRS (Cartesian coordinates)</source>
         <translation>変換先の参照座標系（直交座標系）</translation>
     </message>
     <message>
-        <location filename="../fetchjapop.py" line="168"/>
+        <location filename="../fetchjapop.py" line="197"/>
         <source>Population (Ja)</source>
         <translation>人口</translation>
+    </message>
+    <message>
+        <location filename="../fetchjapop.py" line="136"/>
+        <source>No population results were obtained!</source>
+        <translation>人口データは見つかりませんでした</translation>
     </message>
 </context>
 <context>
@@ -479,7 +479,7 @@
         <translation>情報取得範囲の外側のバッファー（変換先の参照座標系使用）</translation>
     </message>
     <message>
-        <location filename="../fetchjaroad.py" line="186"/>
+        <location filename="../fetchjaroad.py" line="179"/>
         <source>Fetch geometries (Ja)</source>
         <translation>地物取得（日本国内）</translation>
     </message>
@@ -514,7 +514,7 @@
         <translation>道路</translation>
     </message>
     <message>
-        <location filename="../fetchjaroad.py" line="183"/>
+        <location filename="../fetchjaroad.py" line="176"/>
         <source>Road centerline (Ja)</source>
         <translation>道路中心線</translation>
     </message>
@@ -532,22 +532,22 @@
         <translation>情報取得範囲の外側のバッファー（変換先の参照座標系使用）</translation>
     </message>
     <message>
-        <location filename="../fetchosmbuilding.py" line="49"/>
+        <location filename="../fetchosmbuilding.py" line="50"/>
         <source>Key of OpenStreetMap for buildings. By default, &apos;building&apos;</source>
         <translation>建物情報取得のためのOpenStreetMapのKey（デフォルト：&apos;building&apos;）</translation>
     </message>
     <message>
-        <location filename="../fetchosmbuilding.py" line="57"/>
+        <location filename="../fetchosmbuilding.py" line="58"/>
         <source>Value of OpenStreetMap for buildings. By default, &apos;&apos; (all buildings)</source>
         <translation>建物情報取得のためのOpenStreetMapのValue（デフォルト：&apos;&apos;（全建物））</translation>
     </message>
     <message>
-        <location filename="../fetchosmbuilding.py" line="74"/>
+        <location filename="../fetchosmbuilding.py" line="75"/>
         <source>Building</source>
         <translation>建物</translation>
     </message>
     <message>
-        <location filename="../fetchosmbuilding.py" line="120"/>
+        <location filename="../fetchosmbuilding.py" line="121"/>
         <source>Building (OSM)</source>
         <translation>建物（OSM）</translation>
     </message>
@@ -562,12 +562,12 @@
         <translation>OpenStreetMapクエリのURL</translation>
     </message>
     <message>
-        <location filename="../fetchosmbuilding.py" line="123"/>
+        <location filename="../fetchosmbuilding.py" line="124"/>
         <source>Fetch geometries</source>
         <translation>地物取得（グローバル対応）</translation>
     </message>
     <message>
-        <location filename="../fetchosmbuilding.py" line="65"/>
+        <location filename="../fetchosmbuilding.py" line="66"/>
         <source>Value of the timeout for the query (in seconds)</source>
         <translation>クエリのタイムアウト（秒）</translation>
     </message>
@@ -633,27 +633,27 @@
         <translation>情報取得範囲の外側のバッファー</translation>
     </message>
     <message>
-        <location filename="../fetchsrtmdem.py" line="58"/>
+        <location filename="../fetchsrtmdem.py" line="66"/>
         <source>Username to login SRTM data system</source>
         <translation>SRTMシステムのログインUsername</translation>
     </message>
     <message>
-        <location filename="../fetchsrtmdem.py" line="64"/>
+        <location filename="../fetchsrtmdem.py" line="72"/>
         <source>Password to login SRTM data system</source>
         <translation>SRTMシステムのログインPassword</translation>
     </message>
     <message>
-        <location filename="../fetchsrtmdem.py" line="76"/>
+        <location filename="../fetchsrtmdem.py" line="84"/>
         <source>Elevation raster (DEM)</source>
         <translation>標高ラスタ（DEM）</translation>
     </message>
     <message>
-        <location filename="../fetchsrtmdem.py" line="157"/>
+        <location filename="../fetchsrtmdem.py" line="158"/>
         <source>No SRTM files were downloaded!</source>
         <translation>SRTMファイルはダウンロードされませんでした</translation>
     </message>
     <message>
-        <location filename="../fetchsrtmdem.py" line="70"/>
+        <location filename="../fetchsrtmdem.py" line="78"/>
         <source>Elevation points (DEM)</source>
         <translation>標高点（DEM）</translation>
     </message>
@@ -663,17 +663,17 @@
         <translation>変換先の参照座標系（直交座標系）</translation>
     </message>
     <message>
-        <location filename="../fetchsrtmdem.py" line="235"/>
+        <location filename="../fetchsrtmdem.py" line="236"/>
         <source>Fetch geometries</source>
         <translation>地物取得（グローバル対応）</translation>
     </message>
     <message>
-        <location filename="../fetchsrtmdem.py" line="84"/>
+        <location filename="../fetchsrtmdem.py" line="92"/>
         <source>The CRS is NOT a Geographic Coordinate System</source>
         <translation>参照座標系が地理座標系ではありません</translation>
     </message>
     <message>
-        <location filename="../fetchsrtmdem.py" line="87"/>
+        <location filename="../fetchsrtmdem.py" line="95"/>
         <source>The extent is out of SRTM-covered area</source>
         <translation>指定範囲がSRTMデータ提供範囲ではありません</translation>
     </message>
@@ -683,15 +683,20 @@
         <translation>SRTMのベースURL</translation>
     </message>
     <message>
-        <location filename="../fetchsrtmdem.py" line="232"/>
+        <location filename="../fetchsrtmdem.py" line="233"/>
         <source>Elevation points (SRTM)</source>
         <translation>標高点（SRTM）</translation>
+    </message>
+    <message>
+        <location filename="../fetchsrtmdem.py" line="59"/>
+        <source>Login-URL of the SRTM data</source>
+        <translation>SRTMのログインURL</translation>
     </message>
 </context>
 <context>
     <name>hrisk_provider</name>
     <message>
-        <location filename="../hrisk_provider.py" line="59"/>
+        <location filename="../hrisk_provider.py" line="63"/>
         <source>H-RISK</source>
         <translation>H-RISK</translation>
     </message>
@@ -704,67 +709,70 @@
         <translation>ポリゴンレイヤ</translation>
     </message>
     <message>
-        <location filename="../initbuilding.py" line="26"/>
-        <source>Overwrite existing fields??</source>
-        <translation>既存フィールドとの重複があった場合に上書きするか</translation>
-    </message>
-    <message>
-        <location filename="../initbuilding.py" line="28"/>
-        <source>Overwrite</source>
-        <translation>上書き</translation>
-    </message>
-    <message>
-        <location filename="../initbuilding.py" line="29"/>
-        <source>Append</source>
-        <translation>付け足し</translation>
-    </message>
-    <message>
-        <location filename="../initbuilding.py" line="60"/>
+        <location filename="../initbuilding.py" line="57"/>
         <source>Building</source>
         <translation>建物</translation>
     </message>
     <message>
-        <location filename="../initbuilding.py" line="63"/>
+        <location filename="../initbuilding.py" line="60"/>
+        <source>Initialize features</source>
+        <translation>地物の初期化</translation>
+    </message>
+    <message>
+        <location filename="../initbuilding.py" line="26"/>
+        <source>Overwrite existing fields?</source>
+        <translation>既存フィールドを上書き</translation>
+    </message>
+</context>
+<context>
+    <name>initelevationpoint</name>
+    <message>
+        <location filename="../initelevationpoint.py" line="18"/>
+        <source>Point layer</source>
+        <translation>ポイントレイヤ</translation>
+    </message>
+    <message>
+        <location filename="../initelevationpoint.py" line="26"/>
+        <source>Overwrite existing fields?</source>
+        <translation>既存フィールドを上書き</translation>
+    </message>
+    <message>
+        <location filename="../initelevationpoint.py" line="33"/>
+        <source>Elevation points</source>
+        <translation>標高点</translation>
+    </message>
+    <message>
+        <location filename="../initelevationpoint.py" line="57"/>
+        <source>Elevation point</source>
+        <translation>標高点</translation>
+    </message>
+    <message>
+        <location filename="../initelevationpoint.py" line="60"/>
         <source>Initialize features</source>
         <translation>地物の初期化</translation>
     </message>
 </context>
 <context>
-    <name>initdem</name>
+    <name>initgroundabsorption</name>
     <message>
-        <location filename="../initdem.py" line="18"/>
-        <source>Point layer</source>
-        <translation>ポイントレイヤ</translation>
+        <location filename="../initgroundabsorption.py" line="18"/>
+        <source>Polygon layer</source>
+        <translation>ポリゴンレイヤ</translation>
     </message>
     <message>
-        <location filename="../initdem.py" line="26"/>
-        <source>Overwrite existing fields??</source>
-        <translation>既存フィールドとの重複があった場合に上書きするか</translation>
+        <location filename="../initgroundabsorption.py" line="26"/>
+        <source>Overwrite existing fields?</source>
+        <translation>既存フィールドを上書き</translation>
     </message>
     <message>
-        <location filename="../initdem.py" line="28"/>
-        <source>Overwrite</source>
-        <translation>上書き</translation>
+        <location filename="../initgroundabsorption.py" line="57"/>
+        <source>Ground absorption</source>
+        <translation>地表面吸音効果</translation>
     </message>
     <message>
-        <location filename="../initdem.py" line="29"/>
-        <source>Append</source>
-        <translation>付け足し</translation>
-    </message>
-    <message>
-        <location filename="../initdem.py" line="37"/>
-        <source>Elevation points</source>
-        <translation>標高点</translation>
-    </message>
-    <message>
-        <location filename="../initdem.py" line="62"/>
+        <location filename="../initgroundabsorption.py" line="60"/>
         <source>Initialize features</source>
         <translation>地物の初期化</translation>
-    </message>
-    <message>
-        <location filename="../initdem.py" line="59"/>
-        <source>Elevation point</source>
-        <translation>標高点</translation>
     </message>
 </context>
 <context>
@@ -775,34 +783,24 @@
         <translation>線レイヤー</translation>
     </message>
     <message>
-        <location filename="../initroad.py" line="26"/>
-        <source>Overwrite existing fields??</source>
-        <translation>既存フィールドとの重複があった場合に上書きするか</translation>
-    </message>
-    <message>
-        <location filename="../initroad.py" line="28"/>
-        <source>Overwrite</source>
-        <translation>上書き</translation>
-    </message>
-    <message>
-        <location filename="../initroad.py" line="29"/>
-        <source>Append</source>
-        <translation>付け足し</translation>
-    </message>
-    <message>
-        <location filename="../initroad.py" line="111"/>
+        <location filename="../initroad.py" line="110"/>
         <source>Road with acoustic information</source>
         <translation>道路</translation>
     </message>
     <message>
-        <location filename="../initroad.py" line="114"/>
+        <location filename="../initroad.py" line="113"/>
         <source>Initialize features</source>
         <translation>地物の初期化</translation>
     </message>
     <message>
-        <location filename="../initroad.py" line="37"/>
+        <location filename="../initroad.py" line="33"/>
         <source>Road</source>
         <translation>道路</translation>
+    </message>
+    <message>
+        <location filename="../initroad.py" line="26"/>
+        <source>Overwrite existing fields?</source>
+        <translation>既存フィールドを上書き</translation>
     </message>
 </context>
 <context>
@@ -820,7 +818,7 @@
     <message>
         <location filename="../initroademissionfromtraffic.py" line="94"/>
         <source>Road emission calculated from traffic</source>
-        <translation>道路</translation>
+        <translation>道路（交通量を音響レベルに変換）</translation>
     </message>
     <message>
         <location filename="../initroademissionfromtraffic.py" line="97"/>
@@ -1072,12 +1070,12 @@
         <translation>計算スレッド数 (0: 全て)</translation>
     </message>
     <message>
-        <location filename="../noisefromtraffic.py" line="300"/>
+        <location filename="../noisefromtraffic.py" line="302"/>
         <source>Prediction from traffic</source>
         <translation>交通量に基づく予測</translation>
     </message>
     <message>
-        <location filename="../noisefromtraffic.py" line="303"/>
+        <location filename="../noisefromtraffic.py" line="305"/>
         <source>Predict sound level</source>
         <translation>騒音予測</translation>
     </message>
