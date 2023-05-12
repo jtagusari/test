@@ -24,14 +24,17 @@ License of the external program used by this plug-in:
 
 ## How to install
 
-To calculate the sound levels, NoiseModelling (https://noise-planet.org/noisemodelling.html) and Java implementation are needed.
+Install QGIS (version >= 3.22.0) and install the plugin according to the following instruction.
+Since this plugin is not shared in QGIS repository at this moment, manual copy of the script to the QGIS plugin folder and activation of the plugin in QGIS is necessary.
+In addition, to calculate the sound levels, NoiseModelling (https://noise-planet.org/noisemodelling.html) and Java implementation are needed.
 
+The installer (`installer/hrisk-setup.exe`) will help install required components including the present plugin.
 
 ### Using installer (Windows 10)
 
- Execute the installer (`installer/hrisk-setup.exe`). 
- The program can also install this plugin, as well as all the required components. 
- Environmental variables that are needed to execute NoiseModelling are also set. 
+Execute the installer (`installer/hrisk-setup.exe`). 
+The program can also install this plugin, as well as all the required components. 
+Environmental variables that are needed to execute NoiseModelling are also set. 
 
 ### Manual install
 
