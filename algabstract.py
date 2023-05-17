@@ -19,34 +19,37 @@ from qgis.core import (
 import os
 import sys
 import asyncio
+import re
 
 class algabstract(QgsProcessingAlgorithm):
-  NOISEMODELLING = {}
+  NOISEMODELLING = {
+    "CMD": None,
+    "GROOVY_SCRIPT": None,
+    "TEMP_DIR":None,
+    "WPS_ARGS":None
+    }
   
-  def initNoiseModelling(self, groovy_script_str):
-    self.NOISEMODELLING["CMD_HOME"] = os.path.dirname(__file__)#os.environ["NOISEMODELLING"]
-    self.NOISEMODELLING["WPS_SCRIPTS"] = os.path.join(os.path.dirname(__file__), "noisemodelling","bin", "wps_scripts")
-    self.NOISEMODELLING["SCRIPT"] = os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", groovy_script_str)
+  
+  def initNoiseModellingPath(self, groovy_script_str):
+    self.NOISEMODELLING["GROOVY_SCRIPT"] = os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", groovy_script_str)
   
     # folder where the files are saved
     self.NOISEMODELLING["TEMP_DIR"] = os.path.normpath(os.path.dirname(QgsProcessingUtils.generateTempFilename("")))
     if not os.path.exists(self.NOISEMODELLING["TEMP_DIR"]):
       os.mkdir(self.NOISEMODELLING["TEMP_DIR"])
     
-    self.addPathNoiseModelling()
+  def addNoiseModellingPath(self, paths:dict=None):
+    if (isinstance(paths, dict)):
+      self.NOISEMODELLING.update(paths)
+
   
-  def addPathNoiseModelling(self):
-    pass
-  
-  def initWpsArgs(self, parameters, context, feedback, additional_wps = None):   
+  def initNoiseModellingArg(self, parameters, context, feedback):   
     self.NOISEMODELLING["WPS_ARGS"] = {
       "w": self.NOISEMODELLING["TEMP_DIR"], 
-      "s": self.NOISEMODELLING["SCRIPT"],
-      "exportDir": self.NOISEMODELLING["TEMP_DIR"]
+      "s": self.NOISEMODELLING["GROOVY_SCRIPT"],
+      "noiseModellingHome": '"' + os.path.normpath(os.environ["NOISEMODELLING_HOME"]) + '"',
+      "exportDir": '"' + self.NOISEMODELLING["TEMP_DIR"]+ '"'
     }
-    
-    if additional_wps is not None:
-      self.NOISEMODELLING["WPS_ARGS"].update(additional_wps)
     
     # get CRS
     crs_key = [key for key, value in self.PARAMETERS.items() if value.get("crs_referrence") != None and value.get("crs_referrence") == True]
@@ -64,7 +67,7 @@ class algabstract(QgsProcessingAlgorithm):
             vl = src.materialize(QgsFeatureRequest(), feedback)
             vl_path = os.path.join(self.NOISEMODELLING["TEMP_DIR"], key + ".geojson")
             self.saveVectorLayer(vl, vl_path)
-            self.NOISEMODELLING["WPS_ARGS"][value.get("n_mdl")] = vl_path
+            self.NOISEMODELLING["WPS_ARGS"][value.get("n_mdl")] = '"' + vl_path + '"'
         else:
           if value.get("ui_func") == QgsProcessingParameterString:
             value_input = self.parameterAsString(parameters, key, context)
@@ -77,12 +80,10 @@ class algabstract(QgsProcessingAlgorithm):
               value_input = self.parameterAsDouble(parameters, key, context)
             
           self.NOISEMODELLING["WPS_ARGS"][value.get("n_mdl")] = value_input
-    self.genCmd()
   
-  # method just to generate the command to execute a groovy script
-  def genCmd(self):
-    self.NOISEMODELLING["CMD"] = os.path.join("noisemodelling","bin","wps_scripts") + \
-      "".join([" -" + k + " " + str(v) for k, v in self.NOISEMODELLING["WPS_ARGS"].items()])
+  def addNoiseModellingArg(self, paths:dict=None):
+    if (isinstance(paths, dict)):
+      self.NOISEMODELLING["WPS_ARGS"].update(paths)
   
   # add parameters using PARAMETERS attribute
   def initParameters(self):    
@@ -118,22 +119,25 @@ class algabstract(QgsProcessingAlgorithm):
       )
   
   # execution of the NoiseModelling scrript
-  def execNoiseModelling(self, parameters, context, feedback):
+  def execNoiseModellingCmd(self, parameters, context, feedback):    
+    self.NOISEMODELLING["CMD"] = os.path.join(os.path.dirname(__file__), "noisemodelling","bin","wps_scripts") + \
+      "".join([" -" + k + " " + str(v) for k, v in self.NOISEMODELLING["WPS_ARGS"].items()])
+    feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
     loop = asyncio.ProactorEventLoop()      
     loop.run_until_complete(
-      self.streamNoiseModelling(self.NOISEMODELLING["CMD"], feedback)
+      self.streamNoiseModellingCmd(self.NOISEMODELLING["CMD"], feedback)
     )
     
-  async def streamNoiseModelling(self, cmd, feedback):
+  async def streamNoiseModellingCmd(self, cmd, feedback):
     proc = await asyncio.create_subprocess_shell(
       cmd,
       stdout=asyncio.subprocess.PIPE,
       stderr=asyncio.subprocess.PIPE,
-      cwd = self.NOISEMODELLING["CMD_HOME"]
+      cwd = self.NOISEMODELLING["TEMP_DIR"]
     )
 
     while True:
-      if proc.stdout.at_eof() and proc.stderr.at_eof():
+      if proc.stdout.at_eof() or proc.stderr.at_eof():
         break  
 
       stderr_raw = await proc.stderr.readline() # for debugging
@@ -145,6 +149,13 @@ class algabstract(QgsProcessingAlgorithm):
       
       if stderr:
         feedback.pushInfo(stderr.replace("\n",""))
+        
+        
+      prg_match = re.search(r".*[0-9]+\.[0-9]+.*%", stderr)
+      if prg_match:                
+        feedback.setProgress(
+          int(float(re.search(r"[0-9]+\.[0-9]+", prg_match.group()).group()))
+        )
   
   # import the results of the NoiseModelling as a sink
   def importNoiseModellingResultsAsSink(self, parameters, context, attribute, path):

@@ -1,5 +1,7 @@
 [日本語版 README ](/README-ja.md)
 
+# H-RISK with NoiseModelling
+
 ## About
 
 This is a QGIS plugin, which implements NoiseModelling (https://github.com/Universite-Gustave-Eiffel/NoiseModelling) and help estimate the health risks posed by (road traffic) noise.
@@ -9,8 +11,10 @@ This is a QGIS plugin, which implements NoiseModelling (https://github.com/Unive
 This plugin can
 
 - fetch geometries from OpenStreetMap, Shuttle Radar Topography Mission, and Vector Tiles (provided by the Geospatial Information Authority of Japan).
-- predict sound levels using NoiseModelling.
+- predict sound levels using NoiseModelling, by executing the Java script (specified Java implementation is required).
 - estimate health risks based on the predicted sound levels and expore-response relationships shown in the Environmental Noise Guidelines in European Region (WHO Regional Office for Europe).
+
+At this moment, the operation of the plugin with NoiseModelling v4.0.2 is confirmed. (Not with v4.0.4)
 
 ## License
 
@@ -22,11 +26,12 @@ License of the external program used by this plug-in:
 - NoiseModelling: GPL v3
 - OpenJDK: GPL v2 (Classpath Exception)
 
+Note: This service uses the API function of the e-Stat (e-Stat), but the content of the service is not guaranteed by the government.
+
 ## How to install
 
 Install QGIS (version >= 3.22.0) and install the plugin according to the following instruction.
-Since this plugin is not shared in QGIS repository at this moment, manual copy of the script to the QGIS plugin folder and activation of the plugin in QGIS is necessary.
-In addition, to calculate the sound levels, NoiseModelling (https://noise-planet.org/noisemodelling.html) and Java implementation are needed.
+Note that to calculate the sound levels, NoiseModelling (https://noise-planet.org/noisemodelling.html) and Java implementation are needed.
 
 The installer (`installer/hrisk-setup.exe`) will help install required components including the present plugin.
 
@@ -40,7 +45,7 @@ Environmental variables that are needed to execute NoiseModelling are also set.
 
 #### This plugin
 
-Install from QGIS repo or Download all the files in the repository (https://gitlab.com/jtagusari/hrisk-noisemodelling) and save them in the QGIS plugin folder.
+Install from QGIS repo (currently preparing) or download all the files in the repository (https://gitlab.com/jtagusari/hrisk-noisemodelling) and save them in the QGIS plugin folder.
 
 #### NoiseModelling
 
@@ -60,7 +65,7 @@ Install from QGIS repo or Download all the files in the repository (https://gitl
 ### Fetch the geometries
 
 Specify area and fetch the geometries of roads and buildings in the area.
-The algorithms are stored in `Fetch geometries (Global)` group.
+The algorithms are stored in `Fetch geometries` group.
 In Japan, precised data (including population) can be obtained using the algorithms stored in `Fetch geometries (Ja)` group.
 
 ### Set information on the sound sources
@@ -86,3 +91,5 @@ The algorithms are stored in `Evaluate health risk` group.
 The affected population can also be evaluated if each building has the population field.
 
 ## How to uninstall
+
+Delete the files and folders in `JAVA_FOR_NOISEMODELLING` and `NOISEMODELLING_HOME` paths and delete the environmental variables.

@@ -7,9 +7,10 @@ from qgis.core import (
   )
 
 
-from .receiverabstract import receiverabstract
+from .algabstract import algabstract
+import os
 
-class receiverdelaunaygrid(receiverabstract):
+class receiverdelaunaygrid(algabstract):
   PARAMETERS = { 
     "BUILDING": {
       "crs_referrence": True, # this parameter is used as CRS referrence
@@ -96,13 +97,17 @@ class receiverdelaunaygrid(receiverabstract):
     self.initParameters()
 
   def processAlgorithm(self, parameters, context, feedback):    
-    self.initNoiseModelling("receiverdelaunaygrid.groovy")
-    self.initWpsArgs(parameters, context, feedback)
-    
-    feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
+    self.initNoiseModellingPath("receiverdelaunaygrid.groovy")
+    self.addNoiseModellingPath(
+      {
+        "RECEIVER_PATH": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "RECEIVERS.geojson"),
+        "TRIANGLE_PATH": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "TRIANGLES.geojson")
+        }
+      )
+    self.initNoiseModellingArg(parameters, context, feedback)
     
     # execute groovy script using wps_scripts
-    self.execNoiseModelling(parameters, context, feedback)
+    self.execNoiseModellingCmd(parameters, context, feedback)
       
     dest_id_rcv = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT",self.NOISEMODELLING["RECEIVER_PATH"])
     dest_id_tri = self.importNoiseModellingResultsAsSink(parameters, context, "TRIANGLE",self.NOISEMODELLING["TRIANGLE_PATH"])

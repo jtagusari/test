@@ -26,6 +26,12 @@ inputs = [
     type: Integer.class,
     min: 0, max: 1
   ],
+  noiseModellingHome : [
+    name: "Path of NOISEMODELLING_HOME",
+    title: "Path of NOISEMODELLING_HOME",
+    description: "Path of NOISEMODELLING_HOME",
+    type : String.class
+  ],
   exportDir : [
     name: "Path of export directory",
     title: "Path of export directory",
@@ -45,10 +51,13 @@ outputs = [
 ]
 
 
+def noiseModellingPath
+
 def runScript(connection, scriptFile, arguments) {
+  Path scriptPath = noiseModellingPath.resolve(Paths.get(scriptFile))
   Logger logger = LoggerFactory.getLogger("script")
   GroovyShell shell = new GroovyShell()
-  Script scriptInstance = shell.parse(new File(scriptFile))
+  Script scriptInstance = shell.parse(new File(scriptPath.toString()))
   Object result = scriptInstance.invokeMethod("exec", [connection, arguments])
   if(result != null) {
     logger.info(result.toString())
@@ -67,6 +76,8 @@ def importAndGetTable(connection, pathFile, inputSRID){
 }
 
 def exec(Connection connection, input) {
+  // set noiseModellingPath
+  noiseModellingPath = Paths.get(input["noiseModellingHome"])
 
   // set building table
   String tableRoads =  importAndGetTable(connection, input["roadGeomPath"], input["inputSRID"])

@@ -7,9 +7,10 @@ from qgis.core import (
   )
 
 
-from .receiverabstract import receiverabstract
+from .algabstract import algabstract
+import os
 
-class receiverregulargrid(receiverabstract):
+class receiverregulargrid(algabstract):
   PARAMETERS = { 
     "FENCE": {
       "crs_referrence": True, # this parameter is used as CRS referrence
@@ -73,13 +74,14 @@ class receiverregulargrid(receiverabstract):
   
 
   def processAlgorithm(self, parameters, context, feedback):    
-    self.initNoiseModelling("receiverregulargrid.groovy")
-    self.initWpsArgs(parameters, context, feedback)
-    
-    feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
-    
+    self.initNoiseModellingPath("receiverregulargrid.groovy")
+    self.addNoiseModellingPath(
+      {"RECEIVER_PATH": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "RECEIVERS.geojson")}
+      )
+    self.initNoiseModellingArg(parameters, context, feedback)
+        
     # execute groovy script using wps_scripts
-    self.execNoiseModelling(parameters, context, feedback)
+    self.execNoiseModellingCmd(parameters, context, feedback)
     
     # import the result    
     dest_id_rcv = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT", self.NOISEMODELLING["RECEIVER_PATH"])

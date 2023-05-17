@@ -18,9 +18,8 @@ import uuid
 
 
 from .fetchabstract import fetchabstract
-from .receiverabstract import receiverabstract
 
-class fetchjageom(fetchabstract, receiverabstract):
+class fetchjageom(fetchabstract):
   PARAMETERS = {  
     "FETCH_EXTENT": {
       "ui_func": QgsProcessingParameterExtent,

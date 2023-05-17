@@ -81,27 +81,65 @@
 <context>
     <name>estimatepopulationofbuilding</name>
     <message>
-        <location filename="../estimatepopulationofbuilding.py" line="24"/>
+        <location filename="../estimatepopulationofbuilding.py" line="26"/>
         <source>Building layer</source>
         <translation>建物レイヤ</translation>
     </message>
     <message>
-        <location filename="../estimatepopulationofbuilding.py" line="31"/>
+        <location filename="../estimatepopulationofbuilding.py" line="33"/>
         <source>Population layer</source>
         <translation>人口レイヤ</translation>
     </message>
     <message>
-        <location filename="../estimatepopulationofbuilding.py" line="37"/>
+        <location filename="../estimatepopulationofbuilding.py" line="39"/>
         <source>Building with population</source>
         <translation>建物（人口）</translation>
     </message>
     <message>
-        <location filename="../estimatepopulationofbuilding.py" line="137"/>
-        <source>Estimate populations of buildings</source>
-        <translation>各建物の居住者数を推定</translation>
+        <location filename="../estimatepopulationofbuilding.py" line="159"/>
+        <source>Evaluate health risk</source>
+        <translation>リスクの評価</translation>
     </message>
     <message>
-        <location filename="../estimatepopulationofbuilding.py" line="140"/>
+        <location filename="../estimatepopulationofbuilding.py" line="156"/>
+        <source>Estimate populations of buildings using Raster</source>
+        <translation>各建物の居住者数を推定（ラスター）</translation>
+    </message>
+</context>
+<context>
+    <name>estimatepopulationofbuildingplg</name>
+    <message>
+        <location filename="../estimatepopulationofbuildingplg.py" line="24"/>
+        <source>Building layer</source>
+        <translation>建物レイヤ</translation>
+    </message>
+    <message>
+        <location filename="../estimatepopulationofbuildingplg.py" line="31"/>
+        <source>Population layer</source>
+        <translation>人口レイヤ</translation>
+    </message>
+    <message>
+        <location filename="../estimatepopulationofbuildingplg.py" line="38"/>
+        <source>Primary key field</source>
+        <translation>人口レイヤのプライマリーキーフィールド</translation>
+    </message>
+    <message>
+        <location filename="../estimatepopulationofbuildingplg.py" line="45"/>
+        <source>Population field</source>
+        <translation>人口レイヤの居住者数フィールド</translation>
+    </message>
+    <message>
+        <location filename="../estimatepopulationofbuildingplg.py" line="52"/>
+        <source>Building with population</source>
+        <translation>建物（人口）</translation>
+    </message>
+    <message>
+        <location filename="../estimatepopulationofbuildingplg.py" line="168"/>
+        <source>Estimate populations of buildings using Polygons</source>
+        <translation>各建物の居住者数を推定（ポリゴン）</translation>
+    </message>
+    <message>
+        <location filename="../estimatepopulationofbuildingplg.py" line="171"/>
         <source>Evaluate health risk</source>
         <translation>リスクの評価</translation>
     </message>
@@ -273,152 +311,152 @@
 <context>
     <name>fetchjageom</name>
     <message>
-        <location filename="../fetchjageom.py" line="40"/>
+        <location filename="../fetchjageom.py" line="39"/>
         <source>Buffer of the fetch area (using Target CRS)</source>
         <translation>情報取得範囲の外側のバッファー（変換先の参照座標系使用）</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="86"/>
+        <location filename="../fetchjageom.py" line="85"/>
         <source>Distance between receivers (m)</source>
         <translation>受音点間の距離 (m)</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="96"/>
+        <location filename="../fetchjageom.py" line="95"/>
         <source>Height of receivers (m)</source>
         <translation>受音点高さ (m)</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="321"/>
+        <location filename="../fetchjageom.py" line="320"/>
         <source>Configurations</source>
         <translation>設定・初期化</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="381"/>
+        <location filename="../fetchjageom.py" line="380"/>
         <source>Fetch geometries (Ja)</source>
         <translation>地物取得（日本国内）</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="326"/>
+        <location filename="../fetchjageom.py" line="325"/>
         <source>Set fetch area</source>
         <translation>計算範囲を設定</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="331"/>
+        <location filename="../fetchjageom.py" line="330"/>
         <source>Fetch geometry of population</source>
         <translation>人口情報を取得</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="335"/>
+        <location filename="../fetchjageom.py" line="334"/>
         <source>Fetch geometry of roads</source>
         <translation>道路中心線を取得</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="344"/>
+        <location filename="../fetchjageom.py" line="343"/>
         <source>Fetch geometry of DEM</source>
         <translation>標高点（DEM）を取得</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="349"/>
+        <location filename="../fetchjageom.py" line="348"/>
         <source>Set receivers at building facade</source>
         <translation>建物壁面の受音点を設定</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="354"/>
+        <location filename="../fetchjageom.py" line="353"/>
         <source>Set receivers of delaunay grid</source>
         <translation>ドロネー三角形分割点に受音点を設定</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="106"/>
+        <location filename="../fetchjageom.py" line="105"/>
         <source>Maximum propagation distance between sources and receivers (m)</source>
         <translation>騒音の最大伝搬距離 (m)</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="116"/>
+        <location filename="../fetchjageom.py" line="115"/>
         <source>Road width (m), where no receivers will be set closer than it</source>
         <translation>音源と最近接受音点の距離 (m)</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="126"/>
+        <location filename="../fetchjageom.py" line="125"/>
         <source>Maximum trianglar area (m2)</source>
         <translation>三角形の面積の最大値 (m2)</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="151"/>
+        <location filename="../fetchjageom.py" line="150"/>
         <source>Roads</source>
         <translation>道路</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="158"/>
+        <location filename="../fetchjageom.py" line="157"/>
         <source>Buildings</source>
         <translation>建物</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="165"/>
+        <location filename="../fetchjageom.py" line="164"/>
         <source>Receivers at facade</source>
         <translation>受音点（建物壁面）</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="172"/>
+        <location filename="../fetchjageom.py" line="171"/>
         <source>Receivers of delaunay</source>
         <translation>受音点（ドロネー三角形分割点）</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="179"/>
+        <location filename="../fetchjageom.py" line="178"/>
         <source>Triangles of delaunay</source>
         <translation>ドロネー三角形分割ポリゴン</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="186"/>
+        <location filename="../fetchjageom.py" line="185"/>
         <source>Elevation point (DEM)</source>
         <translation>標高点（DEM）</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="193"/>
+        <location filename="../fetchjageom.py" line="192"/>
         <source>Elevation raster (DEM)</source>
         <translation>標高ラスタ（DEM）</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="200"/>
+        <location filename="../fetchjageom.py" line="199"/>
         <source>Population</source>
         <translation>人口</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="378"/>
+        <location filename="../fetchjageom.py" line="377"/>
         <source>All geometries and set receivers</source>
         <translation>全て取得・受音点設定</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="28"/>
+        <location filename="../fetchjageom.py" line="27"/>
         <source>Extent for fetching data</source>
         <translation>情報取得範囲</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="339"/>
+        <location filename="../fetchjageom.py" line="338"/>
         <source>Fetch geometry of buildings and estimate the population</source>
         <translation>建物情報を取得</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="34"/>
+        <location filename="../fetchjageom.py" line="33"/>
         <source>Target CRS (Cartesian coordinates)</source>
         <translation>変換先の参照座標系（直交座標系）</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="50"/>
+        <location filename="../fetchjageom.py" line="49"/>
         <source>Fetch elevation points?</source>
         <translation>標高点情報を取得</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="59"/>
+        <location filename="../fetchjageom.py" line="58"/>
         <source>Set receiver at building facade?</source>
         <translation>建物壁面に受音点を設定</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="68"/>
+        <location filename="../fetchjageom.py" line="67"/>
         <source>Set receiver at delaynay grid point?</source>
         <translation>ドロネー分割点に受音点を設定</translation>
     </message>
     <message>
-        <location filename="../fetchjageom.py" line="144"/>
+        <location filename="../fetchjageom.py" line="143"/>
         <source>Fetch area</source>
         <translation>地物取得範囲</translation>
     </message>
@@ -426,47 +464,47 @@
 <context>
     <name>fetchjapop</name>
     <message>
-        <location filename="../fetchjapop.py" line="200"/>
+        <location filename="../fetchjapop.py" line="225"/>
         <source>Fetch geometries (Ja)</source>
         <translation>地物取得（日本国内）</translation>
     </message>
     <message>
-        <location filename="../fetchjapop.py" line="71"/>
+        <location filename="../fetchjapop.py" line="75"/>
         <source>Population</source>
         <translation>人口</translation>
     </message>
     <message>
-        <location filename="../fetchjapop.py" line="35"/>
+        <location filename="../fetchjapop.py" line="39"/>
         <source>Extent for fetching data</source>
         <translation>情報取得範囲</translation>
     </message>
     <message>
-        <location filename="../fetchjapop.py" line="47"/>
+        <location filename="../fetchjapop.py" line="51"/>
         <source>Buffer of the fetch area (using Target CRS)</source>
         <translation>情報取得範囲の外側のバッファー</translation>
     </message>
     <message>
-        <location filename="../fetchjapop.py" line="56"/>
+        <location filename="../fetchjapop.py" line="60"/>
         <source>Base-URL of the vector-tile map</source>
         <translation>ベクトルタイル地図のベースURL</translation>
     </message>
     <message>
-        <location filename="../fetchjapop.py" line="64"/>
+        <location filename="../fetchjapop.py" line="68"/>
         <source>CRS of the vector-tile map</source>
         <translation>ベクトルタイル地図の参照座標系</translation>
     </message>
     <message>
-        <location filename="../fetchjapop.py" line="41"/>
+        <location filename="../fetchjapop.py" line="45"/>
         <source>Target CRS (Cartesian coordinates)</source>
         <translation>変換先の参照座標系（直交座標系）</translation>
     </message>
     <message>
-        <location filename="../fetchjapop.py" line="197"/>
+        <location filename="../fetchjapop.py" line="222"/>
         <source>Population (Ja)</source>
         <translation>人口</translation>
     </message>
     <message>
-        <location filename="../fetchjapop.py" line="136"/>
+        <location filename="../fetchjapop.py" line="162"/>
         <source>No population results were obtained!</source>
         <translation>人口データは見つかりませんでした</translation>
     </message>
@@ -696,7 +734,7 @@
 <context>
     <name>hrisk_provider</name>
     <message>
-        <location filename="../hrisk_provider.py" line="63"/>
+        <location filename="../hrisk_provider.py" line="67"/>
         <source>H-RISK</source>
         <translation>H-RISK</translation>
     </message>
@@ -816,25 +854,43 @@
         <translation>道路</translation>
     </message>
     <message>
-        <location filename="../initroademissionfromtraffic.py" line="94"/>
+        <location filename="../initroademissionfromtraffic.py" line="96"/>
         <source>Road emission calculated from traffic</source>
         <translation>道路（交通量を音響レベルに変換）</translation>
     </message>
     <message>
-        <location filename="../initroademissionfromtraffic.py" line="97"/>
+        <location filename="../initroademissionfromtraffic.py" line="99"/>
         <source>Initialize features</source>
         <translation>地物の初期化</translation>
     </message>
 </context>
 <context>
+    <name>installcomponents</name>
+    <message>
+        <location filename="../installcomponents.py" line="19"/>
+        <source>Exec components installer</source>
+        <translation>インストーラーの実行</translation>
+    </message>
+    <message>
+        <location filename="../installcomponents.py" line="47"/>
+        <source>Install required components</source>
+        <translation>インストール</translation>
+    </message>
+    <message>
+        <location filename="../installcomponents.py" line="50"/>
+        <source>Initialize plugin</source>
+        <translation>プラグインの初期化</translation>
+    </message>
+</context>
+<context>
     <name>isosurface</name>
     <message>
-        <location filename="../isosurface.py" line="47"/>
+        <location filename="../isosurface.py" line="46"/>
         <source>Triangle layer</source>
         <translation>三角分割ポリゴン</translation>
     </message>
     <message>
-        <location filename="../isosurface.py" line="56"/>
+        <location filename="../isosurface.py" line="55"/>
         <source>Separation of sound levels for isosurfaces (e.g. 35.0,40.0)</source>
         <translation>騒音レベルコンターの値（例 35.0,40.0）</translation>
     </message>
@@ -844,22 +900,22 @@
         <translation>平滑化パラメータ（ベジェ曲線係数）</translation>
     </message>
     <message>
-        <location filename="../isosurface.py" line="122"/>
+        <location filename="../isosurface.py" line="124"/>
         <source>Isosurface</source>
         <translation>騒音レベルコンターの作成</translation>
     </message>
     <message>
-        <location filename="../isosurface.py" line="125"/>
+        <location filename="../isosurface.py" line="127"/>
         <source>Predict sound level</source>
         <translation>騒音予測</translation>
     </message>
     <message>
-        <location filename="../isosurface.py" line="32"/>
+        <location filename="../isosurface.py" line="31"/>
         <source>Sound level layer</source>
         <translation>騒音レベルレイヤ</translation>
     </message>
     <message>
-        <location filename="../isosurface.py" line="39"/>
+        <location filename="../isosurface.py" line="38"/>
         <source>Receiver ID Field of the Sound level layer</source>
         <translation>受音点ID（騒音レベルレイヤ）</translation>
     </message>
@@ -982,12 +1038,12 @@
         <translation>建物（壁面騒音レベル）</translation>
     </message>
     <message>
-        <location filename="../noisefromemission.py" line="299"/>
+        <location filename="../noisefromemission.py" line="300"/>
         <source>Prediction from emission</source>
         <translation>音響出力に基づく予測</translation>
     </message>
     <message>
-        <location filename="../noisefromemission.py" line="302"/>
+        <location filename="../noisefromemission.py" line="303"/>
         <source>Predict sound level</source>
         <translation>騒音予測</translation>
     </message>
@@ -1070,12 +1126,12 @@
         <translation>計算スレッド数 (0: 全て)</translation>
     </message>
     <message>
-        <location filename="../noisefromtraffic.py" line="302"/>
+        <location filename="../noisefromtraffic.py" line="299"/>
         <source>Prediction from traffic</source>
         <translation>交通量に基づく予測</translation>
     </message>
     <message>
-        <location filename="../noisefromtraffic.py" line="305"/>
+        <location filename="../noisefromtraffic.py" line="302"/>
         <source>Predict sound level</source>
         <translation>騒音予測</translation>
     </message>
@@ -1133,57 +1189,57 @@
 <context>
     <name>receiverdelaunaygrid</name>
     <message>
-        <location filename="../receiverdelaunaygrid.py" line="46"/>
+        <location filename="../receiverdelaunaygrid.py" line="47"/>
         <source>Maximum propagation distance between sources and receivers (m)</source>
         <translation>騒音の最大伝搬距離 (m)</translation>
     </message>
     <message>
-        <location filename="../receiverdelaunaygrid.py" line="55"/>
+        <location filename="../receiverdelaunaygrid.py" line="56"/>
         <source>Road width (m), where no receivers will be set closer than it</source>
         <translation>音源と最近接受音点の距離 (m)</translation>
     </message>
     <message>
-        <location filename="../receiverdelaunaygrid.py" line="64"/>
+        <location filename="../receiverdelaunaygrid.py" line="65"/>
         <source>Maximum trianglar area (m2)</source>
         <translation>三角形の面積の最大値 (m2)</translation>
     </message>
     <message>
-        <location filename="../receiverdelaunaygrid.py" line="18"/>
+        <location filename="../receiverdelaunaygrid.py" line="19"/>
         <source>Building layer</source>
         <translation>建物レイヤ</translation>
     </message>
     <message>
-        <location filename="../receiverdelaunaygrid.py" line="27"/>
+        <location filename="../receiverdelaunaygrid.py" line="28"/>
         <source>Source layer</source>
         <translation>音源（道路）レイヤ</translation>
     </message>
     <message>
-        <location filename="../receiverdelaunaygrid.py" line="36"/>
+        <location filename="../receiverdelaunaygrid.py" line="37"/>
         <source>Fence layer</source>
         <translation>受音点の設定範囲</translation>
     </message>
     <message>
-        <location filename="../receiverdelaunaygrid.py" line="73"/>
+        <location filename="../receiverdelaunaygrid.py" line="74"/>
         <source>Height of receivers (m)</source>
         <translation>受音点高さ (m)</translation>
     </message>
     <message>
-        <location filename="../receiverdelaunaygrid.py" line="117"/>
+        <location filename="../receiverdelaunaygrid.py" line="122"/>
         <source>Delaunary grid</source>
         <translation>ドロネー三角形分割</translation>
     </message>
     <message>
-        <location filename="../receiverdelaunaygrid.py" line="120"/>
+        <location filename="../receiverdelaunaygrid.py" line="125"/>
         <source>Set receivers</source>
         <translation>受音点の設定</translation>
     </message>
     <message>
-        <location filename="../receiverdelaunaygrid.py" line="82"/>
+        <location filename="../receiverdelaunaygrid.py" line="83"/>
         <source>Receivers of delaunay</source>
         <translation>受音点（ドロネー三角形分割点）</translation>
     </message>
     <message>
-        <location filename="../receiverdelaunaygrid.py" line="88"/>
+        <location filename="../receiverdelaunaygrid.py" line="89"/>
         <source>Triangles of delaunay</source>
         <translation>ドロネー三角形分割ポリゴン</translation>
     </message>
@@ -1191,42 +1247,42 @@
 <context>
     <name>receiverfacade</name>
     <message>
-        <location filename="../receiverfacade.py" line="18"/>
+        <location filename="../receiverfacade.py" line="19"/>
         <source>Building layer</source>
         <translation>建物レイヤ</translation>
     </message>
     <message>
-        <location filename="../receiverfacade.py" line="27"/>
+        <location filename="../receiverfacade.py" line="28"/>
         <source>Source layer</source>
         <translation>音源レイヤ</translation>
     </message>
     <message>
-        <location filename="../receiverfacade.py" line="37"/>
+        <location filename="../receiverfacade.py" line="38"/>
         <source>Fence layer</source>
         <translation>受音点の設定範囲</translation>
     </message>
     <message>
-        <location filename="../receiverfacade.py" line="48"/>
+        <location filename="../receiverfacade.py" line="49"/>
         <source>Distance between receivers (m)</source>
         <translation>受音点間の距離 (m)</translation>
     </message>
     <message>
-        <location filename="../receiverfacade.py" line="57"/>
+        <location filename="../receiverfacade.py" line="58"/>
         <source>Height of receivers (m)</source>
         <translation>受音点高さ (m)</translation>
     </message>
     <message>
-        <location filename="../receiverfacade.py" line="93"/>
+        <location filename="../receiverfacade.py" line="95"/>
         <source>At building facade</source>
         <translation>建物の壁面</translation>
     </message>
     <message>
-        <location filename="../receiverfacade.py" line="96"/>
+        <location filename="../receiverfacade.py" line="98"/>
         <source>Set receivers</source>
         <translation>受音点の設定</translation>
     </message>
     <message>
-        <location filename="../receiverregulargrid.py" line="66"/>
+        <location filename="../receiverregulargrid.py" line="67"/>
         <source>Receivers at facade</source>
         <translation>受音点（建物壁面）</translation>
     </message>
@@ -1234,37 +1290,37 @@
 <context>
     <name>receiverregulargrid</name>
     <message>
-        <location filename="../receiverregulargrid.py" line="18"/>
+        <location filename="../receiverregulargrid.py" line="19"/>
         <source>Fence layer</source>
         <translation>受音点の設定範囲</translation>
     </message>
     <message>
-        <location filename="../receiverregulargrid.py" line="27"/>
+        <location filename="../receiverregulargrid.py" line="28"/>
         <source>Building layer</source>
         <translation>建物レイヤ</translation>
     </message>
     <message>
-        <location filename="../receiverregulargrid.py" line="37"/>
+        <location filename="../receiverregulargrid.py" line="38"/>
         <source>Source layer</source>
         <translation>音源（道路）</translation>
     </message>
     <message>
-        <location filename="../receiverregulargrid.py" line="48"/>
+        <location filename="../receiverregulargrid.py" line="49"/>
         <source>Distance between receivers (m)</source>
         <translation>受音点間の距離 (m)</translation>
     </message>
     <message>
-        <location filename="../receiverregulargrid.py" line="57"/>
+        <location filename="../receiverregulargrid.py" line="58"/>
         <source>Height of receivers (m)</source>
         <translation>受音点高さ (m)</translation>
     </message>
     <message>
-        <location filename="../receiverregulargrid.py" line="96"/>
+        <location filename="../receiverregulargrid.py" line="98"/>
         <source>Regular grid</source>
         <translation>格子点</translation>
     </message>
     <message>
-        <location filename="../receiverregulargrid.py" line="99"/>
+        <location filename="../receiverregulargrid.py" line="101"/>
         <source>Set receivers</source>
         <translation>受音点の設定</translation>
     </message>

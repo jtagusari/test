@@ -1,2 +1,0 @@
-time,jdbc_stack,progression,jvm_used_heap_mb,jvm_max_heap_mb,receiver_min,receiver_median,receiver_mean,receiver_max,receiver_median_rays,receiver_max_rays
-0.20,0,0.00,31,512,0,0,0,0,0,0

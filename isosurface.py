@@ -21,7 +21,6 @@ from .algabstract import algabstract
 
 import os
 import re
-import asyncio
 
 class isosurface(algabstract):
   PARAMETERS = { 
@@ -79,12 +78,14 @@ class isosurface(algabstract):
   def initAlgorithm(self, config):
     self.initParameters() 
 
-  def addPathNoiseModelling(self):
-    self.NOISEMODELLING["LEVEL_PATH"] = os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LEVEL_RESULT.geojson")
-    self.NOISEMODELLING["ISOSURFACE_PATH"] = os.path.join(self.NOISEMODELLING["TEMP_DIR"], "CONTOURLNG_NOISE_MAP.geojson")
-    
   def processAlgorithm(self, parameters, context, feedback):
-    self.initNoiseModelling("isosurface.groovy")
+    self.initNoiseModellingPath("isosurface.groovy")
+    self.addNoiseModellingPath(
+      {
+        "LEVEL_PATH": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LEVEL_RESULT.geojson"),
+        "ISOSURFACE_PATH": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "CONTOURLNG_NOISE_MAP.geojson")
+        }
+      )
     
     processing.run(
       "native:renametablefield",
@@ -96,12 +97,13 @@ class isosurface(algabstract):
       }
     )
     
-    self.initWpsArgs(parameters, context, feedback, {"resultGeomPath": self.NOISEMODELLING["LEVEL_PATH"]})
+    self.initNoiseModellingArg(parameters, context, feedback)
+    self.addNoiseModellingArg({"resultGeomPath": self.NOISEMODELLING["LEVEL_PATH"]})
     
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
     
     # execute groovy script using wps_scripts
-    self.execNoiseModelling(parameters, context, feedback)
+    self.execNoiseModellingCmd(parameters, context, feedback)
     
     # import the result    
     dest_id = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT", self.NOISEMODELLING["ISOSURFACE_PATH"])

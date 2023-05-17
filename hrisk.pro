@@ -1,6 +1,8 @@
 SOURCES = \
+installcomponents.py \
 estimatelevelofbuilding.py \
 estimatepopulationofbuilding.py \
+estimatepopulationofbuildingplg.py \
 estimateriskofbuilding.py \
 fetchjabuilding.py \
 fetchjadem.py \

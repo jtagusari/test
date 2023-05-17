@@ -13,30 +13,6 @@ from qgis.core import (
 from .algabstract import algabstract
 
 class initabstract(algabstract):
-  PARAMETERS = {                  
-    "INPUT": {
-      "ui_func": QgsProcessingParameterFeatureSource,
-      "ui_args":{
-        "description": QT_TRANSLATE_NOOP("initabstract","Line layer"),
-        "types": [QgsProcessing.TypeVectorLine],
-        "optional": True
-      }
-    },
-    "OVERWRITE": {
-      "ui_func": QgsProcessingParameterBoolean,
-      "ui_args":{
-        "description" : QT_TRANSLATE_NOOP("initabstract","Overwrite existing fields?"),
-        "defaultValue": True
-      }
-    },
-    "OUTPUT": {
-      "ui_func": QgsProcessingParameterFeatureSink,
-      "ui_args": {
-        "description": QT_TRANSLATE_NOOP("sourceemissionfield","Road with emission fields" )
-      }
-    }
-  }
-  
   FIELDS_ADD = {    
     "PK":        {"TYPE": QVariant.Int, "DEFAULT_VALUE": None}
   }

@@ -49,7 +49,7 @@ const
   NoiseModelling_name = 'NoiseModelling';
   NoiseModelling_dir_default = '{commonpf64}\NoiseModelling';
   NoiseModelling_env='NOISEMODELLING_HOME';
-  NoiseModelling_URL = 'https://github.com/Universite-Gustave-Eiffel/NoiseModelling/releases/download/v4.0.4/NoiseModelling_without_gui.zip';
+  NoiseModelling_URL = 'https://github.com/Universite-Gustave-Eiffel/NoiseModelling/releases/download/v4.0.2/NoiseModelling_without_gui.zip';
   Hrisk_name = 'H-RISK';
   Hrisk_dir_default = '{userappdata}\QGIS\QGIS3\profiles\default\python\plugins\hrisk';
 var

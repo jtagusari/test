@@ -1,4 +1,4 @@
-from qgis.PyQt.QtCore import (QCoreApplication, QT_TRANSLATE_NOOP)
+from qgis.PyQt.QtCore import (QT_TRANSLATE_NOOP)
 from qgis.core import (
   QgsCoordinateReferenceSystem,
   QgsProcessingParameterExtent,

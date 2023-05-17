@@ -244,13 +244,14 @@ class noisefromemission(noiseabstract):
     self.initParameters()
 
   def processAlgorithm(self, parameters, context, feedback):
-    self.initNoiseModelling("noisefromemission.groovy")
-    self.initWpsArgs(parameters, context, feedback)
+    self.initNoiseModellingPath("noisefromemission.groovy")
+    self.addNoiseModellingPath()
+    self.initNoiseModellingArg(parameters, context, feedback)
 
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
                 
     # execute groovy script using wps_scripts
-    self.execNoiseModelling(parameters, context, feedback)
+    self.execNoiseModellingCmd(parameters, context, feedback)
     feedback.setProgress(100)
     
     self.NOISEMODELLING["WPS_ARGS"].update({"time_stamp": datetime.datetime.now().isoformat()})

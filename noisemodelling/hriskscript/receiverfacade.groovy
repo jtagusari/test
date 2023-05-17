@@ -2,8 +2,8 @@ import org.h2gis.api.ProgressVisitor
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.Connection
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.Path
+import java.nio.file.Paths
 
 title = 'Receiver at building facade'
 description = 'Geometry of receivers at building facade is obtained'
@@ -54,6 +54,12 @@ inputs = [
     min        : 0, max: 10,
     type       : Double.class
   ],
+  noiseModellingHome : [
+    name: "Path of NOISEMODELLING_HOME",
+    title: "Path of NOISEMODELLING_HOME",
+    description: "Path of NOISEMODELLING_HOME",
+    type : String.class
+  ],
   exportDir : [
     name: "Path of export directory",
     title: "Path of export directory",
@@ -72,11 +78,13 @@ outputs = [
   ]
 ]
 
+def noiseModellingPath
 
 def runScript(connection, scriptFile, arguments) {
+  Path scriptPath = noiseModellingPath.resolve(Paths.get(scriptFile))
   Logger logger = LoggerFactory.getLogger("script")
   GroovyShell shell = new GroovyShell()
-  Script scriptInstance = shell.parse(new File(scriptFile))
+  Script scriptInstance = shell.parse(new File(scriptPath.toString()))
   Object result = scriptInstance.invokeMethod("exec", [connection, arguments])
   if(result != null) {
     logger.info(result.toString())
@@ -95,6 +103,8 @@ def importAndGetTable(connection, pathFile, inputSRID){
 }
 
 def exec(Connection connection, input) {
+  // set noiseModellingPath
+  noiseModellingPath = Paths.get(input["noiseModellingHome"])
 
   // set building table
   String tableBuilding =  importAndGetTable(connection, input["buildingGeomPath"], input["inputSRID"])

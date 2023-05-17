@@ -1,5 +1,6 @@
 from qgis.core import QgsProcessingProvider
 
+from .installcomponents import installcomponents
 from .noisefromtraffic import noisefromtraffic
 from .noisefromemission import noisefromemission
 from .initroademissionfromtraffic import initroademissionfromtraffic
@@ -21,6 +22,7 @@ from .receiverdelaunaygrid import receiverdelaunaygrid
 from .isosurface import isosurface
 from .estimatelevelofbuilding import estimatelevelofbuilding
 from .estimatepopulationofbuilding import estimatepopulationofbuilding
+from .estimatepopulationofbuildingplg import estimatepopulationofbuildingplg
 from .estimateriskofbuilding import estimateriskofbuilding
 
 
@@ -33,6 +35,7 @@ class hrisk_provider(QgsProcessingProvider):
         pass
 
     def loadAlgorithms(self):
+        self.addAlgorithm(installcomponents())
         self.addAlgorithm(fetchjageom())
         self.addAlgorithm(fetchjaroad())
         self.addAlgorithm(fetchjabuilding())
@@ -54,6 +57,7 @@ class hrisk_provider(QgsProcessingProvider):
         self.addAlgorithm(isosurface())
         self.addAlgorithm(estimatelevelofbuilding())
         self.addAlgorithm(estimatepopulationofbuilding())
+        self.addAlgorithm(estimatepopulationofbuildingplg())
         self.addAlgorithm(estimateriskofbuilding())
 
     def id(self):

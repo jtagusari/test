@@ -45,17 +45,22 @@ class noiseabstract(algabstract):
   def initAlgorithm(self, config):
     self.initParameters()
 
-  def addPathNoiseModelling(self):
-    self.NOISEMODELLING["TRIANGLE_PATH"] = os.path.join(self.NOISEMODELLING["TEMP_DIR"], "TRIANGLES.geojson")
-    self.NOISEMODELLING["RESULTS_PATH"]  = {
-      "LDAY":     os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LDAY_GEOM.geojson"),
-      "LEVENING": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LEVENING_GEOM.geojson"),
-      "LNIGHT":   os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LNIGHT_GEOM.geojson"),
-      "LDEN":     os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LDEN_GEOM.geojson"),
-    }
-    self.NOISEMODELLING["RESULTS_BUILDING_PATH"] = {
-      "BUILDING_WITH_LEVEL": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "BUILDING_WITH_LEVEL.geojson")
+  def addNoiseModellingPath(self, paths={}):
+    paths.update(
+      {
+        "TRIANGLE_PATH": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "TRIANGLES.geojson"),
+        "RESULTS_PATH":  {
+          "LDAY":     os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LDAY_GEOM.geojson"),
+          "LEVENING": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LEVENING_GEOM.geojson"),
+          "LNIGHT":   os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LNIGHT_GEOM.geojson"),
+          "LDEN":     os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LDEN_GEOM.geojson"),
+        },
+        "RESULTS_BUILDING_PATH": {
+          "BUILDING_WITH_LEVEL": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "BUILDING_WITH_LEVEL.geojson")
+        }
       }
+    )
+    super().addNoiseModellingPath(paths)
     
   def outputWpsArgs(self, parameters, context, extent_crs):  
     args_fields = QgsFields()
@@ -129,30 +134,6 @@ class noiseabstract(algabstract):
       )["OUTPUT"]
       
       
-  async def streamNoiseModelling(self, cmd, feedback):
-    # set proc
-    proc = await asyncio.create_subprocess_shell(
-      cmd,
-      stdout=asyncio.subprocess.PIPE,
-      stderr=asyncio.subprocess.PIPE,
-      cwd = self.NOISEMODELLING["CMD_HOME"]
-    )
-
-    while True:
-      if proc.stdout.at_eof() and proc.stderr.at_eof():
-        break  
-
-      stderr_raw = await proc.stderr.readline() # for debugging
-      stderr = stderr_raw.decode()
-      
-      if stderr:
-        feedback.pushInfo(stderr.replace("\n",""))
-
-      prg_match = re.search(r".*[0-9]+\.[0-9]+.*%", stderr)
-      if prg_match:                
-        feedback.setProgress(
-          int(float(re.search(r"[0-9]+\.[0-9]+", prg_match.group()).group()))
-        )
 
   # Post processing; append layers
   def postProcessAlgorithm(self, context, feedback):

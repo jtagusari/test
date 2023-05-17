@@ -23,10 +23,14 @@ import itertools
 import urllib
 import sys
 import json
+import os
 from .fetchabstract import fetchabstract
-from .jameshpop import jameshpop
+from .worldmesh import (
+  cal_meshcode5,
+  meshcode_to_latlong
+)
 
-class fetchjapop(fetchabstract, jameshpop):
+class fetchjapop(fetchabstract):
   
   PARAMETERS = {  
     "FETCH_EXTENT": {
@@ -74,11 +78,30 @@ class fetchjapop(fetchabstract, jameshpop):
   }  
   
   
+  ESTAT_ID_MESH_FILE = os.path.join(os.path.dirname(__file__),"estatId_mesh_list.txt")
+  ESTAT_ID_MESH_DICT = {}
+  
+  ESTAT_API_URL = "https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData"   
+  ESTAT_API_PARAMS = {
+    "appId": "b877fd89560ce21475681dba1a6681dd6426cbc3",
+    "statsDataId": "",
+    "statsCode": "00200521",
+    "cdCat01": "0010",
+    "cdArea": "",
+    "metaGetFlg": "N"
+  }
+  
+  
+  LAT_UNIT_5 =  7.5 / 3600.0
+  LNG_UNIT_5 = 11.25 / 3600.0
+  
   def __init__(self) -> None:
     super().__init__()
     self.WEBFETCH_ARGS.update(
       {"MESH": {}}
     )
+    with open(self.ESTAT_ID_MESH_FILE) as f:
+      self.ESTAT_ID_MESH_DICT = {key: value for line in f for (key, value) in [line.strip().split(None, 1)]}
       
   
   # set information about the map tile
@@ -95,27 +118,30 @@ class fetchjapop(fetchabstract, jameshpop):
     lat_grid = [lat_min + self.LAT_UNIT_5 * i for i in range(0, 2 + int((lat_max - lat_min) / self.LAT_UNIT_5))]
     lng_grid = [lng_min + self.LNG_UNIT_5 * i for i in range(0, 2 + int((lng_max - lng_min) / self.LNG_UNIT_5))]
     
-    m1_str = None
+    mesh_code_1 = None
     mesh_dict = {}
     for lat, lng in itertools.product(lat_grid, lng_grid):
-      (mesh_str, lng_lat_coords) = self.coordsToMesh(lng, lat)
-      if m1_str is not None and m1_str != mesh_str[:4]:
-        self.WEBFETCH_ARGS["MESH"][m1_str] = mesh_dict
+      mesh_code_5 = cal_meshcode5(lat, lng)[2:]
+      coords_mesh = meshcode_to_latlong("20" + mesh_code_5)
+      lat_mesh = coords_mesh["lat"] - self.LAT_UNIT_5 / 2
+      lng_mesh = coords_mesh["long"] +  self.LNG_UNIT_5 / 2
+      if mesh_code_1 is not None and mesh_code_1 != mesh_code_5[:4]:
+        self.WEBFETCH_ARGS["MESH"][mesh_code_1] = mesh_dict
         mesh_dict = {}
       else:
-        m1_str = mesh_str[:4]
-        mesh_dict[mesh_str] = {"LONG": lng_lat_coords[0], "LAT": lng_lat_coords[1]}
+        mesh_code_1 = mesh_code_5[:4]
+        mesh_dict[mesh_code_5] = {"LONG": lng_mesh, "LAT": lat_mesh}
     
     if len(mesh_dict) > 0:
-      self.WEBFETCH_ARGS["MESH"][m1_str] = mesh_dict
+      self.WEBFETCH_ARGS["MESH"][mesh_code_1] = mesh_dict
     
     
-    for mesh1, mesh_dict in self.WEBFETCH_ARGS["MESH"].items():
+    for mesh_code_1, mesh_dict in self.WEBFETCH_ARGS["MESH"].items():
       params_estat = self.ESTAT_API_PARAMS
-      params_estat["statsDataId"] = self.ESTAT_ID_MESH_DICT.get(mesh1)
+      params_estat["statsDataId"] = self.ESTAT_ID_MESH_DICT.get(mesh_code_1)
     
-      for mesh5_list_short in [list(mesh_dict.keys())[i:i+20] for i in range(0, len(mesh_dict), 20)]:
-        params_estat["cdArea"] = ",".join(mesh5_list_short)
+      for mesh_code_5_shortlist in [list(mesh_dict.keys())[i:i+20] for i in range(0, len(mesh_dict), 20)]:
+        params_estat["cdArea"] = ",".join(mesh_code_5_shortlist)
 
         self.WEBFETCH_ARGS["URL"].append(
           self.parameterAsString(parameters, "WEBFETCH_URL", context) + f"?{urllib.parse.urlencode(params_estat)}"
@@ -160,8 +186,7 @@ class fetchjapop(fetchabstract, jameshpop):
     self.initParameters()
   
   
-  def processAlgorithm(self, parameters, context, feedback):   
-    
+  def processAlgorithm(self, parameters, context, feedback):  
     self.setFetchArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
     self.setWebFetchArgs(parameters, context, feedback)
     
