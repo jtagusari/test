@@ -118,15 +118,17 @@ class algabstract(QgsProcessingAlgorithm):
       raster_layer.crs()
       )
   
-  # execution of the NoiseModelling scrript
+  # execution of the NoiseModelling script
   def execNoiseModellingCmd(self, parameters, context, feedback):    
     self.NOISEMODELLING["CMD"] = os.path.join(os.path.dirname(__file__), "noisemodelling","bin","wps_scripts") + \
       "".join([" -" + k + " " + str(v) for k, v in self.NOISEMODELLING["WPS_ARGS"].items()])
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
-    loop = asyncio.ProactorEventLoop()      
+    
+    loop = asyncio.new_event_loop()
     loop.run_until_complete(
       self.streamNoiseModellingCmd(self.NOISEMODELLING["CMD"], feedback)
     )
+    
     
   async def streamNoiseModellingCmd(self, cmd, feedback):
     proc = await asyncio.create_subprocess_shell(

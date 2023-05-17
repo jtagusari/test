@@ -1,4 +1,4 @@
-from qgis.PyQt.QtCore import (QCoreApplication, QT_TRANSLATE_NOOP)
+from qgis.PyQt.QtCore import (QT_TRANSLATE_NOOP)
 from qgis.core import (
   QgsProcessing,
   QgsProcessingParameterFeatureSource,
@@ -72,7 +72,8 @@ class receiverfacade(algabstract):
   def initAlgorithm(self, config):
     self.initParameters()
 
-  def processAlgorithm(self, parameters, context, feedback):    
+  def processAlgorithm(self, parameters, context, feedback):   
+    
     self.initNoiseModellingPath("receiverfacade.groovy")
     self.addNoiseModellingPath(
       {"RECEIVER_PATH": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "RECEIVERS.geojson")}
