@@ -15,7 +15,7 @@ repository=https://gitlab.com/jtagusari/hrisk-noisemodelling
 # recommended items:
 changelog=None
 
-tags=environmental noise, health risk, japan
+tags=environmental noise,health risk
 
 homepage=https://gitlab.com/jtagusari/hrisk-noisemodelling
 deprecated=False
