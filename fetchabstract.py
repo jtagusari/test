@@ -7,9 +7,9 @@ from qgis.core import (
   QgsVectorLayer,
   QgsCoordinateReferenceSystem,
   QgsProcessingUtils,
-  QgsProcessingParameterDistance,
-  QgsProcessingParameterCrs, 
-  QgsProcessingParameterFeatureSink,
+  QgsProcessingContext,
+  QgsProcessingFeedback, 
+  QgsRasterLayer,
   QgsRectangle,
   QgsGeometry,
   QgsFeature,
@@ -33,12 +33,12 @@ from .algabstract import algabstract
 
 # abstract class for fetching information from web
 class fetchabstract(algabstract):
-  
-  # input UIs
-  PARAMETERS = {}
-  
+    
   # fetch area
   FETCH_AREA = None
+  
+  # fetched features
+  FETCH_FEATURE = None
     
   # parameters for fetching data from map tile
   TILEMAP_ARGS = {
@@ -76,7 +76,7 @@ class fetchabstract(algabstract):
   }
   
   # initialize extent and CRS using the canvas
-  def initUsingCanvas(self):
+  def initUsingCanvas(self) -> None:
     map_rectangle = iface.mapCanvas().extent()
     map_crs = iface.mapCanvas().mapSettings().destinationCrs()
     if map_crs.isGeographic():
@@ -89,7 +89,7 @@ class fetchabstract(algabstract):
       
   
   # get CRS of the UTM using longitude and latitude
-  def getUtmCrs(self, lng, lat):
+  def getUtmCrs(self, lng: float, lat: float) -> QgsCoordinateReferenceSystem:
     epsg_code = 32600 + 100 * (lat < 0) + int((lng + 180) / 6) + 1
     crs = QgsCoordinateReferenceSystem(f'EPSG:{epsg_code}')
     if crs.isValid():
@@ -100,7 +100,7 @@ class fetchabstract(algabstract):
   # set fetch_area
   # it is used mainly for fetching the data, 
   # so the crs for fetching the data should be used
-  def setFetchArea(self, parameters, context, feedback, new_crs = None):
+  def setFetchArea(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback, new_crs: QgsCoordinateReferenceSystem = None) -> None:
     
     # get target x-y CRS, to apply the buffer and determine the fetch area
     target_crs = self.parameterAsCrs(parameters, "TARGET_CRS", context)
@@ -137,7 +137,7 @@ class fetchabstract(algabstract):
       self.FETCH_AREA = fetch_area
   
   # get the fetch area as a polygon vector layer
-  def fetchAreaAsVectorLayer(self):
+  def fetchAreaAsVectorLayer(self) -> QgsVectorLayer:
     vec_layer = QgsVectorLayer("Polygon?crs=" + self.FETCH_AREA.crs().authid(), "fetch_area", "memory")
     ft = QgsFeature()
     ft.setGeometry(QgsGeometry.fromRect(self.FETCH_AREA))
@@ -145,7 +145,7 @@ class fetchabstract(algabstract):
     return(vec_layer)
       
   # set information about the map tile
-  def setTileMapArgs(self, parameters, context, feedback, geom_type = None):
+  def setTileMapArgs(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback, geom_type: str = None) -> None:
     # set parameters (from UIs)
     self.TILEMAP_ARGS["URL"] = self.parameterAsString(parameters,"TILEMAP_URL", context)
     self.TILEMAP_ARGS["CRS"] = self.parameterAsCrs(parameters,"TILEMAP_CRS", context)
@@ -173,7 +173,7 @@ class fetchabstract(algabstract):
   
   
   # set information about the map tile
-  def setOsmArgs(self, parameters, context, feedback, geom_type=None):
+  def setOsmArgs(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback, geom_type: str=None) -> None:
     self.TILEMAP_ARGS["URL"] = self.parameterAsString(parameters, "OSM_URL", context)
     self.OSM_ARGS["GEOM_TYPE"] = geom_type
     self.OSM_ARGS["QUICKOSM_ARGS"]["KEY"] = self.parameterAsString(parameters, "OSM_KEY", context)
@@ -193,11 +193,11 @@ class fetchabstract(algabstract):
         self.OSM_ARGS["SET"] = True
   
   # to set the parameters for using data over the Internet
-  def setWebFetchArgs(self, parameters, context, feedback):
+  def setWebFetchArgs(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> None:
     pass
   
   # fetch features from the map tile
-  def fetchFeaturesFromTile(self, parameters, context, feedback):
+  def fetchFeaturesFromTile(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> None:
     
     # if not all the parameters were set, stop
     if self.TILEMAP_ARGS["SET"] is not True:
@@ -245,11 +245,11 @@ class fetchabstract(algabstract):
             vec_layer.updateFields()
           vec_pr.addFeatures([ft])
           
-    return vec_layer
+    self.FETCH_FEATURE = vec_layer
     
   # fetch features from the URL
   # note that it only downloads file(s)
-  def fetchFeaturesFromWeb(self, parameters, context, feedback):
+  def fetchFeaturesFromWeb(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> None:
     if not self.WEBFETCH_ARGS["SET"]:
       return
     # if login is needed, session is also needed
@@ -301,13 +301,8 @@ class fetchabstract(algabstract):
       executor.map(lambda args: fetchFromSingleURL(*args), iter_obj)
       
   
-  # function to create a feature from the downloaded file(s)
-  def mergeFetchedFeatures(self, parameters, context, feedback):
-    pass
-  
-  
   # fetch features from the map tile
-  def fetchFeaturesFromOsm(self, context, feedback):
+  def fetchFeaturesFromOsm(self, parameters:dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> None:
     if self.OSM_ARGS["SET"]:
       
       quickosm_results = processing.run(
@@ -336,15 +331,13 @@ class fetchabstract(algabstract):
       else:
         vec_layer = None
       
-      return vec_layer
-    else:
-      return None
+      self.FETCH_FEATURE = vec_layer
   
   
-  def modifyFeaturesFromTile(self, fts, z, tx, ty):
+  def modifyFeaturesFromTile(self, fts: QgsVectorLayer | QgsRasterLayer, z: int, tx: int, ty: int)- > QgsVectorLayer | QgsRasterLayer:
     return(fts)
     
-  def dissolveFeatures(self, fts):
+  def dissolveFeatures(self, fts: QgsVectorLayer) -> QgsVectorLayer:
       # Dissolve
       fts_dissolve = processing.run(
         "native:dissolve", 
@@ -367,7 +360,7 @@ class fetchabstract(algabstract):
       return fts_single
   
   # transform to the target CRS
-  def transformToTargetCrs(self, parameters, context, feedback, fts):
+  def transformToTargetCrs(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback, fts: QgsVectorLayer) -> QgsVectorLayer:
     target_crs = self.parameterAsCrs(parameters, "TARGET_CRS", context)
     fts_transformed = processing.run(
         "native:reprojectlayer", 

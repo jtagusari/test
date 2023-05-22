@@ -170,7 +170,7 @@ class estimateriskofbuilding(algabstract):
   
 
   def displayName(self):
-    return self.tr("Estimate health risk of buildings")
+    return self.tr("Estimate health risks of buildings")
 
   def group(self):
     return self.tr("Evaluate health risk")

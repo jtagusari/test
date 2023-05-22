@@ -165,7 +165,7 @@ class estimatepopulationofbuildingplg(algabstract):
     return {"OUTPUT": dest_id}
   
   def displayName(self):
-    return self.tr("Estimate populations of buildings using Polygons")
+    return self.tr("Estimate populations of buildings using Polygon")
 
   def group(self):
     return self.tr("Evaluate health risk")

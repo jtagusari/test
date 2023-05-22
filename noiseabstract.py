@@ -9,18 +9,19 @@ from qgis.core import (
   QgsMarkerSymbol,
   QgsFillSymbol,
   QgsLineSymbol,
+  QgsProcessingContext,
+  QgsReferencedRectangle,
   QgsWkbTypes,
   QgsProcessingLayerPostProcessorInterface,
   QgsField,
   QgsFields,
   QgsFeature,
-  QgsGeometry
+  QgsGeometry,
+  QgsProcessingFeedback
   )
 
 from qgis import processing
 
-import asyncio
-import re
 import os
 import uuid
 
@@ -28,7 +29,7 @@ from .algabstract import algabstract
 
 class noiseabstract(algabstract):
   
-  ARGS_FOR_BLDG_LEVEL = {
+  BLDG_LEVEL_ARGS = {
     "BUILDING_BID": "PK", # primary key of the buildings
     "RECEIVER_BID": "BUILD_PK", # primary key of the buildings, written in receiver layer
     "RECEIVER_RID": "PK", # primary key of the receivers
@@ -36,33 +37,31 @@ class noiseabstract(algabstract):
     "LEVEL_ASSIGN": ["LAEQ"] # which attribute(s) to be assined
   }
   
-  ARGS_FOR_ISOSURFACE = {
+  ISOSURFACE_ARGS = {
     "LEVEL_RID": "IDRECEIVER" #primary key of the receivers, written in level layer        
   }
     
   PROC_RESULTS = {}
   
-  def initAlgorithm(self, config):
-    self.initParameters()
 
-  def addNoiseModellingPath(self, paths={}):
+  def initNoiseModellingPath(self, paths={}):
     paths.update(
       {
-        "TRIANGLE_PATH": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "TRIANGLES.geojson"),
-        "RESULTS_PATH":  {
+        "TRIANGLE": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "TRIANGLES.geojson"),
+        "LEVEL_RESULTS":  {
           "LDAY":     os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LDAY_GEOM.geojson"),
           "LEVENING": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LEVENING_GEOM.geojson"),
           "LNIGHT":   os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LNIGHT_GEOM.geojson"),
           "LDEN":     os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LDEN_GEOM.geojson"),
         },
-        "RESULTS_BUILDING_PATH": {
+        "BUILDING_RESULTS": {
           "BUILDING_WITH_LEVEL": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "BUILDING_WITH_LEVEL.geojson")
         }
       }
     )
-    super().addNoiseModellingPath(paths)
+    super().initNoiseModellingPath(paths)
     
-  def outputWpsArgs(self, parameters, context, extent_crs):  
+  def outputWpsArgs(self, parameters:dict, context:QgsProcessingContext, extent_rec: QgsReferencedRectangle) -> str:  
     args_fields = QgsFields()
     for key, value in self.NOISEMODELLING["WPS_ARGS"].items():
       if type(value) in [int, bool]:
@@ -73,20 +72,20 @@ class noiseabstract(algabstract):
         args_fields.append(QgsField(key, QVariant.String))
         
     (sink, dest_id) = self.parameterAsSink(
-      parameters, "WPS_ARGS", context, args_fields, QgsWkbTypes.Polygon, extent_crs.crs()
+      parameters, "WPS_ARGS", context, args_fields, QgsWkbTypes.Polygon, extent_rec.crs()
       )
     
     ft = QgsFeature(args_fields)
-    ft.setGeometry(QgsGeometry.fromRect(extent_crs))
+    ft.setGeometry(QgsGeometry.fromRect(extent_rec))
     for key, value in self.NOISEMODELLING["WPS_ARGS"].items():
       ft[key] = value
     sink.addFeature(ft)
     
     return dest_id
   
-  def cmptBuildingLevel(self, parameters, context, feedback, bldg_layer, rcv_layer):
+  def cmptBuildingLevel(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback, bldg_layer: QgsVectorLayer, rcv_layer: QgsVectorLayer) -> None:
     
-    for noise_idx, file_path in self.NOISEMODELLING["RESULTS_PATH"].items():          
+    for noise_idx, file_path in self.NOISEMODELLING["LEVEL_RESULTS"].items():          
       # overwrite building layer
       estimate_level_args = {
           "BUILDING": bldg_layer,
@@ -96,7 +95,7 @@ class noiseabstract(algabstract):
           "OVERWRITE": True,
           "OUTPUT": "TEMPORARY_OUTPUT"
           }
-      estimate_level_args.update(self.ARGS_FOR_BLDG_LEVEL)
+      estimate_level_args.update(self.BLDG_LEVEL_ARGS)
       
       bldg_layer = processing.run(
         "hrisk:estimatelevelofbuilding",
@@ -117,16 +116,16 @@ class noiseabstract(algabstract):
     )["OUTPUT"]
     
     # save the result
-    self.saveVectorLayer(bldg_layer, self.NOISEMODELLING["RESULTS_BUILDING_PATH"]["BUILDING_WITH_LEVEL"] )
+    self.saveVectorLayer(bldg_layer, self.NOISEMODELLING["BUILDING_RESULTS"]["BUILDING_WITH_LEVEL"] )
 
   
-  def createIsoSurface(self, triangle_layer, iso_class, smooth_coef):    
-    for noise_idx, file_path in self.NOISEMODELLING["RESULTS_PATH"].items():
+  def createIsoSurface(self, triangle_layer: QgsVectorLayer, iso_class: list, smooth_coef: float) -> None:    
+    for noise_idx, file_path in self.NOISEMODELLING["LEVEL_RESULTS"].items():
       isosurface_layer = processing.run(
         "hrisk:isosurface",
         {
           "LEVEL_RESULT": QgsVectorLayer(file_path, noise_idx),
-          "LEVEL_RID": self.ARGS_FOR_ISOSURFACE["LEVEL_RID"],
+          "LEVEL_RID": self.ISOSURFACE_ARGS["LEVEL_RID"],
           "TRIANGLE": triangle_layer,
           "ISO_CLASS": iso_class,
           "SMOOTH_COEF": smooth_coef

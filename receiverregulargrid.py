@@ -74,17 +74,19 @@ class receiverregulargrid(algabstract):
   
 
   def processAlgorithm(self, parameters, context, feedback):    
-    self.initNoiseModellingPath("receiverregulargrid.groovy")
-    self.addNoiseModellingPath(
-      {"RECEIVER_PATH": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "RECEIVERS.geojson")}
-      )
+    self.initNoiseModellingPath(
+      {
+        "GROOVY_SCRIPT": os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", "receiverregulargrid.groovy"),
+        "RECEIVER": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "RECEIVERS.geojson")
+      }
+    )
     self.initNoiseModellingArg(parameters, context, feedback)
         
     # execute groovy script using wps_scripts
     self.execNoiseModellingCmd(parameters, context, feedback)
     
     # import the result    
-    dest_id_rcv = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT", self.NOISEMODELLING["RECEIVER_PATH"])
+    dest_id_rcv = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT", self.NOISEMODELLING["RECEIVER"])
     
     return {"OUTPUT": dest_id_rcv}
           

@@ -97,20 +97,20 @@ class receiverdelaunaygrid(algabstract):
     self.initParameters()
 
   def processAlgorithm(self, parameters, context, feedback):    
-    self.initNoiseModellingPath("receiverdelaunaygrid.groovy")
-    self.addNoiseModellingPath(
+    self.initNoiseModellingPath(
       {
-        "RECEIVER_PATH": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "RECEIVERS.geojson"),
-        "TRIANGLE_PATH": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "TRIANGLES.geojson")
-        }
-      )
+        "GROOVY_SCRIPT": os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", "receiverdelaunaygrid.groovy")
+        "RECEIVER": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "RECEIVERS.geojson"),
+        "TRIANGLE": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "TRIANGLES.geojson")
+      }
+    )
     self.initNoiseModellingArg(parameters, context, feedback)
     
     # execute groovy script using wps_scripts
     self.execNoiseModellingCmd(parameters, context, feedback)
       
-    dest_id_rcv = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT",self.NOISEMODELLING["RECEIVER_PATH"])
-    dest_id_tri = self.importNoiseModellingResultsAsSink(parameters, context, "TRIANGLE",self.NOISEMODELLING["TRIANGLE_PATH"])
+    dest_id_rcv = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT",self.NOISEMODELLING["RECEIVER"])
+    dest_id_tri = self.importNoiseModellingResultsAsSink(parameters, context, "TRIANGLE",self.NOISEMODELLING["TRIANGLE"])
         
     return {"OUTPUT": dest_id_rcv, "TRIANGLE": dest_id_tri}
     
@@ -119,7 +119,7 @@ class receiverdelaunaygrid(algabstract):
     return {}
 
   def displayName(self):
-    return self.tr("Delaunary grid")
+    return self.tr("Delaunay grid")
 
   def group(self):
     return self.tr('Set receivers')

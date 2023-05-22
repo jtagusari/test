@@ -84,7 +84,8 @@ class fetchosmbuilding(fetchabstract):
     self.setFetchArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
     self.setOsmArgs(parameters, context, feedback, geom_type="Polygon")
     
-    bldg_raw = self.fetchFeaturesFromOsm(context, feedback)
+    self.fetchFeaturesFromOsm(parameters, context, feedback)
+    bldg_raw = self.FETCH_FEATURE
     
     # post processing if there are features
     if bldg_raw is not None and bldg_raw.featureCount() > 0:

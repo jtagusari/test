@@ -36,11 +36,11 @@ class initroademissionfromtraffic(algabstract):
     self.initParameters()   
     
   def processAlgorithm(self, parameters, context, feedback):
-    self.initNoiseModellingPath("initroademissionfromtraffic.groovy")
-    self.addNoiseModellingPath(
+    self.initNoiseModellingPath(
       {
-        "ROAD_LW_PATH": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LW_ROADS.geojson"),
-        "ROAD_JOINED_PATH": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LW_ROADS_JOINED.geojson")
+        "GROOVY_SCRIPT": os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", "initroademissionfromtraffic.groovy"),
+        "LW_ROADS": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LW_ROADS.geojson"),
+        "LW_ROADS_JOINED": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LW_ROADS_JOINED.geojson")
       }
     )
     self.initNoiseModellingArg(parameters,context,feedback)    
@@ -54,7 +54,7 @@ class initroademissionfromtraffic(algabstract):
     
     # first add level values to the receivers
     road_tr_layer = self.parameterAsSource(parameters, "INPUT", context).materialize(QgsFeatureRequest(), feedback)
-    road_lw_layer = QgsVectorLayer(self.NOISEMODELLING["ROAD_LW_PATH"])
+    road_lw_layer = QgsVectorLayer(self.NOISEMODELLING["LW_ROADS"])
     
     lw_in_road_tr_layer = [fld for fld in road_tr_layer.fields().names() if fld[:3].lower() in ["lwd", "lwe","lwn"]]
     
@@ -79,12 +79,12 @@ class initroademissionfromtraffic(algabstract):
         "METHOD": 0,
         "DISCARD_NONMATCHING": False,
         "PREFIX": "",
-        "OUTPUT": self.NOISEMODELLING["ROAD_JOINED_PATH"]
+        "OUTPUT": self.NOISEMODELLING["LW_ROADS_JOINED"]
       }
     )
     
     # import the result    
-    dest_id = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT", self.NOISEMODELLING["ROAD_JOINED_PATH"])
+    dest_id = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT", self.NOISEMODELLING["LW_ROADS_JOINED"])
     
     return {"OUTPUT": dest_id}
     

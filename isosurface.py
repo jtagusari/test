@@ -79,11 +79,11 @@ class isosurface(algabstract):
     self.initParameters() 
 
   def processAlgorithm(self, parameters, context, feedback):
-    self.initNoiseModellingPath("isosurface.groovy")
-    self.addNoiseModellingPath(
+    self.initNoiseModellingPath(
       {
-        "LEVEL_PATH": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LEVEL_RESULT.geojson"),
-        "ISOSURFACE_PATH": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "CONTOURLNG_NOISE_MAP.geojson")
+        "GROOVY_SCRIPT": os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", "isosurface.groovy"),
+        "LEVEL_RESULT": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LEVEL_RESULT.geojson"),
+        "ISOSURFACE": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "CONTOURLNG_NOISE_MAP.geojson")
         }
       )
     
@@ -93,12 +93,12 @@ class isosurface(algabstract):
         "INPUT": self.parameterAsSource(parameters, "LEVEL_RESULT", context).materialize(QgsFeatureRequest(), feedback),
         "FIELD": self.parameterAsFields(parameters, "LEVEL_RID", context)[0],
         "NEW_NAME": "PK",
-        "OUTPUT": self.NOISEMODELLING["LEVEL_PATH"]
+        "OUTPUT": self.NOISEMODELLING["LEVEL_RESULT"]
       }
     )
     
     self.initNoiseModellingArg(parameters, context, feedback)
-    self.addNoiseModellingArg({"resultGeomPath": self.NOISEMODELLING["LEVEL_PATH"]})
+    self.addNoiseModellingArg({"resultGeomPath": self.NOISEMODELLING["LEVEL_RESULT"]})
     
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
     
@@ -106,7 +106,7 @@ class isosurface(algabstract):
     self.execNoiseModellingCmd(parameters, context, feedback)
     
     # import the result    
-    dest_id = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT", self.NOISEMODELLING["ISOSURFACE_PATH"])
+    dest_id = self.importNoiseModellingResultsAsSink(parameters, context, "OUTPUT", self.NOISEMODELLING["ISOSURFACE"])
     
     return {"OUTPUT": dest_id}          
 

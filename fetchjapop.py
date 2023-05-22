@@ -1,6 +1,8 @@
 from qgis.PyQt.QtCore import (QCoreApplication, QT_TRANSLATE_NOOP, QVariant)
 from qgis.PyQt.QtGui import QColor
 from qgis.core import (
+  QgsProcessingContext,
+  QgsProcessingFeedback,
   QgsProcessingParameterCrs,
   QgsCoordinateReferenceSystem,
   QgsVectorLayer,
@@ -150,9 +152,11 @@ class fetchjapop(fetchabstract):
     if self.WEBFETCH_ARGS["CRS"] is not None and self.WEBFETCH_ARGS["MESH"] is not None:
         self.WEBFETCH_ARGS["SET"] = True
   
-  # fetch features from the map tile
-  def mergeFetchedFeatures(self, parameters, context, feedback):
+  # fetch features from web
+  def fetchFeaturesFromWeb(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> None:
+    super().fetchFeaturesFromWeb(parameters, context, feedback)
     
+    # then merge the downloaded files
     init_string = self.WEBFETCH_ARGS["GEOM_TYPE"] + "?crs=" + self.WEBFETCH_ARGS["CRS"].authid() + "&index=yes&field=population:integer"
     vec_layer = QgsVectorLayer(init_string,baseName = "layer_from_tile", providerLib = "memory")
     vec_pr = vec_layer.dataProvider()
@@ -179,8 +183,20 @@ class fetchjapop(fetchabstract):
             ft["population"] = stat_dict["$"]
             vec_pr.addFeatures([ft])
     
-    return vec_layer
-  
+    self.FETCH_FEATURE = processing.run(
+      "gdal:rasterize",
+      {
+        "INPUT": vec_layer,
+        "FIELD": "population",
+        "UNITS": 1,
+        "WIDTH": 11.25 / 3600.0,
+        "HEIGHT": 7.5 / 3600.0,
+        "DATA_TYPE": 2,
+        "INIT": 0,
+        "OUTPUT": self.parameterAsOutputLayer(parameters, "OUTPUT", context)
+      }
+    )["OUTPUT"]
+      
   def initAlgorithm(self, config):    
     self.initUsingCanvas()
     self.initParameters()
@@ -191,22 +207,8 @@ class fetchjapop(fetchabstract):
     self.setWebFetchArgs(parameters, context, feedback)
     
     self.fetchFeaturesFromWeb(parameters, context, feedback)
-    pop_raw = self.mergeFetchedFeatures(parameters, context, feedback)
-    pop_raster = processing.run(
-      "gdal:rasterize",
-      {
-        "INPUT": pop_raw,
-        "FIELD": "population",
-        "UNITS": 1,
-        "WIDTH": 11.25 / 3600.0,
-        "HEIGHT": 7.5 / 3600.0,
-        "DATA_TYPE": 2,
-        "INIT": 0,
-        "OUTPUT": self.parameterAsOutputLayer(parameters, "OUTPUT", context)
-      }
-    )["OUTPUT"]
         
-    return {"OUTPUT":pop_raster}
+    return {"OUTPUT":self.FETCH_FEATURE}
     
   # Post processing; append layers
   def postProcessAlgorithm(self, context, feedback):

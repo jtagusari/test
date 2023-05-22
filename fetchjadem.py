@@ -85,7 +85,9 @@ class fetchjadem(fetchabstract):
     self.setFetchArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:6668"))
     self.setTileMapArgs(parameters, context, feedback, "Point")
     
-    dem_raw = self.fetchFeaturesFromTile(parameters, context, feedback)
+    self.fetchFeaturesFromTile(parameters, context, feedback)
+    dem_raw = self.FETCH_FEATURE
+    
     
     # CRS transform    
     dem_transformed = self.transformToTargetCrs(parameters,context,feedback,dem_raw)

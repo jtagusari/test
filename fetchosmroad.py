@@ -84,7 +84,8 @@ class fetchosmroad(fetchabstract):
     self.setFetchArea(parameters,context,feedback,QgsCoordinateReferenceSystem("EPSG:4326"))
     self.setOsmArgs(parameters, context, feedback, geom_type="Linestring")
     
-    road_raw = self.fetchFeaturesFromOsm(context, feedback)
+    self.fetchFeaturesFromOsm(parameters, context, feedback)
+    road_raw = self.FETCH_FEATURE
     
     # post processing if there are features
     if road_raw is not None and road_raw.featureCount() > 0:

@@ -214,7 +214,7 @@ class estimatelevelofbuilding(algabstract):
   
 
   def displayName(self):
-    return self.tr("Estimate levels to buildings")
+    return self.tr("Estimate level of buildings")
 
   def group(self):
     return self.tr("Evaluate health risk")

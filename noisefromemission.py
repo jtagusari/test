@@ -13,7 +13,9 @@ from qgis.core import (
   )
 
 import datetime
+import os
 from .noiseabstract import noiseabstract
+
 
 class noisefromemission(noiseabstract):
   PARAMETERS = {
@@ -244,8 +246,11 @@ class noisefromemission(noiseabstract):
     self.initParameters()
 
   def processAlgorithm(self, parameters, context, feedback):
-    self.initNoiseModellingPath("noisefromemission.groovy")
-    self.addNoiseModellingPath()
+    self.initNoiseModellingPath(
+      {
+        "GROOVY_SCRIPT": os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", "noisefromemission.groovy")
+      }
+    )
     self.initNoiseModellingArg(parameters, context, feedback)
 
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
@@ -264,8 +269,8 @@ class noisefromemission(noiseabstract):
       rcv_layer = self.parameterAsSource(parameters, "RECEIVER", context).materialize(QgsFeatureRequest(), feedback)
       
       # check if the receier has building id
-      if self.ARGS_FOR_BLDG_LEVEL["RECEIVER_BID"] in rcv_layer.fields().names() and \
-        self.ARGS_FOR_BLDG_LEVEL["RECEIVER_RID"] in rcv_layer.fields().names():
+      if self.BLDG_LEVEL_ARGS["RECEIVER_BID"] in rcv_layer.fields().names() and \
+        self.BLDG_LEVEL_ARGS["RECEIVER_RID"] in rcv_layer.fields().names():
           self.cmptBuildingLevel(parameters,context,feedback,bldg_layer,rcv_layer)
       
     # make iso surface, if specified
@@ -288,8 +293,8 @@ class noisefromemission(noiseabstract):
     )    
     
     # finally import as sink
-    output_dict = self.NOISEMODELLING["RESULTS_PATH"]
-    output_dict.update(self.NOISEMODELLING["RESULTS_BUILDING_PATH"])
+    output_dict = self.NOISEMODELLING["LEVEL_RESULTS"]
+    output_dict.update(self.NOISEMODELLING["BUILDING_RESULTS"])
     for file_name, file_path in output_dict.items():
       self.PROC_RESULTS[file_name] = self.importNoiseModellingResultsAsSink(
         parameters, context, file_name, file_path

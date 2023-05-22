@@ -106,7 +106,8 @@ class fetchjabuilding(fetchabstract):
     self.setTileMapArgs(parameters, context, feedback, "Polygon")
     
     # fetch the data from vector map tile
-    bldg_raw = self.fetchFeaturesFromTile(parameters, context, feedback)
+    self.fetchFeaturesFromTile(parameters, context, feedback)
+    bldg_raw = self.FETCH_FEATURE
     
     # post processing if there are any features
     if bldg_raw.featureCount() > 0:

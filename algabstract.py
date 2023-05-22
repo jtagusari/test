@@ -13,7 +13,10 @@ from qgis.core import (
   QgsProcessingParameterString,
   QgsProcessingParameterBoolean,
   QgsCoordinateReferenceSystem,
-  QgsRasterFileWriter
+  QgsRasterFileWriter,
+  QgsProcessingFeedback,
+  QgsProcessingContext,
+  QgsRasterLayer
   )
 
 import os
@@ -29,8 +32,9 @@ class algabstract(QgsProcessingAlgorithm):
     "WPS_ARGS":None
     }
   
+  PARAMETERS = {}
   
-  def initNoiseModellingPath(self, groovy_script_str):
+  def initNoiseModellingPath(self, paths:dict) -> None:
     self.NOISEMODELLING["GROOVY_SCRIPT"] = os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", groovy_script_str)
   
     # folder where the files are saved
@@ -38,12 +42,13 @@ class algabstract(QgsProcessingAlgorithm):
     if not os.path.exists(self.NOISEMODELLING["TEMP_DIR"]):
       os.mkdir(self.NOISEMODELLING["TEMP_DIR"])
     
-  def addNoiseModellingPath(self, paths:dict=None):
-    if (isinstance(paths, dict)):
+    if paths is not None and isinstance(paths, dict):
       self.NOISEMODELLING.update(paths)
 
-  
-  def initNoiseModellingArg(self, parameters, context, feedback):   
+    
+  def initNoiseModellingArg(
+    self, parameters:dict, context: QgsProcessingContext, feedback:QgsProcessingFeedback
+    ) -> None:   
     self.NOISEMODELLING["WPS_ARGS"] = {
       "w": self.NOISEMODELLING["TEMP_DIR"], 
       "s": self.NOISEMODELLING["GROOVY_SCRIPT"],
@@ -81,12 +86,12 @@ class algabstract(QgsProcessingAlgorithm):
             
           self.NOISEMODELLING["WPS_ARGS"][value.get("n_mdl")] = value_input
   
-  def addNoiseModellingArg(self, paths:dict=None):
-    if (isinstance(paths, dict)):
-      self.NOISEMODELLING["WPS_ARGS"].update(paths)
+  def addNoiseModellingArg(self, args:dict=None) -> None:
+    if (isinstance(args, dict)):
+      self.NOISEMODELLING["WPS_ARGS"].update(args)
   
   # add parameters using PARAMETERS attribute
-  def initParameters(self):    
+  def initParameters(self) -> None:    
     for key, value in self.PARAMETERS.items():
       args = value.get("ui_args")
       args["name"] = key
@@ -100,7 +105,7 @@ class algabstract(QgsProcessingAlgorithm):
       self.addParameter(ui)  
   
   # to save a vector layer
-  def saveVectorLayer(self, vector_layer, path):
+  def saveVectorLayer(self, vector_layer: QgsVectorLayer, path: str) -> None:
     save_options = QgsVectorFileWriter.SaveVectorOptions()
     save_options.driverName = "GeoJSON"
     QgsVectorFileWriter.writeAsVectorFormatV3(
@@ -109,7 +114,7 @@ class algabstract(QgsProcessingAlgorithm):
   
   
   # to save a raster layer
-  def saveRasterLayer(self, raster_layer, path):
+  def saveRasterLayer(self, raster_layer:QgsRasterLayer, path: str) -> None:
     file_writer = QgsRasterFileWriter(path)
     file_writer.writeRaster(
       raster_layer.pipe(), 
@@ -119,7 +124,10 @@ class algabstract(QgsProcessingAlgorithm):
       )
   
   # execution of the NoiseModelling script
-  def execNoiseModellingCmd(self, parameters, context, feedback):    
+  def execNoiseModellingCmd(
+    self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> None:    
+    
     self.NOISEMODELLING["CMD"] = os.path.join(os.path.dirname(__file__), "noisemodelling","bin","wps_scripts") + \
       "".join([" -" + k + " " + str(v) for k, v in self.NOISEMODELLING["WPS_ARGS"].items()])
     feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
@@ -128,9 +136,10 @@ class algabstract(QgsProcessingAlgorithm):
     loop.run_until_complete(
       self.streamNoiseModellingCmd(self.NOISEMODELLING["CMD"], feedback)
     )
+    loop.close()
     
     
-  async def streamNoiseModellingCmd(self, cmd, feedback):
+  async def streamNoiseModellingCmd(self, cmd: str, feedback: QgsProcessingFeedback) -> None:
     proc = await asyncio.create_subprocess_shell(
       cmd,
       stdout=asyncio.subprocess.PIPE,
@@ -160,7 +169,7 @@ class algabstract(QgsProcessingAlgorithm):
         )
   
   # import the results of the NoiseModelling as a sink
-  def importNoiseModellingResultsAsSink(self, parameters, context, attribute, path):
+  def importNoiseModellingResultsAsSink(self, parameters: dict, context: QgsProcessingContext, attribute: str, path: str) -> None:
 
     dest_id = None
     if os.path.exists(path):

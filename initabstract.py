@@ -1,11 +1,9 @@
 from qgis.PyQt.QtCore import (
-  QT_TRANSLATE_NOOP, QVariant
+  QVariant
   )
 from qgis.core import (
-  QgsProcessing,
-  QgsProcessingParameterFeatureSource,
-  QgsProcessingParameterFeatureSink,
-  QgsProcessingParameterBoolean,
+  QgsProcessingFeedback,
+  QgsProcessingContext,
   QgsField,
   QgsFeature
   )
@@ -22,7 +20,7 @@ class initabstract(algabstract):
     
 
   # set the fields that are added / overwritten / not changed
-  def setFields(self, parameters, context, feedback):
+  def setFields(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> None:
     self.FIELDS_FROM = {}
     input_layer = self.parameterAsSource(parameters, "INPUT", context)
     fields_init = input_layer.fields()
@@ -50,7 +48,7 @@ class initabstract(algabstract):
     self.FIELDS_INIT = fields_init
   
   # create a sink that contains necessary fields
-  def createVectorLayerAsSink(self, parameters, context, feedback):
+  def createVectorLayerAsSink(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> str:
         
     input_layer = self.parameterAsSource(parameters, "INPUT", context)
     # define the feature sink

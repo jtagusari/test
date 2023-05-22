@@ -1,12 +1,13 @@
 from qgis.PyQt.QtCore import (QCoreApplication, QT_TRANSLATE_NOOP)
 from qgis.core import (
   QgsCoordinateReferenceSystem,
+  QgsProcessingContext,
+  QgsProcessingFeedback,
   QgsProcessingParameterExtent,
   QgsProcessingParameterDistance,
   QgsProcessingParameterCrs, 
   QgsProcessingParameterFeatureSink,
   QgsProcessingParameterRasterDestination,
-  QgsProcessingUtils,
   QgsProcessingParameterString,
   QgsRasterLayer
   )
@@ -146,7 +147,9 @@ class fetchsrtmdem(fetchabstract):
   
   
   # create the raster from downloaded hgt files
-  def mergeFetchedFeatures(self, parameters, context, feedback):
+  def fetchFeaturesFromWeb(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> None:
+    super().fetchFeaturesFromWeb(parameters, context, feedback)
+    
     # list the files that has hgt extension
     files_to_be_merged = []
     for file in self.WEBFETCH_ARGS["DOWNLOADED_FILE"]:
@@ -159,20 +162,19 @@ class fetchsrtmdem(fetchabstract):
     
     # if there are only a file
     elif len(files_to_be_merged) == 1:
-      return QgsRasterLayer(files_to_be_merged[0], "SRTM")
+      self.FETCH_FEATURE = QgsRasterLayer(files_to_be_merged[0], "SRTM")
     
     # if there are multiple files
     else:
       rasters = []
       for file in files_to_be_merged:
         rasters.append(QgsRasterLayer(file + "|layername=1", "SRTM"))
-      raster_layer = processing.run(
+      self.FETCH_FEATURE = processing.run(
         "gdal:merge",{
           "INPUT": rasters,
           "OUTPUT": "TEMPORARY_OUTPUT"
         }
       )["OUTPUT"]
-      return raster_layer
     
   # initialize of the algorithm  
   def initAlgorithm(self, config):    
@@ -190,15 +192,12 @@ class fetchsrtmdem(fetchabstract):
     
     # download files using the session info
     self.fetchFeaturesFromWeb(parameters, context, feedback)
-    
-    # create raster from file(s)
-    dem_raster = self.mergeFetchedFeatures(parameters, context, feedback)
-    
+        
     # clip the raster because it is too large as a point vector
     dem_raster_clipped = processing.run(
       "gdal:cliprasterbyextent", 
       {
-        "INPUT": dem_raster,
+        "INPUT": self.FETCH_FEATURE,
         "PROJWIN": self.FETCH_AREA,
         "OUTPUT": self.parameterAsOutputLayer(parameters, "OUTPUT_RASTER", context)
       }

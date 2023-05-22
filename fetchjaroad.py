@@ -82,7 +82,8 @@ class fetchjaroad(fetchabstract):
     self.setTileMapArgs(parameters, context, feedback, "Linestring")
     
     # fetch the data from vector map tile
-    road_raw = self.fetchFeaturesFromTile(parameters, context, feedback)
+    self.fetchFeaturesFromTile(parameters, context, feedback)
+    road_raw = self.FETCH_FEATURE
     
     # post processing if there are features
     if road_raw.featureCount() > 0:
