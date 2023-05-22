@@ -3,12 +3,16 @@ name=H-RISK with noisemodelling
 qgisMinimumVersion=3.16
 qgisMaximumVersion=3.99
 description=Sound levels and Health risks of environmental noise 
-about=This plugin helps in fetching geometries to calculate sound levels from environmental noise, calculating the sound levels, and evaluating health risks. For use, NoiseModelling (https://noise-planet.org/noisemodelling.html) must be prepared. See README of the repository.
-version=0.0.1
+about=This plugin helps in fetching geometries to calculate sound levels from environmental noise, 
+  calculating the sound levels, and evaluating health risks. 
+  For use, NoiseModelling (https://noise-planet.org/noisemodelling.html) must be prepared. 
+  See README of the repository.
+version=version 0.0.1
 author= Junta Tagusari
 email=j.tagusari@eng.hokudai.ac.jp
 hasProcessingProvider=yes
 repository=https://gitlab.com/jtagusari/hrisk-noisemodelling
+tracker=https://gitlab.com/jtagusari/hrisk-noisemodelling
 
 # end of mandatory metadata
 
