@@ -1,4 +1,4 @@
-[general]
+﻿[general]
 name=H-RISK with noisemodelling
 qgisMinimumVersion=3.16
 description=Sound levels and Health risks of environmental noise 
