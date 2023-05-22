@@ -64,31 +64,30 @@ Install from QGIS repo (currently preparing) or download all the files in the re
 
 ### Fetch the geometries
 
-Specify area and fetch the geometries of roads and buildings in the area.
-The algorithms are stored in `Fetch geometries` group.
-In Japan, precised data (including population) can be obtained using the algorithms stored in `Fetch geometries (Ja)` group.
+The user can fetch the geometries of roads and buildings using algorithms in `Fetch geometries` group.
+In Japan, precised data (including population) can be obtained using algorithms in `Fetch geometries (Ja)` group.
+
+To fetch geometries from OpenStreetMap, `QuickOSM` plugin (https://docs.3liz.org/QuickOSM/) is needed.
+To fetch geometries from Shuttle Radar Topography Mission, user id and password of Earthdata Login (https://urs.earthdata.nasa.gov/users/new) is needed.
 
 ### Set information on the sound sources
 
-Traffic volumes (light/medium/heavy vehicles during day/evening/night) or the sound power levels are set in the fields of road layer.
-Required fields are set in the layer fetched in the previous procedure.
+Before calculating sound levels, the user must set traffic volumes (light/medium/heavy vehicles during day/evening/night) or the sound power levels, as the fields of road layer.
+Required fields are already set in the layer fetched if the features are fetched using the algorithms in `Fetch geometries` group (previous procedure).
+Or, the user can manually set the fields using algorithms in `Initialize features` group.
 
 ### Set receiver points
 
-Set receiver points, such as the facades of the buildings.
-The algorithms are stored in `Set receivers` group, which employs NoiseModelling algorithms implemented using Java.
+To set receiver points, algorithms in `Set receivers` group are available.
+The algorithms, employing `NoiseModelling` algorithms, set receiver points, such as at the facades of the buildings and at delaunay grid points.
 
 ### Calculate the sound levels
 
-Calculate the sound levels using the algorithms stored in `Predict sound level` group.
-Sound-level contours can also be created.
-It employs NoiseModelling algorithms.
+The sound levels at receiver points can be calculate using algorithms stored in `Predict sound level` group, employing `NoiseModelling`.
 
 ### Estimate health risks
 
-The health risks are estimated using the sound level of each building, base-line risk level and exposure-response relationships.
-The algorithms are stored in `Evaluate health risk` group.
-The affected population can also be evaluated if each building has the population field.
+The user can assign the number of residents of each building and estimate health risks posed by the noise, using algorithms in `Evaluate health risk` group.
 
 ## How to uninstall
 
