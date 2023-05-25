@@ -1,5 +1,5 @@
 from qgis.PyQt.QtCore import (
-  QT_TRANSLATE_NOOP
+  QT_TRANSLATE_NOOP, QVariant
   )
 from qgis.core import (
   QgsProject,
@@ -13,11 +13,13 @@ from qgis.core import (
   QgsFillSymbol,
   QgsProcessingParameterField,
   QgsFeatureRequest,
-  QgsProcessingLayerPostProcessorInterface
+  QgsProcessingLayerPostProcessorInterface,
+  QgsVectorLayer
   )
 
 from qgis import processing
 from .algabstract import algabstract
+from .noisecolor import getNoiseColorMap
 
 import os
 import re
@@ -38,6 +40,14 @@ class isosurface(algabstract):
         "description": QT_TRANSLATE_NOOP("isosurface","Receiver ID Field of the Sound level layer"),
         "parentLayerParameterName": "LEVEL_RESULT",
         "defaultValue": "IDRECEIVER"
+      }
+    },
+    "LEVEL_LID": {
+      "ui_func": QgsProcessingParameterField,
+      "ui_args":{
+        "description": QT_TRANSLATE_NOOP("isosurface","Sound-level Field of the Sound level layer"),
+        "parentLayerParameterName": "LEVEL_RESULT",
+        "defaultValue": "LAEQ"
       }
     },
     "TRIANGLES": { # Note: the name "TRIANGLES" should not be changed
@@ -75,6 +85,10 @@ class isosurface(algabstract):
     }
   }
         
+  FIELDS_LEVEL = {    
+    "PL":   {"TYPE": QVariant.Int, "DEFAULT_VALUE": None},
+    "LAEQ": {"TYPE": QVariant.Double, "DEFAULT_VALUE": None}
+  }
   def initAlgorithm(self, config):
     self.initParameters() 
 
@@ -82,26 +96,50 @@ class isosurface(algabstract):
     self.initNoiseModellingPath(
       {
         "GROOVY_SCRIPT": os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", "isosurface.groovy"),
-        "LEVEL_RESULT": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LEVEL_RESULT.geojson"),
-        "ISOSURFACE": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "CONTOURLNG_NOISE_MAP.geojson")
+        "LEVEL_RESULT": os.path.join("%nmtmp%", "LEVEL_RESULT.geojson"),
+        "ISOSURFACE": os.path.join("%nmtmp%", "CONTOURING_NOISE_MAP.geojson")
         }
       )
     
-    processing.run(
+    spl_input = self.parameterAsSource(parameters, "LEVEL_RESULT", context).materialize(QgsFeatureRequest(), feedback)
+    pk_field = self.parameterAsFields(parameters, "LEVEL_RID", context)[0]
+    level_field = self.parameterAsFields(parameters, "LEVEL_LID", context)[0]
+    spl_ext = processing.run(
+      "native:retainfields",
+      {
+        "INPUT": spl_input,
+        "FIELDS": [pk_field, level_field],
+        "OUTPUT": "TEMPORARY_OUTPUT"
+      }
+    )["OUTPUT"]
+    
+    
+    spl_pk = processing.run(
       "native:renametablefield",
       {
-        "INPUT": self.parameterAsSource(parameters, "LEVEL_RESULT", context).materialize(QgsFeatureRequest(), feedback),
+        "INPUT": spl_ext,
         "FIELD": self.parameterAsFields(parameters, "LEVEL_RID", context)[0],
         "NEW_NAME": "PK",
-        "OUTPUT": self.NOISEMODELLING["LEVEL_RESULT"]
+        "OUTPUT": "TEMPORARY_OUTPUT"
       }
-    )
+    )["OUTPUT"]
+    
+    
+    spl_laeq = processing.run(
+      "native:renametablefield",
+      {
+        "INPUT": spl_pk,
+        "FIELD": self.parameterAsFields(parameters, "LEVEL_LID", context)[0],
+        "NEW_NAME": "LAEQ",
+        "OUTPUT": "TEMPORARY_OUTPUT"
+      }
+    )["OUTPUT"]
+    
+    self.saveVectorLayer(spl_laeq, self.NOISEMODELLING["LEVEL_RESULT"])
     
     self.initNoiseModellingArg(parameters, context, feedback)
     self.addNoiseModellingArg({"resultGeomPath": self.NOISEMODELLING["LEVEL_RESULT"]})
-    
-    feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
-    
+        
     # execute groovy script using wps_scripts
     self.execNoiseModellingCmd(parameters, context, feedback)
     
@@ -141,19 +179,7 @@ class isosurfacePostProcessor (QgsProcessingLayerPostProcessorInterface):
     root = QgsProject.instance().layerTreeRoot()
     vl = root.findLayer(layer.id())
     
-    col_map = {
-      "< 35 dB":    {"lower": -999, "upper":  35, "color": "255,255,255, 100"},
-      "35 - 40 dB": {"lower":   35, "upper":  40, "color": "160,186,191, 100"},
-      "40 - 45 dB": {"lower":   40, "upper":  45, "color": "184,214,209, 100"},
-      "45 - 50 dB": {"lower":   45, "upper":  50, "color": "206,228,204, 100"},
-      "50 - 55 dB": {"lower":   50, "upper":  55, "color": "226,242,191, 100"},
-      "55 - 60 dB": {"lower":   55, "upper":  60, "color": "243,198,131, 100"},
-      "60 - 65 dB": {"lower":   60, "upper":  65, "color": "232,126, 77, 100"},
-      "65 - 70 dB": {"lower":   65, "upper":  70, "color": "205, 70, 62, 100"},
-      "70 - 75 dB": {"lower":   70, "upper":  75, "color": "161, 26, 77, 100"},
-      "75 - 80 dB": {"lower":   75, "upper":  80, "color": "117,  8, 92, 100"},
-      "> 80 dB":    {"lower":   80, "upper": 999, "color": " 67, 10, 74, 100"}
-    }
+    col_map = getNoiseColorMap(100)
     
     col_dict = {}
     for ft in layer.getFeatures():

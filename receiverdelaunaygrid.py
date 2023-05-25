@@ -3,14 +3,15 @@ from qgis.core import (
   QgsProcessing,
   QgsProcessingParameterFeatureSource,
   QgsProcessingParameterNumber,
-  QgsProcessingParameterFeatureSink
+  QgsProcessingParameterFeatureSink,
+  QgsProcessingParameterExtent
   )
 
 
-from .algabstract import algabstract
+from .receiverabstract import receiverabstract
 import os
 
-class receiverdelaunaygrid(algabstract):
+class receiverdelaunaygrid(receiverabstract):
   PARAMETERS = { 
     "BUILDING": {
       "crs_referrence": True, # this parameter is used as CRS referrence
@@ -31,15 +32,13 @@ class receiverdelaunaygrid(algabstract):
       "n_mdl": "sourceGeomPath",
       "save_layer_get_path": True
     },    
-    "FENCE": {
-      "ui_func": QgsProcessingParameterFeatureSource,
+    "FENCE_EXTENT": {
+      "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("receiverdelaunaygrid","Fence layer"),
-        "types": [QgsProcessing.TypeVectorPolygon],
-        "optional": True
-      },
-      "n_mdl": "fenceGeomPath",
-      "save_layer_get_path": True
+        "description": QT_TRANSLATE_NOOP("receiverfacade","Calculation extent"),
+        "defaultValue": None,
+        "optional": True,
+      }
     },
     "MAX_PROP_DIST": {
       "ui_func": QgsProcessingParameterNumber,
@@ -99,12 +98,13 @@ class receiverdelaunaygrid(algabstract):
   def processAlgorithm(self, parameters, context, feedback):    
     self.initNoiseModellingPath(
       {
-        "GROOVY_SCRIPT": os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", "receiverdelaunaygrid.groovy")
-        "RECEIVER": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "RECEIVERS.geojson"),
-        "TRIANGLE": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "TRIANGLES.geojson")
+        "GROOVY_SCRIPT": os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", "receiverdelaunaygrid.groovy"),
+        "RECEIVER": os.path.join("%nmtmp%", "RECEIVERS.geojson"),
+        "TRIANGLE": os.path.join("%nmtmp%", "TRIANGLES.geojson")
       }
     )
     self.initNoiseModellingArg(parameters, context, feedback)
+    self.fenceExtentAsWkt(parameters, context, feedback)
     
     # execute groovy script using wps_scripts
     self.execNoiseModellingCmd(parameters, context, feedback)

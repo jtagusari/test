@@ -35,11 +35,7 @@ class initbuilding(initabstract):
     }
   }
   
-  def __init__(self) -> None:
-    super().__init__()
-    self.FIELDS_ADD.update(
-      {"height":     {"TYPE": QVariant.Double, "DEFAULT_VALUE": 6.0}}
-    )
+  FIELDS_ADD ={"height":     {"TYPE": QVariant.Double, "DEFAULT_VALUE": 6.0}}
       
   def initAlgorithm(self, config):
     self.initParameters()

@@ -26,6 +26,7 @@ import os
 import uuid
 
 from .algabstract import algabstract
+from .noisecolor import getNoiseColorMap
 
 class noiseabstract(algabstract):
   
@@ -47,15 +48,15 @@ class noiseabstract(algabstract):
   def initNoiseModellingPath(self, paths={}):
     paths.update(
       {
-        "TRIANGLE": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "TRIANGLES.geojson"),
+        "TRIANGLE": os.path.join("%nmtmp%", "TRIANGLES.geojson"),
         "LEVEL_RESULTS":  {
-          "LDAY":     os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LDAY_GEOM.geojson"),
-          "LEVENING": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LEVENING_GEOM.geojson"),
-          "LNIGHT":   os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LNIGHT_GEOM.geojson"),
-          "LDEN":     os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LDEN_GEOM.geojson"),
+          "LDAY":     os.path.join("%nmtmp%", "LDAY_GEOM.geojson"),
+          "LEVENING": os.path.join("%nmtmp%", "LEVENING_GEOM.geojson"),
+          "LNIGHT":   os.path.join("%nmtmp%", "LNIGHT_GEOM.geojson"),
+          "LDEN":     os.path.join("%nmtmp%", "LDEN_GEOM.geojson"),
         },
         "BUILDING_RESULTS": {
-          "BUILDING_WITH_LEVEL": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "BUILDING_WITH_LEVEL.geojson")
+          "BUILDING_WITH_LEVEL": os.path.join("%nmtmp%", "BUILDING_WITH_LEVEL.geojson")
         }
       }
     )
@@ -118,22 +119,6 @@ class noiseabstract(algabstract):
     # save the result
     self.saveVectorLayer(bldg_layer, self.NOISEMODELLING["BUILDING_RESULTS"]["BUILDING_WITH_LEVEL"] )
 
-  
-  def createIsoSurface(self, triangle_layer: QgsVectorLayer, iso_class: list, smooth_coef: float) -> None:    
-    for noise_idx, file_path in self.NOISEMODELLING["LEVEL_RESULTS"].items():
-      isosurface_layer = processing.run(
-        "hrisk:isosurface",
-        {
-          "LEVEL_RESULT": QgsVectorLayer(file_path, noise_idx),
-          "LEVEL_RID": self.ISOSURFACE_ARGS["LEVEL_RID"],
-          "TRIANGLE": triangle_layer,
-          "ISO_CLASS": iso_class,
-          "SMOOTH_COEF": smooth_coef
-        }
-      )["OUTPUT"]
-      
-      
-
   # Post processing; append layers
   def postProcessAlgorithm(self, context, feedback):
     # use postprocessor class, defined below
@@ -192,19 +177,7 @@ class splcalcPostProcessor (QgsProcessingLayerPostProcessorInterface):
     if self.spl_attribute_name != "NO_RENDERING" and self.spl_attribute_name in vl.layer().fields().names():
       # set renderer
       renderer = QgsGraduatedSymbolRenderer(self.spl_attribute_name)
-      category = {
-        "< 35 dB":    {"lower": -999, "upper":  35, "color": "255,255,255,255"},
-        "35 - 40 dB": {"lower":   35, "upper":  40, "color": "160,186,191,255"},
-        "40 - 45 dB": {"lower":   40, "upper":  45, "color": "184,214,209,255"},
-        "45 - 50 dB": {"lower":   45, "upper":  50, "color": "206,228,204,255"},
-        "50 - 55 dB": {"lower":   50, "upper":  55, "color": "226,242,191,255"},
-        "55 - 60 dB": {"lower":   55, "upper":  60, "color": "243,198,131,255"},
-        "60 - 65 dB": {"lower":   60, "upper":  65, "color": "232,126,77,255" },
-        "65 - 70 dB": {"lower":   65, "upper":  70, "color": "205,70,62,255"  },
-        "70 - 75 dB": {"lower":   70, "upper":  75, "color": "161,26,77,255"  },
-        "75 - 80 dB": {"lower":   75, "upper":  80, "color": "117,8,92,255"   },
-        "> 80 dB":    {"lower":   80, "upper": 999, "color": "67,10,74,255"   }
-      }
+      col_map = getNoiseColorMap()
       
       # change symboller according to the wkb-type
       symb_fun = None
@@ -217,7 +190,7 @@ class splcalcPostProcessor (QgsProcessingLayerPostProcessorInterface):
       
       # set symbols
       if symb_fun != None:
-        for key, value in category.items():
+        for key, value in col_map.items():
           renderer.addClassRange(
             QgsRendererRange(
               QgsClassificationRange(key, value.get("lower"), value.get("upper")), 

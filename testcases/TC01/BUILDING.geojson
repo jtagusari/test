@@ -1,0 +1,10 @@
+{
+  "type": "FeatureCollection",
+  "name": "building",
+  "crs": { 
+    "type": "name", 
+    "properties": { "name": "urn:ogc:def:crs:EPSG::32601" } 
+  },
+  "features": []
+}
+  

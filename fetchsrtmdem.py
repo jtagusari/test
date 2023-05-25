@@ -97,6 +97,8 @@ class fetchsrtmdem(fetchabstract):
 
   def setWebFetchArgs(self, parameters, context, feedback):
     
+    self.WEBFETCH_ARGS["URL"] = []
+    
     # set url and file names
     lat_min = math.floor(self.FETCH_AREA.yMinimum())
     lat_max = math.ceil(self.FETCH_AREA.yMaximum())
@@ -142,8 +144,6 @@ class fetchsrtmdem(fetchabstract):
     if self.WEBFETCH_ARGS["URL"] is not None and self.WEBFETCH_ARGS["LOGIN"] is not None:
           self.WEBFETCH_ARGS["SET"] = True
     
-    # # return session, which will be used at downloading the data
-    # return session
   
   
   # create the raster from downloaded hgt files
@@ -225,7 +225,7 @@ class fetchsrtmdem(fetchabstract):
           )
     sink.addFeatures(dem_final.getFeatures())
     
-    return {"OUTPUT": dest_id, "OUTPUT_RASTER": dem_raster}   
+    return {"OUTPUT": dest_id, "OUTPUT_RASTER": dem_raster_clipped}   
     
   
   def displayName(self):

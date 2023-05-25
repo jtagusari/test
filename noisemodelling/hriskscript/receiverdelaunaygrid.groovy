@@ -21,10 +21,10 @@ inputs = [
     description : "Path of the source file",
     type : String.class
   ],
-  fenceGeomPath:[
-    name : "Path of the fence file",
-    title : "Path of the fence file",
-    description : "Path of the fence file",
+  fence:[
+    name : "Polygon that specifies the fence",
+    title : "Polygon that specifies the fence",
+    description : "Polygon that specifies the fence",
     min        : 0, max: 1,
     type : String.class
   ],
@@ -142,16 +142,20 @@ def exec(Connection connection, input) {
   
 
   // set fance table
-  String fenceTableName = null
-  if (input["fenceGeomPath"]) {
-    fenceTableName = importAndGetTable(connection, input["fenceGeomPath"], input["inputSRID"])
+  String fence = null
+  if (input["fence"]) {
+    fence = input["fence"]
   } 
+  // String fenceTableName = null
+  // if (input["fenceGeomPath"]) {
+  //   fenceTableName = importAndGetTable(connection, input["fenceGeomPath"], input["inputSRID"])
+  // } 
 
   // run calculation
   Map args = [
       "tableBuilding": tableBuilding, 
       "sourcesTableName": sourcesTableName, 
-      "fenceTableName": fenceTableName, 
+      "fence": fence, 
       "maxPropDist": input["maxPropDist"],
       "roadWidth": input["roadWidth"],
       "maxArea": input["maxArea"],

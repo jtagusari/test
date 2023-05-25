@@ -35,11 +35,7 @@ class initelevationpoint(initabstract):
     }
   }
   
-  def __init__(self) -> None:
-    super().__init__()
-    self.FIELDS_ADD.update(
-      {"alti":       {"TYPE": QVariant.Double, "DEFAULT_VALUE": None}}
-    )
+  FIELDS_ADD = {"alti":       {"TYPE": QVariant.Double, "DEFAULT_VALUE": None}}
       
   def initAlgorithm(self, config):
     self.initParameters()

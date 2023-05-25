@@ -35,7 +35,9 @@ class algabstract(QgsProcessingAlgorithm):
   PARAMETERS = {}
   
   def initNoiseModellingPath(self, paths:dict) -> None:
-    self.NOISEMODELLING["GROOVY_SCRIPT"] = os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", groovy_script_str)
+    if paths.get("GROOVY_SCRIPT") is None:
+      sys.exit(self.tr("Groovy script is not specified"))
+    self.NOISEMODELLING["GROOVY_SCRIPT"] = os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", paths["GROOVY_SCRIPT"])
   
     # folder where the files are saved
     self.NOISEMODELLING["TEMP_DIR"] = os.path.normpath(os.path.dirname(QgsProcessingUtils.generateTempFilename("")))
@@ -43,12 +45,19 @@ class algabstract(QgsProcessingAlgorithm):
       os.mkdir(self.NOISEMODELLING["TEMP_DIR"])
     
     if paths is not None and isinstance(paths, dict):
+      for key, value in paths.items():
+        if isinstance(value, str):
+          paths[key] = value.replace("%nmtmp%", self.NOISEMODELLING["TEMP_DIR"])
+        elif isinstance(value, dict):
+          for key2, value2 in value.items():
+            paths[key][key2] = value2.replace("%nmtmp%", self.NOISEMODELLING["TEMP_DIR"])
       self.NOISEMODELLING.update(paths)
 
     
   def initNoiseModellingArg(
     self, parameters:dict, context: QgsProcessingContext, feedback:QgsProcessingFeedback
     ) -> None:   
+    
     self.NOISEMODELLING["WPS_ARGS"] = {
       "w": self.NOISEMODELLING["TEMP_DIR"], 
       "s": self.NOISEMODELLING["GROOVY_SCRIPT"],
@@ -57,9 +66,12 @@ class algabstract(QgsProcessingAlgorithm):
     }
     
     # get CRS
-    crs_key = [key for key, value in self.PARAMETERS.items() if value.get("crs_referrence") != None and value.get("crs_referrence") == True]
-    crs_referrence = self.parameterAsSource(parameters, crs_key[0], context).sourceCrs()
-    self.NOISEMODELLING["WPS_ARGS"]["inputSRID"] = crs_referrence.authid().replace("EPSG:","")
+    try:
+      crs_key = [key for key, value in self.PARAMETERS.items() if value.get("crs_referrence") != None and value.get("crs_referrence") == True]
+      crs_referrence = self.parameterAsSource(parameters, crs_key[0], context).sourceCrs()
+      self.NOISEMODELLING["WPS_ARGS"]["inputSRID"] = crs_referrence.authid().replace("EPSG:","")
+    except:
+      sys.exit(self.tr("CRS is not specified by EPSG code!"))
     
     # set other arguments
     for key, value in self.PARAMETERS.items():
@@ -75,7 +87,7 @@ class algabstract(QgsProcessingAlgorithm):
             self.NOISEMODELLING["WPS_ARGS"][value.get("n_mdl")] = '"' + vl_path + '"'
         else:
           if value.get("ui_func") == QgsProcessingParameterString:
-            value_input = self.parameterAsString(parameters, key, context)
+            value_input = '"' + self.parameterAsString(parameters, key, context) + '"'
           if value.get("ui_func") == QgsProcessingParameterBoolean:
             value_input = self.parameterAsInt(parameters, key, context)
           if value.get("ui_func") == QgsProcessingParameterNumber:
@@ -93,16 +105,19 @@ class algabstract(QgsProcessingAlgorithm):
   # add parameters using PARAMETERS attribute
   def initParameters(self) -> None:    
     for key, value in self.PARAMETERS.items():
-      args = value.get("ui_args")
-      args["name"] = key
-      args["description"] = self.tr(args["description"])
-              
-      ui = value.get("ui_func")(**args)
-      
-      if value.get("advanced") != None and value.get("advanced") == True:
-        ui.setFlags(QgsProcessingParameterDefinition.FlagAdvanced)
+      try:
+        args = value.get("ui_args")
+        args["name"] = key
+        args["description"] = self.tr(args["description"])
+                
+        ui = value.get("ui_func")(**args)
         
-      self.addParameter(ui)  
+        if value.get("advanced") != None and value.get("advanced") == True:
+          ui.setFlags(QgsProcessingParameterDefinition.FlagAdvanced)
+          
+        self.addParameter(ui)  
+      except:
+        pass
   
   # to save a vector layer
   def saveVectorLayer(self, vector_layer: QgsVectorLayer, path: str) -> None:

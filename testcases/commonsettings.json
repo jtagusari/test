@@ -1,0 +1,33 @@
+{
+  "ERROR_EPSILON_HIGHEST":   1.0e5,
+  "ERROR_EPSILON_VERY_HIGH": 15.0,
+  "ERROR_EPSILON_HIGH":      3.0,
+  "ERROR_EPSILON_MEDIUM":    1.0,
+  "ERROR_EPSILON_LOW":       0.5,
+  "ERROR_EPSILON_VERY_LOW":  0.2,
+  "ERROR_EPSILON_LOWEST":    0.02,
+
+  "HOM_WIND_ROSE": [
+    0.0, 0.0, 0.0, 0.0, 
+    0.0, 0.0, 0.0, 0.0, 
+    0.0, 0.0, 0.0, 0.0, 
+    0.0, 0.0, 0.0, 0.0
+  ],
+  "FAV_WIND_ROSE":[
+    1.0, 1.0, 1.0, 1.0, 
+    1.0, 1.0, 1.0, 1.0, 
+    1.0, 1.0, 1.0, 1.0, 
+    1.0, 1.0, 1.0, 1.0
+  ],
+
+  "HUMIDITY": 7.0,
+  "TEMPERATURE": 10.0,
+  "SOUND_POWER_LEVELS": {
+    "LWD63": 93.0, "LWD125": 93.0, "LWD250": 93.0, "LWD500": 93.0, 
+    "LWD1000": 93.0, "LWD2000": 93.0, "LWD4000": 93.0, "LWD8000": 93.0
+  },
+  "A_WEIGHTING": [
+    -26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1
+  ],
+  "FAVORABLE_OCCURRENCE": 0.5
+}

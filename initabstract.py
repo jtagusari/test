@@ -11,16 +11,18 @@ from qgis.core import (
 from .algabstract import algabstract
 
 class initabstract(algabstract):
-  FIELDS_ADD = {    
+  FIELDS_ADD_COMMON = {    
     "PK":        {"TYPE": QVariant.Int, "DEFAULT_VALUE": None}
   }
   
+  FIELDS_ADD = {}
   FIELDS_INIT = None
   FIELDS_FROM = {}
     
 
   # set the fields that are added / overwritten / not changed
   def setFields(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> None:
+    self.FIELDS_ADD.update(self.FIELDS_ADD_COMMON)
     self.FIELDS_FROM = {}
     input_layer = self.parameterAsSource(parameters, "INPUT", context)
     fields_init = input_layer.fields()

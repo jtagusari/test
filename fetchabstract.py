@@ -1,5 +1,5 @@
 from qgis.PyQt.QtCore import (
-  QT_TRANSLATE_NOOP
+  QT_TRANSLATE_NOOP, QVariant
   )
 from qgis.core import (
   QgsApplication,
@@ -241,7 +241,12 @@ class fetchabstract(algabstract):
         for ft in vec_from_tile_rev.getFeatures():
           # set the fields if it is not set 
           if vec_layer.fields().count() == 0:
-            vec_pr.addAttributes([ft.fields().at(idx) for idx in range(ft.fields().count())])
+            for idx in range(ft.fields().count()):
+              fld = ft.fields().at(idx)
+              if not fld.type() in [QVariant.Int, QVariant.Double, QVariant.String, QVariant.Date, QVariant.DateTime, QVariant.Time]:
+                fld.setType(QVariant.String)
+                fld.setTypeName("String")
+              vec_pr.addAttributes([fld])
             vec_layer.updateFields()
           vec_pr.addFeatures([ft])
           
@@ -250,6 +255,8 @@ class fetchabstract(algabstract):
   # fetch features from the URL
   # note that it only downloads file(s)
   def fetchFeaturesFromWeb(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> None:
+    self.WEBFETCH_ARGS["DOWNLOADED_FILE"] = []
+    
     if not self.WEBFETCH_ARGS["SET"]:
       return
     # if login is needed, session is also needed
@@ -334,7 +341,7 @@ class fetchabstract(algabstract):
       self.FETCH_FEATURE = vec_layer
   
   
-  def modifyFeaturesFromTile(self, fts: QgsVectorLayer | QgsRasterLayer, z: int, tx: int, ty: int)- > QgsVectorLayer | QgsRasterLayer:
+  def modifyFeaturesFromTile(self, fts, z: int, tx: int, ty: int):
     return(fts)
     
   def dissolveFeatures(self, fts: QgsVectorLayer) -> QgsVectorLayer:

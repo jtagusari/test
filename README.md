@@ -37,7 +37,7 @@ The installer (`installer/hrisk-setup.exe`) will help install required component
 
 ### Using installer (Windows 10)
 
-Execute the installer (`installer/hrisk-setup.exe`). 
+Execute the installer (`installer/hrisk-setup.exe` or `Install required components` algorithm in `Configurations` group). 
 The program can also install this plugin, as well as all the required components. 
 Environmental variables that are needed to execute NoiseModelling are also set. 
 
@@ -50,15 +50,137 @@ Install from QGIS repo or download all the files in the repository (https://gitl
 #### NoiseModelling
 
 1. Download No-GUI version of NoiseModelling (see https://github.com/Universite-Gustave-Eiffel/NoiseModelling/releases)
-2. Save all the files in your PC (e.g. `C:\Program Files`)
+2. Save all the files in your PC (e.g. `C:\Program Files\NoiseModelling`)
 3. Set environmental variable of `NOISEMODELLING_HOME` to the installed folder
 
 #### Java
 
 1. Check the requirements of NoiseModelling and obtain the required version of Java implementation
-2. Save all the files in your PC (e.g. `C:\Program Files`)
+2. Save all the files in your PC (e.g. `C:\Program Files\Java`)
 3. Set environmental variable of `JAVA_FOR_NOISEMODELLING` to the installed folder. Note that `%JAVA_FOR_NOISEMODELLING%\bin\java.exe` exists.
 
+
+## Tutorial (Test the plugin)
+
+The following is a tutorial of this plugin.
+The results are in `tutorial` directory.
+
+### Fetch the geometries
+
+With following procedure, roads, buildings, elevation points, and population mesh are fetched.
+If the parameters are unspecified, use the default values.
+
+- Execute `Road centerline (OSM)` algorithm (in `Fetch geometries` group) using following parameters. Note that `QuickOSM` plugin is needed before the execution.
+  - `FETCH_EXTENT`: 141.295,141.305,43.158,43.168 [EPSG:4326]
+  - `TARGET_CRS`: EPSG: 32654
+  - `BUFFER`: 500.0 (m)
+
+- Execute `Building (OSM)` algorithm using following parameters:
+  - `FETCH_EXTENT`: 141.295,141.305,43.158,43.168 [EPSG:4326]
+  - `TARGET_CRS`: EPSG: 32654
+  - `BUFFER`: 500.0 (m)
+- Execute `Elevation points (SRTM)` algorithm using following parameters. Note that user id and password of Earthdata Login (https://urs.earthdata.nasa.gov/users/new) is needed before the execution.
+  - `FETCH_EXTENT`: 141.295,141.305,43.158,43.168 [EPSG:4326]
+  - `TARGET_CRS`: EPSG: 32654
+  - `BUFFER`: 500.0 (m)
+  - `USERNAME`: (registered user name)
+  - `PASSWORD`: (registered password)
+- Execute `Population (Ja)` algorithm (in `Fetch geometries (Ja)` group) using following parameters. Note that only the population in Japan can be fetched using this algorithm.
+  - `FETCH_EXTENT`: 141.295,141.305,43.158,43.168 [EPSG:4326]
+  - `TARGET_CRS`: EPSG: 32654
+  - `BUFFER`: 200.0 (m)
+
+
+The roads and buildings are also able to be obtained with following procedures. 
+
+1. get the fetch extent as a rectangle
+   1. `native:extenttolayer` using the above `FETCH_EXTENT` as `INPUT` 
+   2. `native:reprojectlayer` using the output of the previous procedure as `INPUT` and the above `TARGET_CRS` as `TARGET_CRS`
+   3. `native:buffer` using the output of the previous procedure as `INPUT` and the above `BUFFER` as `DISTANCE`
+2. get the features from OpenStreetMap
+   1. `quickosm:downloadosmdataextentquery` using highway as `KEY` (if for buildings, building as `KEY`) and the extent of the obtained rectangle as the `EXTENT`
+   2. `native:reprojectlayer` using the output of the previous procedure as `INPUT` and the above `TARGET_CRS` as `TARGET_CRS`
+   3. `native:dissolve` using the output of the previous procedure as `INPUT` and the all the fields as `FIELD`
+   4. `native:multiparttosingleparts` using the output of the previous procedure as `INPUT`
+3. set required fields
+   1. add required fields to the road layer (`PK`,`LV_d`, `LV_e`, `LV_n`, `MV_d`, `MV_e`, `MV_n`, `HV_d`, `HV_e`, `HV_n`, `LV_spd_d`, `LV_spd_e`, `LV_spd_n`, `MV_spd_d`, `MV_spd_e`, `MV_spd_n`, `HV_spd_d`, `HV_spd_e`, `HV_spd_n`, `LWd63`, `LWd125`, `LWd250`, `LWd500`, `LWd1000`, `LWd2000`, `LWd4000`, `LWd8000`, `LWe63`, `LWe125`, `LWe250`, `LWe500`, `LWe1000`, `LWe2000`, `LWe4000`, `LWe8000`, `LWn63`, `LWn125`, `LWn250`, `LWn500`, `LWn1000`, `LWn2000`, `LWn4000`, `LWn8000`, `pvmt`, `temp_d`, `temp_e`, `temp_n`, `ts_stud`, `pm_stud`, `junc_dist`, `slope`, `way`)
+   2. add required fields to the building layer (`PK`,`height`)
+
+### Set traffic volume
+
+As an example, the following traffic volumes are set:
+- For roads of which `osm_id` are `202548600` and `1128470753`:
+  - `LV_d`: 1000 / `LV_e`: 400 / `LV_n` : 120 / `HV_d`: 140 / `HV_e`: 20 / `HV_n` : 20
+
+### Set receivers (at building facade)
+
+- Execute `Building facade` algorithm in `Set receiver` group using following parameters. Receiver points in front of the buildings are created using algorithms implemented in `NoiseModelling`. Note that `NoiseModelling` and `Java` are needed before the execution (see "How to install" section)
+  - `BUILDING`: (buildings fetched)
+  - `SOURCE`: (roads fetched)
+  - `FENCE_EXTENT`: 141.295,141.305,43.158,43.168 [EPSG:4326]
+  - `DELTA`: 2.0
+
+The receivers at buildings facade are used to estimate health risks posed by noise exposure.
+
+### Set receivers (at delaunay grid)
+
+- Execute `Delaunay grid` algorithm in `Set receiver` group using following parameters.
+  - `BUILDING`: (buildings fetched)
+  - `SOURCE`: (roads fetched)
+  - `FENCE_EXTENT`: 141.295,141.305,43.158,43.168 [EPSG:4326]
+  - `MAX_AREA`: 100.0
+
+The receivers at delaunay grid pointsare used to create sound-level contours.
+As well as receiver points, delaunay triangular polygons are output, which is necessary for creating sound-level contour.
+
+### Calculate sound levels
+
+- Execute `Prediction from traffic` algorithm in `Predict sound level` group using following parameters. The sound levels are computed using algorithms implemented in `NoiseModelling`.
+  - `ROAD`: (roads fetched)
+  - `BUILDING`: (buildings fetched)
+  - `RECEIVER`: (receiver points created)
+  - `DEM`: (elevation points fetched)
+  - `MAX_SRC_DIST`: 500
+
+### Create sound-level contour (delaynay-grid receivers)
+
+- Execute `Isosurface` algorithm in `Predict sound level` group using following parameters. The sound-level counters are computed using algorithms implemented in `NoiseModelling`.
+  - `LEVEL_RESULT`: (sound level computed (e.g. Lden) using delaunay grid)
+  - `LEVEL_RID`: `IDRECEIVER`
+  - `LEVEL_LID`: `LAEQ`
+  - `TRIANGLES`: (triangles obtained using delaunay grid)
+
+### Estimate health risks (building-facade receivers)
+
+
+- Execute `Estimate populations of buildings using Raster` algorithm in `Evaluate health risk` group using following parameters.
+  - `BUILDING`: (buildings fetched)
+  - `POPULATION`: (population fetched)
+- Execute `Estimate level of buildings` algorithm using following parameters (assign Lden)
+  - `BUILDING`: (buildings with population information)
+  - `BUILDING_BID`: `PK`
+  - `RECEIVER`: (receivers set at buildings facade)
+  - `RECEIVER_BID`: `BUILD_PK`
+  - `RECEIVER_RID`: `PK`
+  - `LEVEL`: (Lden computed at buildings facade)
+  - `LEVEL_RID`: `IDRECEIVER`
+  - `LEVEL_ASSIGN`: `LAEQ`
+  - `LEVEL_PREFIX`: `Lden_`
+- Execute `Estimate level of buildings` algorithm using following parameters (assign Lnight)
+  - `BUILDING`: (buildings with population information)
+  - `BUILDING_BID`: `PK`
+  - `RECEIVER`: (receivers set at buildings facade)
+  - `RECEIVER_BID`: `BUILD_PK`
+  - `RECEIVER_RID`: `PK`
+  - `LEVEL`: (Lnight computed at buildings facade)
+  - `LEVEL_RID`: `IDRECEIVER`
+  - `LEVEL_ASSIGN`: `LAEQ`
+  - `LEVEL_PREFIX`: `Lnight_`
+- Execute `Estimate health risks of buildings` algorithm using following parameters
+  - `BUILDING`: (buildings with population and sound level information)
+  - `LDEN`: `Lden_LAEQ_Maximum`
+  - `LNIGHT`: `Lnight_LAEQ_Maximum`
+  - `POP`: `popEst`
 
 ## How to use
 

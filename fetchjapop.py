@@ -111,6 +111,7 @@ class fetchjapop(fetchabstract):
         
     self.WEBFETCH_ARGS["CRS"] = self.parameterAsCrs(parameters, "FETCH_CRS", context)
     self.WEBFETCH_ARGS["GEOM_TYPE"] = "Point"
+    self.WEBFETCH_ARGS["URL"] = []
       
     lng_min = self.FETCH_AREA.xMinimum()
     lng_max = self.FETCH_AREA.xMaximum()

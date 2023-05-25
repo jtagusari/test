@@ -24,7 +24,7 @@ class noisefromemission(noiseabstract):
       "ui_func": QgsProcessingParameterFeatureSource,
       "ui_args":{
         "description": QT_TRANSLATE_NOOP("noisefromemission","Road layer"),
-        "types": [QgsProcessing.TypeVectorLine]
+        "types": [QgsProcessing.TypeVectorPoint, QgsProcessing.TypeVectorLine]
       },
       "n_mdl":"roadGeomPath",
       "save_layer_get_path": True
@@ -146,6 +146,33 @@ class noisefromemission(noiseabstract):
       },
       "n_mdl": "confDiffHorizontal"
     },
+    "FAV_OCURRENCE_DAY": {
+      "advanced": True,
+      "ui_func": QgsProcessingParameterString,
+      "ui_args": {
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Probability of occurrence of favorable condition (day)"),
+        "defaultValue": "0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5"
+      },
+      "n_mdl": "confFavorableOccurrencesDay"
+    },
+    "FAV_OCURRENCE_EVENING": {
+      "advanced": True,
+      "ui_func": QgsProcessingParameterString,
+      "ui_args": {
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Probability of occurrence of favorable condition (evening)"),
+        "defaultValue": "0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5"
+      },
+      "n_mdl": "confFavorableOccurrencesEvening"
+    },
+    "FAV_OCURRENCE_NIGHT": {
+      "advanced": True,
+      "ui_func": QgsProcessingParameterString,
+      "ui_args": {
+        "description": QT_TRANSLATE_NOOP("noisefromemission","Probability of occurrence of favorable condition (night)"),
+        "defaultValue": "0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5"
+      },
+      "n_mdl": "confFavorableOccurrencesNight"
+    },
     "THREAD_NUMBER": {
       "advanced": True,
       "ui_func": QgsProcessingParameterNumber,
@@ -162,40 +189,6 @@ class noisefromemission(noiseabstract):
       "ui_args": {
         "description": QT_TRANSLATE_NOOP("noisefromemission","Estimate sound levels and health risks (only for facade receivers)"),
         "defaultValue": False
-      }
-    },
-    "MAKE_ISOSURFACE": {
-      "advanced": True,
-      "ui_func": QgsProcessingParameterBoolean,
-      "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromemission","Make isosurface (only for delaunay receivers and triangle layer is necessary)"),
-        "defaultValue": False
-      }
-    },
-    "TRIANGLE": {
-      "ui_func": QgsProcessingParameterFeatureSource,
-      "ui_args":{
-        "description": QT_TRANSLATE_NOOP("noisefromemission","Triangle layer"),
-        "types": [QgsProcessing.TypeVectorPolygon],
-        "optional": True
-      }
-    },
-    "ISO_CLASS": {
-      "advanced": True,
-      "ui_func": QgsProcessingParameterString,
-      "ui_args":{
-        "description": QT_TRANSLATE_NOOP("noisefromemission","Separation of sound levels for isosurfaces (e.g. 35.0,40.0)"),
-        "defaultValue": "35.0,40.0,45.0,50.0,55.0,60.0,65.0,70.0,75.0,80.0,200.0",
-        "multiLine": False
-      }
-    },    
-    "SMOOTH_COEF": {
-      "advanced": True,
-      "ui_func": QgsProcessingParameterNumber,
-      "ui_args":{
-        "description": QT_TRANSLATE_NOOP("isosurface","Smoothing parameter (Bezier curve coefficient)"),
-        "type": QgsProcessingParameterNumber.Double,
-        "minValue": 0.0, "defaultValue": 1.0, "maxValue": 2.0
       }
     },
     "WPS_ARGS": {
@@ -252,8 +245,6 @@ class noisefromemission(noiseabstract):
       }
     )
     self.initNoiseModellingArg(parameters, context, feedback)
-
-    feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
                 
     # execute groovy script using wps_scripts
     self.execNoiseModellingCmd(parameters, context, feedback)
@@ -272,17 +263,7 @@ class noisefromemission(noiseabstract):
       if self.BLDG_LEVEL_ARGS["RECEIVER_BID"] in rcv_layer.fields().names() and \
         self.BLDG_LEVEL_ARGS["RECEIVER_RID"] in rcv_layer.fields().names():
           self.cmptBuildingLevel(parameters,context,feedback,bldg_layer,rcv_layer)
-      
-    # make iso surface, if specified
-    if self.parameterAsBoolean(parameters, "MAKE_ISOSURFACE", context):
-      
-      # set buildings and receivers layer
-      bldg_layer = self.parameterAsSource(parameters, "BUILDING", context).materialize(QgsFeatureRequest(), feedback)
-      rcv_layer = self.parameterAsSource(parameters, "RECEIVER", context).materialize(QgsFeatureRequest(), feedback)
-      
-      self.cmptBuildingLevel(parameters,context,feedback,bldg_layer,rcv_layer)
-
-    
+          
     # output the results
     self.PROC_RESULTS["WPS_ARGS"] = self.outputWpsArgs(
       parameters, context,

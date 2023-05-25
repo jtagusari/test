@@ -3,14 +3,15 @@ from qgis.core import (
   QgsProcessing,
   QgsProcessingParameterFeatureSource,
   QgsProcessingParameterNumber,
-  QgsProcessingParameterFeatureSink
+  QgsProcessingParameterFeatureSink,
+  QgsProcessingParameterExtent
   )
 
 
-from .algabstract import algabstract
+from .receiverabstract import receiverabstract
 import os
 
-class receiverfacade(algabstract):
+class receiverfacade(receiverabstract):
   PARAMETERS = { 
     "BUILDING": {
       "crs_referrence": True, # this parameter is used as CRS referrence
@@ -32,17 +33,14 @@ class receiverfacade(algabstract):
       "n_mdl": "sourceGeomPath",
       "save_layer_get_path": True
     },    
-    "FENCE": {
-      "ui_func": QgsProcessingParameterFeatureSource,
+    "FENCE_EXTENT": {
+      "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("receiverfacade","Fence layer"),
-        "types": [QgsProcessing.TypeVectorPolygon],
+        "description": QT_TRANSLATE_NOOP("receiverfacade","Calculation extent"),
+        "defaultValue": None,
         "optional": True,
-      },
-      "n_mdl": "fenceGeomPath",
-      "save_layer_get_path": True
+      }
     },
-    
     "DELTA": {
       "ui_func": QgsProcessingParameterNumber,
       "ui_args": {
@@ -71,16 +69,16 @@ class receiverfacade(algabstract):
   
   def initAlgorithm(self, config):
     self.initParameters()
-
-  def processAlgorithm(self, parameters, context, feedback):   
     
+  def processAlgorithm(self, parameters, context, feedback):   
     self.initNoiseModellingPath(
       {
         "GROOVY_SCRIPT": os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", "receiverfacade.groovy"),
-        "RECEIVER": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "RECEIVERS.geojson")
+        "RECEIVER": os.path.join("%nmtmp%", "RECEIVERS.geojson")
       }
     )
     self.initNoiseModellingArg(parameters, context, feedback)
+    self.fenceExtentAsLayer(parameters, context, feedback)
         
     # execute groovy script using wps_scripts
     self.execNoiseModellingCmd(parameters, context, feedback)
@@ -95,7 +93,7 @@ class receiverfacade(algabstract):
     return {}
 
   def displayName(self):
-    return self.tr("At building facade")
+    return self.tr("Building facade")
 
   def group(self):
     return self.tr('Set receivers')

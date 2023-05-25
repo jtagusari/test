@@ -47,10 +47,10 @@ class installcomponents(algabstract):
     return self.tr("Install required components")
 
   def group(self):
-    return self.tr("Initialize plugin")
+    return self.tr("Configurations")
 
   def groupId(self):
-    return "installComponents"
+    return "config"
 
   def createInstance(self):
     return installcomponents()

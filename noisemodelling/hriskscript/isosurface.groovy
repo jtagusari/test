@@ -119,7 +119,7 @@ def exec(Connection connection, input) {
   )
   
   // export results
-  for (tbl in ["CONTOURLNG_NOISE_MAP"]){
+  for (tbl in ["CONTOURING_NOISE_MAP"]){
     Path p_result = Paths.get(input["exportDir"]).resolve(Paths.get(tbl + ".geojson"))
     runScript(
       connection, 

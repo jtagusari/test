@@ -39,13 +39,11 @@ class initroademissionfromtraffic(algabstract):
     self.initNoiseModellingPath(
       {
         "GROOVY_SCRIPT": os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", "initroademissionfromtraffic.groovy"),
-        "LW_ROADS": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LW_ROADS.geojson"),
-        "LW_ROADS_JOINED": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "LW_ROADS_JOINED.geojson")
+        "LW_ROADS": os.path.join("%nmtmp%", "LW_ROADS.geojson"),
+        "LW_ROADS_JOINED": os.path.join("%nmtmp%", "LW_ROADS_JOINED.geojson")
       }
     )
     self.initNoiseModellingArg(parameters,context,feedback)    
-    
-    feedback.pushCommandInfo(self.NOISEMODELLING["CMD"])   
     
     # execute groovy script using wps_scripts
     self.execNoiseModellingCmd(parameters, context, feedback)

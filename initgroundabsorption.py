@@ -35,11 +35,7 @@ class initgroundabsorption(initabstract):
     }
   }
   
-  def __init__(self) -> None:
-    super().__init__()
-    self.FIELDS_ADD.update(
-      {"G":       {"TYPE": QVariant.Double, "DEFAULT_VALUE": 0.0}}
-    )
+  FIELDS_ADD = {"G": {"TYPE": QVariant.Double, "DEFAULT_VALUE": 0.0}}
       
   def initAlgorithm(self, config):
     self.initParameters()

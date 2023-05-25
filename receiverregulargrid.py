@@ -3,14 +3,15 @@ from qgis.core import (
   QgsProcessing,
   QgsProcessingParameterFeatureSource,
   QgsProcessingParameterNumber,
-  QgsProcessingParameterFeatureSink
+  QgsProcessingParameterFeatureSink,
+  QgsProcessingParameterExtent
   )
 
 
-from .algabstract import algabstract
+from .receiverabstract import receiverabstract
 import os
 
-class receiverregulargrid(algabstract):
+class receiverregulargrid(receiverabstract):
   PARAMETERS = { 
     "FENCE": {
       "crs_referrence": True, # this parameter is used as CRS referrence
@@ -77,7 +78,7 @@ class receiverregulargrid(algabstract):
     self.initNoiseModellingPath(
       {
         "GROOVY_SCRIPT": os.path.join(os.path.dirname(__file__), "noisemodelling","hriskscript", "receiverregulargrid.groovy"),
-        "RECEIVER": os.path.join(self.NOISEMODELLING["TEMP_DIR"], "RECEIVERS.geojson")
+        "RECEIVER": os.path.join("%nmtmp%", "RECEIVERS.geojson")
       }
     )
     self.initNoiseModellingArg(parameters, context, feedback)

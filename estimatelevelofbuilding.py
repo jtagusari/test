@@ -102,9 +102,8 @@ class estimatelevelofbuilding(algabstract):
 
 
   def processAlgorithm(self, parameters, context, feedback):
-    
     # initialize road layer (and data provider) to which vector features added
-    bldg = self.parameterAsSource(parameters, "BUILDING", context)
+    bldg = self.parameterAsSource(parameters, "BUILDING", context).materialize(QgsFeatureRequest(), feedback)
     bldg_bid = self.parameterAsString(parameters, "BUILDING_BID", context)
     
     if not bldg_bid in bldg.fields().names():
