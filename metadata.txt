@@ -17,7 +17,7 @@ tracker=https://gitlab.com/jtagusari/hrisk-noisemodelling
 # end of mandatory metadata
 
 # recommended items:
-changelog=None
+changelog=0.0.2: Added tutorial and the extent of the fence was introduced.
 
 tags=environmental noise,health risk
 
