@@ -1,6 +1,6 @@
 ﻿[Setup]
 AppName=H-RISK (with NoiseModelling)
-AppVersion=0.0.1
+AppVersion=0.0.2
 AppPublisher=Junta Tagusari
 AppPublisherURL=https://gitlab.com/jtagusari/hrisk-qgis/
 OutputDir=.

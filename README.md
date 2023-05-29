@@ -30,10 +30,10 @@ Note: This service uses the API function of the e-Stat (e-Stat), but the content
 
 ## How to install
 
-Install QGIS (version >= 3.22.0) and install the plugin according to the following instruction.
+Install QGIS and install the plugin according to the following instruction.
 Note that to calculate the sound levels, NoiseModelling (https://noise-planet.org/noisemodelling.html) and Java implementation are needed.
 
-The installer (`installer/hrisk-setup.exe` or `Install required components` algorithm in `Configurations` group) will help install required components including the present plugin.
+The installer (`installer/hrisk-setup.exe` or `Install required components` algorithm in `Configurations` group) will help install required components.
 
 ### Using installer (Windows 10)
 
@@ -258,7 +258,7 @@ The algorithms in `Evaluate health risk` group are:
 
 ### For developers
 
-There are several scripts for developers, as follows:
+Here are information about classes defined in the plugin:
 
 - `algabstract`: an abstract class inheriting `QgsProcessingAlgorithm`, defining attributes and methods
   - attributes

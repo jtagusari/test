@@ -7,7 +7,7 @@ about=This plugin helps in fetching geometries to calculate sound levels from en
   calculating the sound levels, and evaluating health risks. 
   For use, NoiseModelling (https://noise-planet.org/noisemodelling.html) must be prepared. 
   See README of the repository.
-version=version 0.0.1
+version=version 0.0.2
 author= Junta Tagusari
 email=j.tagusari@eng.hokudai.ac.jp
 hasProcessingProvider=yes
