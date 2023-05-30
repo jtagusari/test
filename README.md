@@ -5,22 +5,23 @@
 ## About
 
 This is a QGIS plugin, which implements NoiseModelling (https://github.com/Universite-Gustave-Eiffel/NoiseModelling) and help estimate the health risks posed by (road traffic) noise.
+The author has also made an application to estimate the risk posed by noise from wind turbines. See https://gitlab.com/jtagusari/hrisk-wtn.
 
 ![](tutorial/result.png)
 
 Figure: Sound levels along a road in Sapporo city (see the Tutorial).
 
-The author has also made an application to estimate the risk posed by noise from wind turbines. See https://gitlab.com/jtagusari/hrisk-wtn .
+
 
 ## Features
 
 This plugin can
 
-- fetch geometries from OpenStreetMap, Shuttle Radar Topography Mission, and Vector Tiles (provided by the Geospatial Information Authority of Japan).
-- predict sound levels by executing NoiseModelling, by executing the Java script (specified Java implementation is required).
-- estimate health risks based on the predicted sound levels and expore-response relationships shown in the Environmental Noise Guidelines in European Region (WHO Regional Office for Europe).
+- Fetch geometries from OpenStreetMap, Shuttle Radar Topography Mission, and Vector Tiles (provided by the Geospatial Information Authority of Japan).
+- Predict sound levels by executing NoiseModelling, by executing the Java script (specified Java implementation is required).
+- Estimate health risks based on the predicted sound levels and expore-response relationships shown in the Environmental Noise Guidelines in European Region (WHO Regional Office for Europe).
 
-The scripts of NoiseModelling are not translated: this plugin executes them using shell command.
+The scripts of NoiseModelling are not translated: this plugin executes them using shell command and you can replace it with a newer version.
 At this moment, the operation of the plugin with NoiseModelling v4.0.2 is confirmed. (Not with v4.0.4)
 
 ## License
