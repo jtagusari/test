@@ -6,14 +6,17 @@
 
 This is a QGIS plugin, which implements NoiseModelling (https://github.com/Universite-Gustave-Eiffel/NoiseModelling) and help estimate the health risks posed by (road traffic) noise.
 
+![](tutorial/result.png "Result of the tutorial project, illustrating the sound levels in Sapporo city.")
+
 ## Features
 
 This plugin can
 
 - fetch geometries from OpenStreetMap, Shuttle Radar Topography Mission, and Vector Tiles (provided by the Geospatial Information Authority of Japan).
-- predict sound levels using NoiseModelling, by executing the Java script (specified Java implementation is required).
+- predict sound levels by executing NoiseModelling, by executing the Java script (specified Java implementation is required).
 - estimate health risks based on the predicted sound levels and expore-response relationships shown in the Environmental Noise Guidelines in European Region (WHO Regional Office for Europe).
 
+The scripts of NoiseModelling are not translated: this plugin executes them using shell command.
 At this moment, the operation of the plugin with NoiseModelling v4.0.2 is confirmed. (Not with v4.0.4)
 
 ## License
@@ -30,10 +33,10 @@ Note: This service uses the API function of the e-Stat (e-Stat), but the content
 
 ## How to install
 
-Install QGIS and install the plugin according to the following instruction.
-Note that to calculate the sound levels, NoiseModelling (https://noise-planet.org/noisemodelling.html) and Java implementation are needed.
+Install QGIS and this plugin according to the following instruction.
+To calculate the sound levels, NoiseModelling (https://noise-planet.org/noisemodelling.html) and Java implementation are needed.
 
-The installer (`installer/hrisk-setup.exe` or `Install required components` algorithm in `Configurations` group) will help install required components.
+The installer (`installer/hrisk-setup.exe` or `Install required components` algorithm in this plugin) will help install required components.
 
 ### Using installer (Windows 10)
 
@@ -138,7 +141,7 @@ The receivers at buildings facade are used to estimate health risks posed by noi
 The receivers at delaunay grid points are used to create sound-level contours.
 The delaunay triangular polygons, which is one of the outputs of the procedure, are also needed for creating sound-level contour.
 
-### Calculate sound levels
+### Calculate the sound levels
 
 - Execute `Prediction from traffic` algorithm in `Predict sound level` group using following parameters. The sound levels are computed using algorithms implemented in `NoiseModelling`.
   - `ROAD`: (roads fetched in the previous procedure)
@@ -186,14 +189,14 @@ The delaunay triangular polygons, which is one of the outputs of the procedure, 
   - `LNIGHT`: Lnight_LAEQ_Maximum
   - `POP`: popEst
 
-## How to use
+## Implemented algorithms
 
-### Fetch the geometries
+### Fetch geometries
 
-The user can fetch the geometries of roads and buildings using algorithms in `Fetch geometries` group.
+The user can fetch geometries of roads and buildings using algorithms in `Fetch geometries` group.
 In Japan, precised data (including population) can be obtained using algorithms in `Fetch geometries (Ja)` group.
 
-The algorithms are:
+Implemented algorithms are:
 
 - `Fetch geometries` group
   - Road centerline (OSM) (`fetchosmroad.py`): fetch road geometries from OpenStreetMap. `QuickOSM` is needed.
@@ -209,13 +212,13 @@ The algorithms are:
 Note that `QuickOSM` plugin (https://docs.3liz.org/QuickOSM/) is needed to fetch geometries from OpenStreetMap.
 To fetch geometries from Shuttle Radar Topography Mission, user id and password of Earthdata Login (https://urs.earthdata.nasa.gov/users/new) is needed.
 
-### Set information on the sound sources
+### Set information on sound sources
 
-Before calculating sound levels, the user must set traffic volumes (light/medium/heavy vehicles during day/evening/night) or the sound power levels, as the fields of road layer.
-Required fields are already set in the layer fetched if the features are fetched using the algorithms in `Fetch geometries` group (previous procedure).
+Before calculating sound levels, user needs to set traffic volumes (light/medium/heavy vehicles during day/evening/night) or the sound power levels, as the fields of road layer.
+Required fields are already set in the layer fetched if the features are fetched using the algorithms above.
 Or, the user can manually set the fields using algorithms in `Initialize features` group.
 
-The algorithms in `Initialize features` group are:
+Algorithms in `Initialize features` group are:
 
 - Road with acoustic information (`initroad.py`): initialize linestrings as roads
 - Road emission calculated from traffic (`initroademissionfromtraffic.py`): calculate the emission level (sound power level) using the traffic volume
@@ -227,20 +230,20 @@ The algorithms in `Initialize features` group are:
 ### Set receiver points
 
 To set receiver points, algorithms in `Set receivers` group are available.
-The algorithms, employing `NoiseModelling` algorithms, set receiver points, such as at the facades of the buildings and at delaunay grid points.
+They execute `NoiseModelling` algorithms and set receiver points such as at building facades and at delaunay grid points.
 
 
-The algorithms in `Set receiver` group are:
+Algorithms in `Set receiver` group are:
 
 - At building facade (`receiverfacade.py`): create receivers at building facades
 - Delaunay grid (`receiverdelaunaygrid.py`): create receivers at delaunay grid points
 - Regular grid (`receiverregulargrid.py`): create receivers at regular grid points
 
-### Calculate the sound levels
+### Calculate sound levels
 
-The sound levels at receiver points can be calculate using algorithms stored in `Predict sound level` group, employing `NoiseModelling`.
+Sound levels at the receiver points can be calculate using algorithms in `Predict sound level` group, which employ `NoiseModelling`.
 
-The algorithms in `Predict sound level` group are:
+Algorithms in `Predict sound level` group are:
 
 - Prediction from traffic (`noisefromtraffic.py`): calculate the sound levels from traffic volume
 - Prediction from emission (`noisefromemission.py`): calculate the sound levels from the sound power level
@@ -249,7 +252,7 @@ The algorithms in `Predict sound level` group are:
 
 The user can assign the number of residents of each building and estimate health risks posed by the noise, using algorithms in `Evaluate health risk` group.
 
-The algorithms in `Evaluate health risk` group are:
+Algorithms in `Evaluate health risk` group are:
 
 - Estimate populations of buildings using Raster (`estimatepopulationofbuilding.py`): estimate the number of residents for each building using a raster representing the population
 - Estimate populations of buildings using Polygon (`estimatepopulationofbuildingplg.py`): estimate the number of residents for each building using polygons representing the population

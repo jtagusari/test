@@ -104,6 +104,7 @@ class isosurface(algabstract):
     spl_input = self.parameterAsSource(parameters, "LEVEL_RESULT", context).materialize(QgsFeatureRequest(), feedback)
     pk_field = self.parameterAsFields(parameters, "LEVEL_RID", context)[0]
     level_field = self.parameterAsFields(parameters, "LEVEL_LID", context)[0]
+    
     spl_ext = processing.run(
       "native:retainfields",
       {
@@ -113,28 +114,32 @@ class isosurface(algabstract):
       }
     )["OUTPUT"]
     
+    if self.parameterAsFields(parameters, "LEVEL_RID", context)[0] != "PK":
+      spl_pk = processing.run(
+        "native:renametablefield",
+        {
+          "INPUT": spl_ext,
+          "FIELD": self.parameterAsFields(parameters, "LEVEL_RID", context)[0],
+          "NEW_NAME": "PK",
+          "OUTPUT": "TEMPORARY_OUTPUT"
+        }
+      )["OUTPUT"]
+    else:
+      spl_pk = spl_ext
     
-    spl_pk = processing.run(
-      "native:renametablefield",
-      {
-        "INPUT": spl_ext,
-        "FIELD": self.parameterAsFields(parameters, "LEVEL_RID", context)[0],
-        "NEW_NAME": "PK",
-        "OUTPUT": "TEMPORARY_OUTPUT"
-      }
-    )["OUTPUT"]
-    
-    
-    spl_laeq = processing.run(
-      "native:renametablefield",
-      {
-        "INPUT": spl_pk,
-        "FIELD": self.parameterAsFields(parameters, "LEVEL_LID", context)[0],
-        "NEW_NAME": "LAEQ",
-        "OUTPUT": "TEMPORARY_OUTPUT"
-      }
-    )["OUTPUT"]
-    
+    if self.parameterAsFields(parameters, "LEVEL_LID", context)[0] != "LAEQ":
+      spl_laeq = processing.run(
+        "native:renametablefield",
+        {
+          "INPUT": spl_pk,
+          "FIELD": self.parameterAsFields(parameters, "LEVEL_LID", context)[0],
+          "NEW_NAME": "LAEQ",
+          "OUTPUT": "TEMPORARY_OUTPUT"
+        }
+      )["OUTPUT"]
+    else:
+      spl_laeq = spl_pk
+      
     self.saveVectorLayer(spl_laeq, self.NOISEMODELLING["LEVEL_RESULT"])
     
     self.initNoiseModellingArg(parameters, context, feedback)
