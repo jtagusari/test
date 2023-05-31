@@ -341,9 +341,11 @@ class fetchabstract(algabstract):
       self.FETCH_FEATURE = vec_layer
   
   
+  # modify features from the tile
   def modifyFeaturesFromTile(self, fts, z: int, tx: int, ty: int):
     return(fts)
     
+  # dissolve features
   def dissolveFeatures(self, fts: QgsVectorLayer) -> QgsVectorLayer:
       # Dissolve
       fts_dissolve = processing.run(

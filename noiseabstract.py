@@ -62,6 +62,8 @@ class noiseabstract(algabstract):
     )
     super().initNoiseModellingPath(paths)
     
+  # output a polygon (sink and output the `dest_id`) 
+  # that stores arguments of the calculation
   def outputWpsArgs(self, parameters:dict, context:QgsProcessingContext, extent_rec: QgsReferencedRectangle) -> str:  
     args_fields = QgsFields()
     for key, value in self.NOISEMODELLING["WPS_ARGS"].items():
@@ -84,6 +86,7 @@ class noiseabstract(algabstract):
     
     return dest_id
   
+  # create sound-level assigned buildings
   def cmptBuildingLevel(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback, bldg_layer: QgsVectorLayer, rcv_layer: QgsVectorLayer) -> None:
     
     for noise_idx, file_path in self.NOISEMODELLING["LEVEL_RESULTS"].items():          

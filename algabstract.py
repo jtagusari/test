@@ -34,6 +34,24 @@ class algabstract(QgsProcessingAlgorithm):
   
   PARAMETERS = {}
   
+  # add parameters using PARAMETERS attribute
+  def initParameters(self) -> None:    
+    for key, value in self.PARAMETERS.items():
+      try:
+        args = value.get("ui_args")
+        args["name"] = key
+        args["description"] = self.tr(args["description"])
+                
+        ui = value.get("ui_func")(**args)
+        
+        if value.get("advanced") != None and value.get("advanced") == True:
+          ui.setFlags(QgsProcessingParameterDefinition.FlagAdvanced)
+          
+        self.addParameter(ui)  
+      except:
+        pass
+  
+  # initialize NoiseModelling paths
   def initNoiseModellingPath(self, paths:dict) -> None:
     if paths.get("GROOVY_SCRIPT") is None:
       sys.exit(self.tr("Groovy script is not specified"))
@@ -53,7 +71,8 @@ class algabstract(QgsProcessingAlgorithm):
             paths[key][key2] = value2.replace("%nmtmp%", self.NOISEMODELLING["TEMP_DIR"])
       self.NOISEMODELLING.update(paths)
 
-    
+  
+  # initialize NoiseModelling arguments using UIs
   def initNoiseModellingArg(
     self, parameters:dict, context: QgsProcessingContext, feedback:QgsProcessingFeedback
     ) -> None:   
@@ -98,26 +117,10 @@ class algabstract(QgsProcessingAlgorithm):
             
           self.NOISEMODELLING["WPS_ARGS"][value.get("n_mdl")] = value_input
   
+  # add NoiseModelling arguments manually
   def addNoiseModellingArg(self, args:dict=None) -> None:
     if (isinstance(args, dict)):
       self.NOISEMODELLING["WPS_ARGS"].update(args)
-  
-  # add parameters using PARAMETERS attribute
-  def initParameters(self) -> None:    
-    for key, value in self.PARAMETERS.items():
-      try:
-        args = value.get("ui_args")
-        args["name"] = key
-        args["description"] = self.tr(args["description"])
-                
-        ui = value.get("ui_func")(**args)
-        
-        if value.get("advanced") != None and value.get("advanced") == True:
-          ui.setFlags(QgsProcessingParameterDefinition.FlagAdvanced)
-          
-        self.addParameter(ui)  
-      except:
-        pass
   
   # to save a vector layer
   def saveVectorLayer(self, vector_layer: QgsVectorLayer, path: str) -> None:
@@ -153,7 +156,8 @@ class algabstract(QgsProcessingAlgorithm):
     )
     loop.close()
     
-    
+  
+  # to stream the NoiseModelling script
   async def streamNoiseModellingCmd(self, cmd: str, feedback: QgsProcessingFeedback) -> None:
     proc = await asyncio.create_subprocess_shell(
       cmd,

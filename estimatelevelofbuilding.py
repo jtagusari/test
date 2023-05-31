@@ -131,7 +131,27 @@ class estimatelevelofbuilding(algabstract):
       if not level_value in level.fields().names():
         sys.exit(self.tr("The following attribute does not exist in the receiver layer:") + level_value)
     
+    overwrite = self.parameterAsBoolean(parameters, "OVERWRITE", context)
+    
     # first add level values to the receivers
+    
+    # remove if level_rid is already exists in the receiver layer
+    if level_rid in receiver.fields().names():
+      if overwrite:  
+        receiver = processing.run(
+          "native:deletecolumn",
+          {
+            "INPUT": receiver,
+            "COLUMN": level_rid,
+            "OUTPUT": "TEMPORARY_OUTPUT"
+          },
+          context = context,
+          feedback = feedback
+        )["OUTPUT"]
+      else:
+        sys.exit(self.tr("The field name of the receiver layer already exists: ") + level_rid)
+    
+    # ok, join the level values to the receiver layer
     receiver_joined = processing.run(
       "native:joinattributestable",
       {
@@ -170,7 +190,24 @@ class estimatelevelofbuilding(algabstract):
         )
         summarized_field.append(new_field)
       
+    # check if the summarized field names already exist in the receiver_joined layer
+    for field in summarized_field:
+      if field in receiver_joined.fields().names():
+        if overwrite:
+          receiver_joined = processing.run(
+            "native:deletecolumn",
+            {
+              "INPUT": receiver_joined,
+              "COLUMN": field,
+              "OUTPUT": "TEMPORARY_OUTPUT"
+            },
+            context = context,
+            feedback = feedback
+          )["OUTPUT"]
+        else:
+          sys.exit(self.tr("The field name of the receiver layer already exists: ") + field)
     
+    # ok, aggregate the values
     receiver_aggregate = processing.run(
       "native:aggregate",
       {
@@ -184,10 +221,29 @@ class estimatelevelofbuilding(algabstract):
     )["OUTPUT"]
     
     # finally the aggregated values are joined
+    
+    # first check if the summarized field names already exist in the bldg layer
+    for field in summarized_field:
+      if field in bldg.fields().names():
+        if overwrite:
+          bldg = processing.run(
+            "native:deletecolumn",
+            {
+              "INPUT": bldg,
+              "COLUMN": field,
+              "OUTPUT": "TEMPORARY_OUTPUT"
+            },
+            context = context,
+            feedback = feedback
+          )["OUTPUT"]
+        else:
+          sys.exit(self.tr("The field name of the building layer already exists: ") + field)
+    
+    # ok, join the aggregated values to the bldg layer
     building_joined = processing.run(
       "native:joinattributestable",
       {
-        "INPUT": bldg.materialize(QgsFeatureRequest(), feedback),
+        "INPUT": bldg,
         "FIELD": bldg_bid,
         "INPUT_2": receiver_aggregate,
         "FIELD_2": receiver_bid,

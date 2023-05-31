@@ -194,6 +194,32 @@ The delaunay triangular polygons, which is one of the outputs of the procedure, 
   - `LNIGHT`: Lnight_LAEQ_Maximum
   - `POP`: popEst
 
+### Complete / Check results
+
+Here are samples of the result to check the functionality of the plugin. 
+Note that the results were obtained on 2023/5/31 using NoiseModelling v4.0.2.
+The number of features may be changed because of the updates of the map database.
+
+- Fetch geometries
+  - The total number of road features: 303
+  - The total number of road features: 3850
+  - The total number of elevation points: 5589
+- Set receivers
+  - The total number of receivers at Delaunay grid: 11429
+  - The total number of Delaunay grid triangles: 17081
+  - The total number of receivers at building facades: 17432
+- Sound levels
+  - At Delaunay-grid receiver of which IDRECEIVER is 8924 located at (x,y,z) = (141.300083, 43.161465, 4), LAEQ of Lden is 67.55
+  - At building-facade receiver of which IDRECEIVER is 119 located at (x,y,z) = (141.299974, 43.161609, 4), LAEQ of Lden is 65.30 and LAEQ of Lnight is 56.41
+- Health risk
+  - On building of which PK is 40 located at (141.300, 43.162)
+    - Lden_LAEQ_Maximum is 65.43
+    - Lnight_LAEQ_Maximum is 56.54
+    - popEst is 0
+    - probHSD is 0.069
+    - relRiskIHD is 1.100
+
+
 ## Implemented algorithms
 
 ### Fetch geometries
@@ -276,15 +302,16 @@ Here are information about classes defined in the plugin:
     - `initParameters(self) -> None`: convert `PARAMETERS` attributes to UIs.
     - `initNoiseModellingPath(self, paths:dict) -> None`: set NoiseModelling paths.
     - `initNoiseModellingArg(self, parameters:dict, context: QgsProcessingContext, feedback:QgsProcessingFeedback) -> None`: initialize NoiseModelling arguments from UIs.
-    - `addNoiseModellingArg(self, args:dict) -> None`: add NoiseModelling arguments.
+    - `addNoiseModellingArg(self, args:dict) -> None`: add NoiseModelling arguments manually.
     - `saveVectorLayer(self, vector_layer: QgsVectorLayer, path: str) -> None)`: save a vector layer.
-    - `saveRasterLayer(self, raster_layer: QgsVectorLayer, path: str) -> None)`: save a raster layer.
+    - `saveRasterLayer(self, raster_layer: QgsRasterLayer, path: str) -> None)`: save a raster layer.
     - `execNoiseModellingCmd(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> None`: exec NoiseModelling.
-    - `streamNoiseModellingCmd(self, cmd: str, feedback: QgsProcessingFeedback) -> None`: stream NoiseModelling
+    - `streamNoiseModellingCmd(self, cmd: str, feedback: QgsProcessingFeedback) -> None`: stream NoiseModelling script
     - `importNoiseModellingResultsAsSink(self, parameters: dict, context: QgsProcessingContext, attribute: str, path: str) -> None`: import NoiseModelling results as a sink
 - `fetchabstract`: an abstract class inheriting `algabstract`, defining attributes and methods
   - attributes
     - `FETCH_AREA`: the fetch area (`QgsReferencedRectangle`)
+    - `FETCH_FEATURE`: the fetch features (`QgsReferencedRectangle`)
     - `TILEMAP_ARGS`: arguments for tile-map
     - `OSM_ARGS`: arguments for OpenStreetMap
     - `WEBFETCH_ARGS`: arguments for fetching geometries from web without tile-map or OpenStreetMap
@@ -304,13 +331,18 @@ Here are information about classes defined in the plugin:
     - `transformToTargetCrs(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback, fts: QgsVectorLayer) -> QgsVectorLayer`: transform features (to the `TARGET_CRS`)
 - `initabstract`: an abstract class inheriting `algabstract`, defining attributes and methods
   - attributes
-    - `FIELDS_ADD`: the fields to be initialized
+    - `FIELDS_ADD_COMMON`: the common fields to be added (e.g. PK)
+    - `FIELDS_ADD`: the fields to be added
     - `FIELDS_INIT`: the existing fields and `FIELDS_ADD`
     - `FIELDS_FROM`: whether each field existed or in `FIELDS_ADD`
   - methods
     - `setFields(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> None`: set `FIELDS_INIT` and `FIELDS_FROM`
     - `createVectorLayerAsSink(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> str`: create a sink using the fields and return `dest_id`
-- `noiseabstract`: an abstract class inheriting `algabstract`, defining attributes and methods
+- `receiverabstract`: an abstract class inheriting `algabstract`, defining methods for setting receivers
+  - methods
+    - `fenceExtentAsLayer(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> None`: save fence extent as a geometry file
+    - `fenceExtentAsWkt(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> None`: set an argument for wps script named fence, which is wkt polygon.
+- `noiseabstract`: an abstract class inheriting `algabstract`, defining attributes and methods for calculating sound levels
   - attributes
     - `BLDG_LEVEL_ARGS`: arguments to assign the sound level to each building
     - `ISOSURFACE_ARGS`: arguments to create isosurface

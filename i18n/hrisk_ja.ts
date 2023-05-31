@@ -68,14 +68,24 @@
         <translation>建物（壁面レベル）</translation>
     </message>
     <message>
-        <location filename="../estimatelevelofbuilding.py" line="219"/>
+        <location filename="../estimatelevelofbuilding.py" line="275"/>
         <source>Evaluate health risk</source>
         <translation>リスクの評価</translation>
     </message>
     <message>
-        <location filename="../estimatelevelofbuilding.py" line="216"/>
+        <location filename="../estimatelevelofbuilding.py" line="272"/>
         <source>Estimate level of buildings</source>
         <translation>建物壁面レベルの推定</translation>
+    </message>
+    <message>
+        <location filename="../estimatelevelofbuilding.py" line="208"/>
+        <source>The field name of the receiver layer already exists: </source>
+        <translation>受音点レイヤに既に次のフィールドが使われています：</translation>
+    </message>
+    <message>
+        <location filename="../estimatelevelofbuilding.py" line="240"/>
+        <source>The field name of the building layer already exists: </source>
+        <translation>建物レイヤに既に次のフィールドが使われています：</translation>
     </message>
 </context>
 <context>
@@ -895,17 +905,17 @@
         <translation>騒音レベルコンターの値（例 35.0,40.0）</translation>
     </message>
     <message>
-        <location filename="../noisefromtraffic.py" line="221"/>
+        <location filename="../isosurface.py" line="74"/>
         <source>Smoothing parameter (Bezier curve coefficient)</source>
         <translation>平滑化パラメータ（ベジェ曲線係数）</translation>
     </message>
     <message>
-        <location filename="../isosurface.py" line="162"/>
+        <location filename="../isosurface.py" line="167"/>
         <source>Isosurface</source>
         <translation>騒音レベルコンターの作成</translation>
     </message>
     <message>
-        <location filename="../isosurface.py" line="165"/>
+        <location filename="../isosurface.py" line="170"/>
         <source>Predict sound level</source>
         <translation>騒音予測</translation>
     </message>
@@ -1005,70 +1015,70 @@
     <message>
         <location filename="../noisefromemission.py" line="197"/>
         <source>Make isosurface (only for delaunay receivers and triangle layer is necessary)</source>
-        <translation>騒音レベルコンターの作成（ドロネー分割受音点の場合のみ）</translation>
+        <translation type="obsolete">騒音レベルコンターの作成（ドロネー分割受音点の場合のみ）</translation>
     </message>
     <message>
         <location filename="../noisefromemission.py" line="204"/>
         <source>Triangle layer</source>
-        <translation>三角分割ポリゴン</translation>
+        <translation type="obsolete">三角分割ポリゴン</translation>
     </message>
     <message>
         <location filename="../noisefromemission.py" line="213"/>
         <source>Separation of sound levels for isosurfaces (e.g. 35.0,40.0)</source>
-        <translation>騒音レベルコンターの値（例 35.0,40.0）</translation>
+        <translation type="obsolete">騒音レベルコンターの値（例 35.0,40.0）</translation>
     </message>
     <message>
-        <location filename="../noisefromemission.py" line="237"/>
+        <location filename="../noisefromemission.py" line="203"/>
         <source>Lden</source>
         <translation>Lden</translation>
     </message>
     <message>
-        <location filename="../noisefromemission.py" line="244"/>
+        <location filename="../noisefromemission.py" line="210"/>
         <source>Lnight</source>
         <translation>Lnight</translation>
     </message>
     <message>
-        <location filename="../noisefromemission.py" line="251"/>
+        <location filename="../noisefromemission.py" line="217"/>
         <source>Lday</source>
         <translation>Lday</translation>
     </message>
     <message>
-        <location filename="../noisefromemission.py" line="258"/>
+        <location filename="../noisefromemission.py" line="224"/>
         <source>Levening</source>
         <translation>Levening</translation>
     </message>
     <message>
-        <location filename="../noisefromemission.py" line="265"/>
+        <location filename="../noisefromemission.py" line="231"/>
         <source>Building with facade level</source>
         <translation>建物（壁面騒音レベル）</translation>
     </message>
     <message>
-        <location filename="../noisefromemission.py" line="330"/>
+        <location filename="../noisefromemission.py" line="286"/>
         <source>Prediction from emission</source>
         <translation>音響出力に基づく予測</translation>
     </message>
     <message>
-        <location filename="../noisefromemission.py" line="333"/>
+        <location filename="../noisefromemission.py" line="289"/>
         <source>Predict sound level</source>
         <translation>騒音予測</translation>
     </message>
     <message>
-        <location filename="../noisefromemission.py" line="230"/>
+        <location filename="../noisefromemission.py" line="196"/>
         <source>Arguments used for the calculation</source>
         <translation>計算に用いたパラメータ</translation>
     </message>
     <message>
-        <location filename="../noisefromtraffic.py" line="151"/>
+        <location filename="../noisefromemission.py" line="152"/>
         <source>Probability of occurrence of favorable condition (day)</source>
         <translation>Favorable環境の発生率（昼間）</translation>
     </message>
     <message>
-        <location filename="../noisefromtraffic.py" line="160"/>
+        <location filename="../noisefromemission.py" line="161"/>
         <source>Probability of occurrence of favorable condition (evening)</source>
         <translation>Favorable環境の発生率（夕方）</translation>
     </message>
     <message>
-        <location filename="../noisefromtraffic.py" line="169"/>
+        <location filename="../noisefromemission.py" line="170"/>
         <source>Probability of occurrence of favorable condition (night)</source>
         <translation>Favorable環境の発生率（夜間）</translation>
     </message>
@@ -1146,42 +1156,42 @@
         <translation>計算スレッド数 (0: 全て)</translation>
     </message>
     <message>
-        <location filename="../noisefromtraffic.py" line="330"/>
+        <location filename="../noisefromtraffic.py" line="287"/>
         <source>Prediction from traffic</source>
         <translation>交通量に基づく予測</translation>
     </message>
     <message>
-        <location filename="../noisefromtraffic.py" line="333"/>
+        <location filename="../noisefromtraffic.py" line="290"/>
         <source>Predict sound level</source>
         <translation>騒音予測</translation>
     </message>
     <message>
-        <location filename="../noisefromtraffic.py" line="229"/>
+        <location filename="../noisefromtraffic.py" line="195"/>
         <source>Arguments for the calculation</source>
         <translation>計算パラメータ</translation>
     </message>
     <message>
-        <location filename="../noisefromtraffic.py" line="236"/>
+        <location filename="../noisefromtraffic.py" line="202"/>
         <source>Lden</source>
         <translation>Lden</translation>
     </message>
     <message>
-        <location filename="../noisefromtraffic.py" line="243"/>
+        <location filename="../noisefromtraffic.py" line="209"/>
         <source>Lnight</source>
         <translation>Lnight</translation>
     </message>
     <message>
-        <location filename="../noisefromtraffic.py" line="250"/>
+        <location filename="../noisefromtraffic.py" line="216"/>
         <source>Lday</source>
         <translation>Lday</translation>
     </message>
     <message>
-        <location filename="../noisefromtraffic.py" line="257"/>
+        <location filename="../noisefromtraffic.py" line="223"/>
         <source>Levening</source>
         <translation>Levening</translation>
     </message>
     <message>
-        <location filename="../noisefromtraffic.py" line="264"/>
+        <location filename="../noisefromtraffic.py" line="230"/>
         <source>Building with facade level</source>
         <translation>建物（壁面騒音レベル）</translation>
     </message>
@@ -1193,17 +1203,32 @@
     <message>
         <location filename="../noisefromtraffic.py" line="196"/>
         <source>Make isosurface (only for delaunay receivers and triangle layer is necessary)</source>
-        <translation>騒音レベルコンターの作成（ドロネー分割受音点の場合のみ）</translation>
+        <translation type="obsolete">騒音レベルコンターの作成（ドロネー分割受音点の場合のみ）</translation>
     </message>
     <message>
         <location filename="../noisefromtraffic.py" line="203"/>
         <source>Triangle layer</source>
-        <translation>三角分割ポリゴン</translation>
+        <translation type="obsolete">三角分割ポリゴン</translation>
     </message>
     <message>
         <location filename="../noisefromtraffic.py" line="212"/>
         <source>Separation of sound levels for isosurfaces (e.g. 35.0,40.0)</source>
-        <translation>騒音レベルコンターの値（例 35.0,40.0）</translation>
+        <translation type="obsolete">騒音レベルコンターの値（例 35.0,40.0）</translation>
+    </message>
+    <message>
+        <location filename="../noisefromtraffic.py" line="151"/>
+        <source>Probability of occurrence of favorable condition (day)</source>
+        <translation>Favorable環境の発生率（昼間）</translation>
+    </message>
+    <message>
+        <location filename="../noisefromtraffic.py" line="160"/>
+        <source>Probability of occurrence of favorable condition (evening)</source>
+        <translation>Favorable環境の発生率（夕方）</translation>
+    </message>
+    <message>
+        <location filename="../noisefromtraffic.py" line="169"/>
+        <source>Probability of occurrence of favorable condition (night)</source>
+        <translation>Favorable環境の発生率（夜間）</translation>
     </message>
 </context>
 <context>
@@ -1257,6 +1282,11 @@
         <location filename="../receiverdelaunaygrid.py" line="122"/>
         <source>Delaunay grid</source>
         <translation>ドロネー三角形分割</translation>
+    </message>
+    <message>
+        <location filename="../receiverdelaunaygrid.py" line="38"/>
+        <source>Calculation extent</source>
+        <translation>計算範囲</translation>
     </message>
 </context>
 <context>

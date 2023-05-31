@@ -96,7 +96,7 @@ class fetchosmbuilding(fetchabstract):
       bldg_final = processing.run(
         "hrisk:initbuilding",{
           "INPUT": bldg_dissolve,
-          "OVERWRITE_MODE": 0,
+          "OVERWRITE": True,
           "OUTPUT": "TEMPORARY_OUTPUT"
         }
       )["OUTPUT"]

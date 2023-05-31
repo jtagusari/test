@@ -35,7 +35,7 @@ class receiverdelaunaygrid(receiverabstract):
     "FENCE_EXTENT": {
       "ui_func": QgsProcessingParameterExtent,
       "ui_args":{
-        "description": QT_TRANSLATE_NOOP("receiverfacade","Calculation extent"),
+        "description": QT_TRANSLATE_NOOP("receiverdelaunaygrid","Calculation extent"),
         "defaultValue": None,
         "optional": True,
       }

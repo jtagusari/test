@@ -97,7 +97,7 @@ class fetchosmroad(fetchabstract):
       road_final = processing.run(
         "hrisk:initroad",{
           "INPUT": road_dissolve,
-          "OVERWRITE_MODE": 0,
+          "OVERWRITE": True,
           "OUTPUT": "TEMPORARY_OUTPUT"
         }
       )["OUTPUT"]

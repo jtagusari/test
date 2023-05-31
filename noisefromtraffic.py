@@ -149,7 +149,7 @@ class noisefromtraffic(noiseabstract):
       "advanced": True,
       "ui_func": QgsProcessingParameterString,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromemission","Probability of occurrence of favorable condition (day)"),
+        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Probability of occurrence of favorable condition (day)"),
         "defaultValue": "0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5"
       },
       "n_mdl": "confFavorableOccurrencesDay"
@@ -158,7 +158,7 @@ class noisefromtraffic(noiseabstract):
       "advanced": True,
       "ui_func": QgsProcessingParameterString,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromemission","Probability of occurrence of favorable condition (evening)"),
+        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Probability of occurrence of favorable condition (evening)"),
         "defaultValue": "0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5"
       },
       "n_mdl": "confFavorableOccurrencesEvening"
@@ -167,7 +167,7 @@ class noisefromtraffic(noiseabstract):
       "advanced": True,
       "ui_func": QgsProcessingParameterString,
       "ui_args": {
-        "description": QT_TRANSLATE_NOOP("noisefromemission","Probability of occurrence of favorable condition (night)"),
+        "description": QT_TRANSLATE_NOOP("noisefromtraffic","Probability of occurrence of favorable condition (night)"),
         "defaultValue": "0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5"
       },
       "n_mdl": "confFavorableOccurrencesNight"
